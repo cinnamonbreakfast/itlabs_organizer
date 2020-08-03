@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group = 'com.core'
+group = 'com.organizer.core'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
