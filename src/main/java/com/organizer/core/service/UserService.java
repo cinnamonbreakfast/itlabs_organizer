@@ -17,4 +17,16 @@ public class UserService {
     public User findByPhone(String phone) {
         return userRepository.findByPhone(phone);
     }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User emailAuth(String email, String password) {
+        return userRepository.findByEmailAndPassword(email, password);
+    }
+
+    public User signUpEmailAndPassword(User user) {
+        return userRepository.save(user);
+    }
 }
