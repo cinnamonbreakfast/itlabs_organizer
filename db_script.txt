@@ -1,0 +1,109 @@
+
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS TimeTable;
+DROP TABLE IF EXISTS Specialist;
+DROP TABLE IF EXISTS Company;
+DROP TABLE IF EXISTS SpecialistService;
+DROP TABLE IF EXISTS Availability;
+DROP TABLE IF EXISTS Service;
+DROP TABLE IF EXISTS Schedule;
+
+CREATE TABLE Users( -- user is taken by postgres
+	id INT GENERATED ALWAYS AS IDENTITY,
+	firstName VARCHAR(255),
+	lastName VARCHAR(255),
+	email VARCHAR(255) UNIQUE,
+	password VARCHAR(255),
+	phone VARCHAR(255) UNIQUE,
+	imageURL VARCHAR(255),
+	role VARCHAR(255),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE Company(
+	id INT GENERATED ALWAYS AS IDENTITY,
+	city VARCHAR(255),
+	name varchar(255) UNIQUE,
+	category varchar(255),
+	adress varchar(255),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE Specialist(
+	id INT GENERATED ALWAYS AS IDENTITY,
+	companyId INT,
+	userId INT,
+	name varchar(255) UNIQUE,
+	phone varchar(255) UNIQUE,
+	PRIMARY KEY(id),
+	CONSTRAINT fk_company
+		FOREIGN KEY(companyId)
+			REFERENCES Company(id),
+	CONSTRAINT fk_user
+		FOREIGN KEY(userId)
+			REFERENCES Users(id)
+);
+
+CREATE TABLE Service(
+	id INT GENERATED ALWAYS AS IDENTITY,
+	companyId INT,
+	serviceName varchar(255),
+	PRIMARY KEY(id),
+	CONSTRAINT fk_company
+		FOREIGN KEY(companyId)
+			REFERENCES Company(id)
+);
+
+
+CREATE TABLE TimeTable(
+	id INT GENERATED ALWAYS AS IDENTITY,
+	specialistId INT,
+	day DATE,				--kinda pointless
+	startTime DATE,
+	endTime DATE,	
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE Availability(
+	id INT GENERATED ALWAYS AS IDENTITY,
+	specialistId INT,
+	startTime DATE,
+	endTime DATE,
+	PRIMARY KEY(id),
+	CONSTRAINT fk_specialist
+		FOREIGN KEY(specialistId)
+			REFERENCES Specialist(id)
+);
+
+CREATE TABLE SpecialistService(
+	id INT GENERATED ALWAYS AS IDENTITY,
+	specialistId INT,
+	serviceId INT,
+	duration real , 
+	PRIMARY KEY(id),
+	CONSTRAINT fk_specialist
+		FOREIGN KEY(specialistId)
+			REFERENCES Specialist(id),
+	CONSTRAINT fk_service
+		FOREIGN KEY(serviceId)
+			REFERENCES Service(id)
+);
+
+CREATE TABLE Schedule(
+	id INT GENERATED ALWAYS AS IDENTITY,
+	userId INT,
+	specialistId INT,
+	serviceId INT,
+	starDate DATE,
+	endDate DATE,
+	PRIMARY KEY(id),
+	CONSTRAINT fk_user
+		FOREIGN KEY(userId)
+			REFERENCES Users(id),
+	CONSTRAINT fk_specialist
+		FOREIGN KEY(specialistId)
+			REFERENCES Specialist(id),
+	CONSTRAINT fk_service
+		FOREIGN KEY(serviceId)
+			REFERENCES Service(id)
+);
