@@ -57,7 +57,7 @@ public class UserController {
 
             // headers set
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add("TOKEN", oauthPair.getUsername());
+            responseHeaders.add("TOKEN", oauthPair.getToken());
             responseHeaders.add("AUTH_TIME", oauthPair.getLoginTime().toString());
 
             // DTO set

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class AuthSession {
-    String username;
+    String token;
     LocalDateTime loginTime;
 
 }

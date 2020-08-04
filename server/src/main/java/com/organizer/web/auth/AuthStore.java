@@ -25,7 +25,7 @@ public class AuthStore {
 
 
         AuthSession localSession = AuthSession.builder()
-                .username(username)
+                .token(username)
                 .loginTime(loginTime)
                 .build();
 
@@ -42,7 +42,7 @@ public class AuthStore {
     }
 
     public String getUsername(String token) {
-        return sessions.get(token).getUsername();
+        return sessions.get(token).getToken();
     }
 
     public boolean sessionExists(String token) {
