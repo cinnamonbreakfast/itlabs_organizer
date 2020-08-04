@@ -27,19 +27,17 @@ public class UserController {
     @RequestMapping(value = "u/auth", method = RequestMethod.POST)
     public ResponseEntity<UserDTO> authenticate(@RequestBody(required = true) String email, @RequestBody(required = true) String password) {
         User authUser = userService.emailAuth(email, password);
-        ResponseEntity<UserDTO> response;
 
         if(authUser != null) {
             // create a token and return it
             Pair<String, LocalDateTime> oauthPair = authStore.createToken(authUser.getId().toString());
 
-            response = new ResponseEntity<>(new UserDTO(), HttpStatus.UNAUTHORIZED);
-//            response.getHeaders().add("TOKEN", oauthPair.getKey());
-//            response.getHeaders().add("AUTH_TIME", oauthPair.getValue().toString());
+            // headers set
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.add("TOKEN", oauthPair.getKey());
             responseHeaders.add("AUTH_TIME", oauthPair.getValue().toString());
 
+            // DTO set
             UserDTO authResponseUser = UserDTO.builder()
                     .email(authUser.getEmail())
                     .name(authUser.getName())
@@ -54,14 +52,12 @@ public class UserController {
                     .body(authResponseUser);
         }
 
-        // bad credentials, unauthorized request + message
-        response = new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        response.getHeaders().add("MESSAGE", "Wrong E-mail address or password.");
-        return response;
+        // bad credentials
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
     }
 
     @RequestMapping(value = "u/signup", method = RequestMethod.POST)
-    public ResponseEntity<String> signUp(@RequestBody(required = true) String email, @RequestBody(required = true) String password) {
+    public ResponseEntity<String> signUp(@RequestParam(required = true) String email, @RequestParam(required = true) String password) {
         User existingUser = userService.findByEmail(email);
 
         if(existingUser == null) {
@@ -71,13 +67,16 @@ public class UserController {
                     .password(password)
                     .build();
 
+            // attempt to create user
             if(userService.signUpEmailAndPassword(user) != null) {
-                return new ResponseEntity<>("Registration complete. You can sign in now.", HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).body("Registration complete. You can sign in now.");
             }
 
-            return new ResponseEntity<>("There was a problem with your registration. Try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
+            // non traced error
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("There was a problem with your registration. Try again later.");
         }
 
-        return new ResponseEntity<>("This E-mail address is already used.", HttpStatus.FORBIDDEN);
+        // user already exists
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("This E-mail address is already used.");
     }
 }
