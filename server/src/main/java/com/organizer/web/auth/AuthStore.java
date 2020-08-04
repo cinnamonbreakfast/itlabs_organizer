@@ -1,5 +1,6 @@
 package com.organizer.web.auth;
 
+import com.organizer.web.utils.AuthSession;
 import javafx.util.Pair;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
@@ -11,20 +12,27 @@ import java.util.Map;
 
 @Component
 public class AuthStore {
-    Map<String, Pair<String, LocalDateTime>> sessions;
+    Map<String, AuthSession> sessions;
     private final Integer EXPIRATION_TIME = 1; // days
 
     public AuthStore() {
         this.sessions = new HashMap<>();
     }
 
-    public Pair<String, LocalDateTime> createToken(String username) {
+    public AuthSession createToken(String username) {
         String token = RandomStringUtils.randomAlphabetic(20);
         LocalDateTime loginTime = LocalDateTime.now();
 
-        sessions.put(token, new Pair<>(username, loginTime));
 
-        return new Pair<String, LocalDateTime>(token, loginTime);
+        AuthSession localSession = AuthSession.builder()
+                .username(username)
+                .loginTime(loginTime)
+                .build();
+
+
+        sessions.put(token, localSession);
+
+        return localSession;
     }
 
     public boolean pop(String token)
@@ -34,7 +42,7 @@ public class AuthStore {
     }
 
     public String getUsername(String token) {
-        return sessions.get(token).getKey();
+        return sessions.get(token).getUsername();
     }
 
     public boolean sessionExists(String token) {
@@ -42,7 +50,7 @@ public class AuthStore {
 
         if(sessions.containsKey(token))
         {
-            if(sessions.get(token).getValue().until(actualTime, ChronoUnit.DAYS) > EXPIRATION_TIME)
+            if(sessions.get(token).getLoginTime().until(actualTime, ChronoUnit.DAYS) > EXPIRATION_TIME)
             {
                 sessions.remove(token);
                 return false;
