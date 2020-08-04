@@ -24,8 +24,30 @@ public class UserController {
         this.authStore = authStore;
     }
 
+    @RequestMapping(value = "/u/search/{email}", method = RequestMethod.GET)
+    public ResponseEntity<UserDTO> findByEmail(@PathVariable(required = true) String email) {
+        User find = userService.findByEmail(email);
+
+        if(find != null) {
+            UserDTO user = UserDTO.builder()
+                    .name(find.getName())
+                    .email(find.getEmail())
+                    .imageURL(find.getImageURL())
+                    .phone(find.getPhone())
+                    .role(find.getRole())
+                    .country(find.getCountry())
+                    .city(find.getCity())
+                    .build();
+            user.setId(find.getId());
+
+            return ResponseEntity.ok(user);
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
     @RequestMapping(value = "u/auth", method = RequestMethod.POST)
-    public ResponseEntity<UserDTO> authenticate(@RequestBody(required = true) String email, @RequestBody(required = true) String password) {
+    public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String email, @RequestParam(required = true) String password) {
         User authUser = userService.emailAuth(email, password);
 
         if(authUser != null) {

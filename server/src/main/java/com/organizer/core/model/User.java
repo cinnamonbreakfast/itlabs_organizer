@@ -36,7 +36,7 @@ public class User extends Entity<Long> {
     private Integer role;
 
     @Basic
-    @Column
+    @Column(name = "image_url")
     private String imageURL;
 
     @Basic(optional = false)
@@ -50,5 +50,14 @@ public class User extends Entity<Long> {
     @Basic
     @Column
     private String country;
+
+    @Basic
+    @Column
+    private Integer verifiedPhone;
+
+    @Basic
+    @Column
+    private Integer verifiedEmail;
+
 
 }
