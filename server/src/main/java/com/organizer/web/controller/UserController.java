@@ -4,6 +4,7 @@ import com.organizer.core.model.User;
 import com.organizer.core.service.UserService;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.dto.UserDTO;
+import com.organizer.web.utils.AuthSession;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -30,12 +31,12 @@ public class UserController {
 
         if(authUser != null) {
             // create a token and return it
-            Pair<String, LocalDateTime> oauthPair = authStore.createToken(authUser.getId().toString());
+            AuthSession oauthPair = authStore.createToken(authUser.getId().toString());
 
             // headers set
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add("TOKEN", oauthPair.getKey());
-            responseHeaders.add("AUTH_TIME", oauthPair.getValue().toString());
+            responseHeaders.add("TOKEN", oauthPair.getUsername());
+            responseHeaders.add("AUTH_TIME", oauthPair.getLoginTime().toString());
 
             // DTO set
             UserDTO authResponseUser = UserDTO.builder()
