@@ -15,7 +15,7 @@ CREATE TABLE Users( -- user is taken by postgres
 	password VARCHAR(255),
 	phone VARCHAR(255) UNIQUE,
 	image_url VARCHAR(255),
-	role VARCHAR(255),
+	role INT,
 	verified_email INT  DEFAULT 0,
 	verified_phone INT DEFAULT 0,
 	city VARCHAR(255),
