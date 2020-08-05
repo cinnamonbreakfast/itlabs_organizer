@@ -32,7 +32,7 @@ public class CompanyService {
 
 
     public List<Company> findByCity(String city){
-        return companyRepository.findByCity(city)
+        return companyRepository.findByCity(city);
     }
 
     public Company findByName(String name){
