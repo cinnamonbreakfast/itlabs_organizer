@@ -1,0 +1,41 @@
+package com.organizer.core.service;
+
+
+import com.organizer.core.model.Company;
+import com.organizer.core.repository.CompanyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CompanyService {
+    CompanyRepository companyRepository;
+
+    @Autowired
+    public CompanyService(CompanyRepository repository)
+    {
+        this.companyRepository = repository;
+    }
+
+
+    public List<Company> findByCityAndCategory(String city, String category){
+        return companyRepository.findByCityAndCategory(city, category);
+
+
+    }
+
+
+    public Company addNewCompany(Company company){
+        return companyRepository.save(company);
+    }
+
+
+    public List<Company> findByCity(String city){
+        return companyRepository.findByCity(city);
+    }
+
+    public Company findByName(String name){
+        return companyRepository.findByName(name);
+    }
+}
