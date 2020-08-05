@@ -7,7 +7,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="users", schema="production")
+@Table(name="users", schema="public")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
