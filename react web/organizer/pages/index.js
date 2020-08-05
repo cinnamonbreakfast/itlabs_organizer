@@ -1,65 +1,41 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React, { useState } from 'react'
+import styles from '../styles/pages/home.module.scss'
 
 export default function Home() {
+  const [autoSuggestion, toggleSuggestions] = useState(false);
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <div className={styles.homeWrapper}>
+      <div className={styles.header}>
+        <h1>Welcome to PlanIt</h1>
+        <p>Search your desired service and book a place. No more queues!</p>
+      </div>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+      <div className={styles.searchForm}>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <div className={styles.formGroup}>
+            <input type="text" name="service" placeholder="Name or service"/>
+          </div>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+          <div className={styles.formGroup}>
+            <input type="text" name="city" placeholder="City" autoComplete="off" onBlur={() => toggleSuggestions(false)} onFocus={() => toggleSuggestions(true) }/>
+            {
+              autoSuggestion && 
+              <div className={styles.autoSuggest}>
+                <ul>
+                  <li>Cluj-Napoca, RO</li>
+                </ul>
+              </div>
+            }
+          </div>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+          <div className={styles.formGroup}>
+            <input type="submit" name="submit" value="Search"/>
+          </div>
+        </form>
+      </div>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+      <div className={styles.footer}>&copy; 2020 PlanIt</div>
     </div>
   )
 }

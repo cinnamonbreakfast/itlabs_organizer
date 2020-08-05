@@ -1,0 +1,39 @@
+.top_nav {
+    background-color: #FFFFFF;
+    width: 100%;
+    height: 55px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 20px;
+
+    .element {
+
+    }
+    
+    .right {
+        .links {
+            padding: 7px 0px;
+
+            ul {
+                display: flex;
+                flex-direction: row;
+                list-style-type: none;
+                padding: 0px;
+                margin: 0px;
+
+                li {
+                    margin-right: 15px;
+
+                    &:last-child {
+                        margin-right: 0px;
+                    }
+                }
+            }
+        }
+    }
+
+    .logo {
+
+    }
+}
