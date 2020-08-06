@@ -11,7 +11,7 @@ public interface CompanyRepository extends Repository<Long, Company> {
     Company findByName(String name);
 
     List<Company> findByCity(String city);
-    Page findAll(Example e, Pageable page);
+    Page<Company> findAll(Example e, Pageable page);
 
 
 }
