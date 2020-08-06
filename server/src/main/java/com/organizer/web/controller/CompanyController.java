@@ -6,10 +6,10 @@ import com.organizer.web.dto.CompanyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class CompanyController {
@@ -42,29 +42,6 @@ public class CompanyController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("This name of the company is already used.");
     }
 
-
-
-    @RequestMapping(value = "c/find",method = RequestMethod.GET)
-    public ResponseEntity<List<CompanyDTO>> getFirstFiveBestResults(@RequestParam(name = "city") String city,@RequestParam(name = "country") String country){
-        if(city.equals(""))
-            city = null;
-
-        if(country.equals(""))
-            country = null;
-
-        List<Company> companies = companyService.findByCountryAndCity(country,city,0);
-
-        List<CompanyDTO> companyDTOList = companies.stream()
-                .map(x->CompanyDTO.builder()
-                        .city(x.getCity())
-                        .country(x.getCountry())
-                        .name(x.getName())
-                        .build())
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(companyDTOList);
-
-    }
-
-
+    //todo: getAllByCity
+    //todo: getAllByCityAndCategory
 }

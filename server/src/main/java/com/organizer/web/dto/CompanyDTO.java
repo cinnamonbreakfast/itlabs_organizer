@@ -14,5 +14,4 @@ public class CompanyDTO extends BaseDTO {
         private String city;
         private String address;
         private String category;
-        private String country;
 }
