@@ -3,7 +3,6 @@ package com.organizer.web.controller;
 import com.organizer.core.model.Specialist;
 import com.organizer.core.service.SpecialistService;
 import com.organizer.web.dto.SpecialistDTO;
-import com.organizer.web.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,20 +21,23 @@ public class SpecialistController {
     public SpecialistController(SpecialistService specialistService){
         this.specialistService = specialistService;
     }
+
     @RequestMapping(value = "/s/search/by/phone/{phone}", method = RequestMethod.GET)
-    public ResponseEntity<SpecialistDTO> findOne(@PathVariable(required= true)String phone){
+    public ResponseEntity<SpecialistDTO> findSpecialistByPhone(@PathVariable(required= true)String phone){
         //todo::validate token
         Specialist specialist = specialistService.findByPhone(phone);
         if(specialist!=null){
-            SpecialistDTO specialistDTO = SpecialistDTO.builder()
+            SpecialistDTO specialistDTO =  SpecialistDTO.builder()
                     .name(specialist.getName())
-                    .phone(specialist.getPhone());
+                    .phone(specialist.getPhone())
+                    .build();
+
             return ResponseEntity.ok(specialistDTO);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
     @RequestMapping(value = "/s/search/by/company/{company_id}", method = RequestMethod.GET)
-    public ResponseEntity<List<SpecialistDTO>> findOne(@PathVariable(required= true)String company_id){
+    public ResponseEntity<List<SpecialistDTO>> findSpecialistsbyCompany(@PathVariable(required= true)String company_id){
         //todo::validate token
         List<Specialist> specialists = specialistService.findByCompany(company_id);
 
@@ -44,7 +46,8 @@ public class SpecialistController {
             for(Specialist specialist : specialists) {
                 SpecialistDTO specialistDTO = SpecialistDTO.builder()
                         .name(specialist.getName())
-                        .phone(specialist.getPhone());
+                        .phone(specialist.getPhone())
+                        .build();
                 specialistDTOS.add(specialistDTO);
             }
             return ResponseEntity.ok(specialistDTOS);
