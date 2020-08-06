@@ -5,7 +5,6 @@ import com.organizer.core.service.UserService;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.dto.UserDTO;
 import com.organizer.web.utils.AuthSession;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

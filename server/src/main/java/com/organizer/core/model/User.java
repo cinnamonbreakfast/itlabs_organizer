@@ -7,7 +7,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="users", schema="public")
+@Table(name="users", schema="production")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -52,12 +52,10 @@ public class User extends Entity<Long> {
     private String country;
 
     @Basic
-    @Column
+    @Column(name = "verified_phone")
     private Integer verifiedPhone;
 
     @Basic
-    @Column
+    @Column(name = "verified_email")
     private Integer verifiedEmail;
-
-
 }

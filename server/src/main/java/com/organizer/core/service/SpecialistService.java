@@ -1,0 +1,29 @@
+package com.organizer.core.service;
+
+import com.organizer.core.model.Specialist;
+import com.organizer.core.repository.SpecialistRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class SpecialistService {
+    SpecialistRepository specialistRepository;
+
+    @Autowired
+    public SpecialistService(SpecialistRepository specialistRepository){
+        this.specialistRepository=specialistRepository;
+    }
+
+    public Specialist findByPhone(String phone){
+        return specialistRepository.findByPhone(phone);
+    }
+    public List<Specialist> findByCompany(String company_id){
+        return specialistRepository.findByCompany(company_id);
+    }
+    public Specialist signSpecialist(Specialist specialist)
+    {
+        return specialistRepository.save(specialist);
+    }
+}
