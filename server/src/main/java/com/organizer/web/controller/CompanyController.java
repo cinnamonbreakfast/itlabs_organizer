@@ -52,16 +52,12 @@ public class CompanyController {
 
 
     @RequestMapping(value = "c/find",method = RequestMethod.GET)
-    public ResponseEntity<List<CompanyDTO>> getFirstFiveBestResults(@RequestParam(required = true) String city,@RequestParam(required = true) String country,@RequestHeader(value = "SESSION") String token){
+    public ResponseEntity<List<CompanyDTO>> getFirstFiveBestResults(@RequestParam(required = false) String city,@RequestParam(false = true) String country,@RequestHeader(value = "SESSION") String token){
         if(!authStore.sessionExists(token))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LinkedList<>());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 
 
-        if(city.equals(""))
-            city = null;
 
-        if(country.equals(""))
-            country = null;
 
         List<Company> companies = companyService.findByCountryAndCity(country,city,0);
 
