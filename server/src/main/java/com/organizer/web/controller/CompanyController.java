@@ -2,23 +2,28 @@ package com.organizer.web.controller;
 
 import com.organizer.core.model.Company;
 import com.organizer.core.service.CompanyService;
+import com.organizer.web.auth.AuthStore;
 import com.organizer.web.dto.CompanyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 public class CompanyController {
 
+
     private final CompanyService companyService;
+    private final AuthStore authStore;
 
     @Autowired
-    public CompanyController(CompanyService companyService) {
+    public CompanyController(CompanyService companyService, AuthStore authStore) {
         this.companyService = companyService;
+        this.authStore = authStore;
     }
 
     @RequestMapping(value = "c/create",method = RequestMethod.POST)
@@ -44,8 +49,14 @@ public class CompanyController {
 
 
 
+
+
     @RequestMapping(value = "c/find",method = RequestMethod.GET)
-    public ResponseEntity<List<CompanyDTO>> getFirstFiveBestResults(@RequestParam(name = "city") String city,@RequestParam(name = "country") String country){
+    public ResponseEntity<List<CompanyDTO>> getFirstFiveBestResults(@RequestParam(required = true) String city,@RequestParam(required = true) String country,@RequestHeader(value = "SESSION") String token){
+        if(!authStore.sessionExists(token))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LinkedList<>());
+
+
         if(city.equals(""))
             city = null;
 
