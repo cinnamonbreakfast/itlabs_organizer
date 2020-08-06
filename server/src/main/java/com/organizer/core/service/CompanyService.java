@@ -19,14 +19,6 @@ public class CompanyService {
         this.companyRepository = repository;
     }
 
-
-    public List<Company> findByCityAndCategory(String city, String category){
-        //return companyRepository.findByCityAndCategory(city, category);
-        return null;
-
-    }
-
-
     public Company addNewCompany(Company company){
         return companyRepository.save(company);
     }
