@@ -21,7 +21,8 @@ a {
   box-sizing: border-box;
 }
 
-input[type='text'] {
+input[type='text'],
+input[type='password'] {
   padding: 9px;
   border: 1px solid #cbcbcb;
   border-radius: 5px;
@@ -50,7 +51,9 @@ button:hover {
 }
 
 input[type='text']:active,
-input[type='text']:focus {
+input[type='text']:focus,
+input[type='password']:active,
+input[type='password']:focus {
   outline: 0 none;
   border: 1px solid #7500D1;
 }

@@ -10,6 +10,12 @@ const links = [
   {
     'url': '/about',
     'name': 'About'
+  },
+  {
+    'url': '/signup',
+    'name': 'Sign Up',
+    'type': 'button',
+    'displayLoggedIn': false,
   }
 ]
 

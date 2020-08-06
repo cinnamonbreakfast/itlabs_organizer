@@ -12,7 +12,7 @@ const TopNavigation = (props) => {
                     <ul>
                         {
                             props.links.map((path, index) => (
-                                    <li key={index}><a href={path.url}>{path.name}</a></li>
+                                    <li key={index} className={path.type === 'button' ? styles.button:null}><a href={path.url}>{path.name}</a></li>
                                 )
                             )
                         }
