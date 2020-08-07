@@ -52,7 +52,7 @@ public class CompanyController {
 
 
     @RequestMapping(value = "c/find",method = RequestMethod.GET)
-    public ResponseEntity<List<CompanyDTO>> getFirstFiveBestResults(@RequestParam(required = false) String city,@RequestParam(false = true) String country,@RequestHeader(value = "SESSION") String token){
+    public ResponseEntity<List<CompanyDTO>> getFirstFiveBestResults(@RequestParam(required = false) String city,@RequestParam(required = false ) String country,@RequestHeader(value = "SESSION") String token){
         if(!authStore.sessionExists(token))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 

@@ -6,9 +6,11 @@ import lombok.*;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import org.hibernate.annotations.NamedQuery;
+
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-@Table(name="company",schema="public")
+@Table(name="Company",schema="public")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +21,6 @@ import javax.persistence.Table;
 @NamedQuery(name="Company.findByName", query = "select c from Company c where c.name = ?1")
 @NamedQuery(name="Company.findByCity", query = "select c from Company c where c.city = ?1")
 @NamedQuery(name="Company.findByCityAndCategory",query = "select c from Company c where c.city = ?1 and c.category = ?2")
-//@NamedQuery(name="Company.findByCityAndCountry",query = "select c from Company c where c.city")
 
 
 public class Company extends Entity<Long>{
@@ -40,10 +41,13 @@ public class Company extends Entity<Long>{
     @Column(nullable = false)
     private String address;
 
-
     @Column(nullable = false)
     @Basic(optional = false)
     private String country;
+
+    @Basic
+    @Column
+    private Long owner;
 
 
 

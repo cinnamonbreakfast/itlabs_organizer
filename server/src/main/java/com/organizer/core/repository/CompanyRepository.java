@@ -9,9 +9,7 @@ import java.util.List;
 
 public interface CompanyRepository extends Repository<Long, Company> {
     Company findByName(String name);
-
     List<Company> findByCity(String city);
     Page<Company> findAll(Example e, Pageable page);
-
 
 }

@@ -15,11 +15,8 @@ public class SpecialistService {
     public SpecialistService(SpecialistRepository specialistRepository){
         this.specialistRepository=specialistRepository;
     }
-
-    public Specialist findByPhone(String phone){
-        return specialistRepository.findByPhone(phone);
-    }
-    public List<Specialist> findByCompany(String company_id){
+    public List<Specialist> findById(Long user_id){ return specialistRepository.findByUser(user_id);}
+    public List<Specialist> findByCompany(Long company_id){
         return specialistRepository.findByCompany(company_id);
     }
     public Specialist signSpecialist(Specialist specialist)

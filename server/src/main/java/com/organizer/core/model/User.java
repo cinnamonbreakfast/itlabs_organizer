@@ -3,11 +3,11 @@ package com.organizer.core.model;
 import lombok.*;
 import org.hibernate.annotations.NamedQuery;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
+import java.util.Set;
 
-@Table(name="users", schema="production")
+@Table(name="users", schema="public")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +18,7 @@ import javax.persistence.Table;
 @NamedQuery(name = "User.findByEmailAndPassword", query = "select u from User u where u.email = ?1 and u.password = ?2")
 @NamedQuery(name = "User.findByPhone", query = "select u from User u where u.phone = ?1")
 @NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email = ?1")
+
 public class User extends Entity<Long> {
     @Basic(optional = false)
     @Column(nullable = false)
@@ -58,4 +59,5 @@ public class User extends Entity<Long> {
     @Basic
     @Column(name = "verified_email")
     private Integer verifiedEmail;
+
 }

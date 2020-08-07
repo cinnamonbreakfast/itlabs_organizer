@@ -1,13 +1,14 @@
 package com.organizer.core.model;
 
 import lombok.*;
+import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.NamedQuery;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Table(name="specialist",schema="production")
+@Table(name="specialist",schema="public")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,23 +16,15 @@ import javax.persistence.Table;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
-@NamedQuery(name = "Specialist.findByPhone", query = "select s from Specialist s where s.phone = ?1")
-@NamedQuery(name = "Specialist.findByCompany", query = "select s from Specialist s where s.companyId= ?1")
+@NamedQuery(name = "Specialist.findByCompany", query = "select s from Specialist s where s.company.id= ?1")
+@NamedQuery(name = "Specialist.findByUser", query= " select s from Specialist s where s.user.id=?1")
 
 public class Specialist extends Entity<Long>{
-    @Basic
-    @Column(name="company_id")
-    Integer companyId;
+    @ManyToOne
+    @JoinColumn(name="company_id",referencedColumnName = "id",nullable = false)
+    private Company company;
 
-    @Basic
-    @Column(name="user_id")
-    Integer userId;
-
-    @Basic
-    @Column
-    String name;
-
-    @Basic
-    @Column
-    String phone;
+    @ManyToOne
+    @JoinColumn(name="user_id",referencedColumnName = "id",nullable = false)
+    private User user;
 }

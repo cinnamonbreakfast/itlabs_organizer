@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @RestController
 public class UserController {
     private final UserService userService;
-    private final AuthStore authStore;
+        private final AuthStore authStore;
 
     @Autowired
     public UserController(UserService userService, AuthStore authStore) {

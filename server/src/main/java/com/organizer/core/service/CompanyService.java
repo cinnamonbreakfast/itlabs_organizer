@@ -54,4 +54,9 @@ public class CompanyService {
         Page<Company> companyPage =this.companyRepository.findAll(example,page);
         return companyPage.getContent();
     }
+    public Company findById(Long id){
+        return companyRepository.findById(id).get();
+
+    }
+
 }
