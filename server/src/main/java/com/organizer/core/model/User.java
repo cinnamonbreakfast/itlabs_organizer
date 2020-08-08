@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.NamedQuery;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -59,5 +60,4 @@ public class User extends Entity<Long> {
     @Basic
     @Column(name = "verified_email")
     private Integer verifiedEmail;
-
 }

@@ -2,6 +2,8 @@ package com.organizer.web.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -15,4 +17,5 @@ public class CompanyDTO extends BaseDTO {
         private String address;
         private String category;
         private String country;
+        private List<SpecialistDTO > specialistDTOList;
 }

@@ -56,9 +56,6 @@ public class CompanyController {
         if(!authStore.sessionExists(token))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 
-
-
-
         List<Company> companies = companyService.findByCountryAndCity(country,city,0);
 
         List<CompanyDTO> companyDTOList = companies.stream()
@@ -70,8 +67,12 @@ public class CompanyController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(companyDTOList);
-
     }
 
-
+    @RequestMapping(value = "c/getId/{id}",method = RequestMethod.GET)
+    public ResponseEntity<Company> findCompanyId(@PathVariable Long id ){
+        System.out.println("Here");
+        Company company = companyService.findById(id);
+        return ResponseEntity.ok(company);
+    }
 }

@@ -1,14 +1,18 @@
 package com.organizer.core.model;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
+import javax.persistence.*;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.NamedQuery;
 
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Table(name="Company",schema="public")
 @javax.persistence.Entity
@@ -49,6 +53,13 @@ public class Company extends Entity<Long>{
     @Column
     private Long owner;
 
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonManagedReference
+   @OneToMany(mappedBy = "company",targetEntity = Specialist.class, cascade = CascadeType.ALL)
+  private List<Specialist> specialists ;
 
-
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonManagedReference
+    @OneToMany(mappedBy = "company",targetEntity = Service.class,cascade = CascadeType.ALL)
+    private List<Service> services;
 }
