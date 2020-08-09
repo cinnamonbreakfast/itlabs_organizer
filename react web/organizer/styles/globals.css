@@ -30,7 +30,8 @@ input[type='password'] {
 
 input[type='submit'],
 input[type='button'],
-button {
+button,
+.button {
   padding: 9px 15px;
   border-radius: 5px;
   background-color: #000;
@@ -44,7 +45,8 @@ button {
 
 input[type='submit']:hover,
 input[type='button']:hover,
-button:hover {
+button:hover,
+.button:hover {
   background-color: #222;
   transition: 0.3s ease;
   cursor: pointer;

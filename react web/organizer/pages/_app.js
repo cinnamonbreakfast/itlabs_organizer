@@ -4,19 +4,25 @@ import TopNavigation from '../components/TopNavigation'
 
 const links = [
   {
-    'url': '/',
-    'name': 'Home'
+    url: '/',
+    name: 'Home',
+    home: true,
   },
   {
-    'url': '/about',
-    'name': 'About'
+    url: '/about',
+    name: 'About'
   },
   {
-    'url': '/signup',
-    'name': 'Sign Up',
-    'type': 'button',
-    'displayLoggedIn': false,
-  }
+    url: '/signin',
+    name: 'Sign In',
+    displayLoggedIn: false,
+  },
+  {
+    url: '/signup',
+    name: 'Sign Up',
+    type: 'button',
+    displayLoggedIn: false,
+  },
 ]
 
 function MyApp({ Component, pageProps }) {

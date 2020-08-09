@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRouter } from 'react'
 import styles from '../styles/components/topNavigation.module.scss'
 
 const TopNavigation = (props) => {
@@ -12,7 +12,7 @@ const TopNavigation = (props) => {
                     <ul>
                         {
                             props.links.map((path, index) => (
-                                    <li key={index} className={path.type === 'button' ? styles.button:null}><a href={path.url}>{path.name}</a></li>
+                                    <li key={index}><a className={path.type === 'button' ? 'button':null} href={path.url}>{path.name}</a></li>
                                 )
                             )
                         }

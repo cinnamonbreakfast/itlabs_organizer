@@ -29,9 +29,10 @@
                         margin-right: 0px;
                     }
 
-                    .button {
-                        background-color: #000;
-                        color: #FFF;
+                    a {
+                        &.active {
+                            color: #7500D1;
+                        }
                     }
                 }
             }
