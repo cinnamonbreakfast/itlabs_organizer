@@ -5,7 +5,6 @@ import com.organizer.core.service.UserService;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.dto.UserDTO;
 import com.organizer.web.utils.AuthSession;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,12 +16,17 @@ import java.time.LocalDateTime;
 @RestController
 public class UserController {
     private final UserService userService;
-    private final AuthStore authStore;
+        private final AuthStore authStore;
 
     @Autowired
     public UserController(UserService userService, AuthStore authStore) {
         this.userService = userService;
         this.authStore = authStore;
+    }
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public ResponseEntity<String> testfnc() {
+        return new ResponseEntity<>("Hello!", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/u/search/{email}", method = RequestMethod.GET)

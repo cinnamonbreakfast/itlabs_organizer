@@ -2,6 +2,7 @@ package com.organizer.core.service;
 
 import com.organizer.core.model.User;
 import com.organizer.core.repository.UserRepository;
+import com.organizer.core.utils.Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +24,15 @@ public class UserService {
     }
 
     public User emailAuth(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, password);
+        return userRepository.findByEmailAndPassword(email, Hash.md5(password));
     }
 
     public User signUpEmailAndPassword(User user) {
+        user.setPassword(Hash.md5(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    public User findById(Long id){
+        return userRepository.findById(id).get();
     }
 }
