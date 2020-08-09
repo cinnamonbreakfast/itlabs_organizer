@@ -15,7 +15,7 @@ public class SpecialistService {
     public SpecialistService(SpecialistRepository specialistRepository){
         this.specialistRepository=specialistRepository;
     }
-    public List<Specialist> findById(Long user_id){ return specialistRepository.findByUser(user_id);}
+    public Specialist findById(Long user_id){ return specialistRepository.findByUser(user_id);}
     public List<Specialist> findByCompany(Long company_id){
         return specialistRepository.findByCompany(company_id);
     }

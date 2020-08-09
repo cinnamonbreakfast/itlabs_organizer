@@ -19,7 +19,7 @@ public class ServiceService {
     }
 
     public com.organizer.core.model.Service findById(Long id){
-        return serviceRepository.findById(id).get();
+        return serviceRepository.findBySpecialist(id);
     }
 
 }

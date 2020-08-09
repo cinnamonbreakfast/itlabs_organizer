@@ -49,17 +49,11 @@ public class Company extends Entity<Long>{
     @Basic(optional = false)
     private String country;
 
-    @Basic
-    @Column
-    private Long owner;
+    @OneToOne
+    @JoinColumn(name = "owner")
+    private User owner;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
     @JsonManagedReference
-   @OneToMany(mappedBy = "company",targetEntity = Specialist.class, cascade = CascadeType.ALL)
-  private List<Specialist> specialists ;
-
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @JsonManagedReference
-    @OneToMany(mappedBy = "company",targetEntity = Service.class,cascade = CascadeType.ALL)
-    private List<Service> services;
+    @OneToMany(mappedBy = "company")
+    private List<Specialist> specialists;
 }

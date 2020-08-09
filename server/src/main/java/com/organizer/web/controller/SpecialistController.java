@@ -36,6 +36,12 @@ public class SpecialistController {
         this.companyService= companyService;
     }
 
+    @RequestMapping(value = "/specialist/search/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Specialist> findSomeSpecialist(@PathVariable Long id) {
+
+        return new ResponseEntity<>(specialistService.findById(id), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/s/search/by/user/{user_id}", method = RequestMethod.GET)
     public ResponseEntity<List<Specialist>> findSpecialistByPhone(@PathVariable(required= true)Long user_id){
 
@@ -44,39 +50,39 @@ public class SpecialistController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Token invalid try log in again").body(null);
 
          */
-        List<Specialist> specialists = specialistService.findById(user_id);
-        List<SpecialistDTO> specialistDTOS = new ArrayList<>(specialists.size());
-        if(specialists!=null){
-            for(Specialist specialist: specialists) {
-                User user = specialist.getUser();
-                Company company = specialist.getCompany();
-                UserDTO userDTO = UserDTO.builder()
-                        .city(user.getCity())
-                        .country(user.getCountry())
-                        .email(user.getEmail())
-                        .imageURL(user.getImageURL())
-                        .name(user.getName())
-                        .phone(user.getPhone())
-                        .build();
-                userDTO.setId(user.getId());
-                CompanyDTO companyDTO = CompanyDTO.builder()
-                        .address(company.getAddress())
-                        .category(company.getAddress())
-                        .city(company.getCity())
-                        .name(company.getName())
-                        .country(company.getCountry())
-                        .build();
-                companyDTO.setId(company.getId());
-                SpecialistDTO specialistDTO = SpecialistDTO.builder()
-                        .user(userDTO)
-                        .company(companyDTO)
-                        .build();
-                specialistDTO.setId(specialist.getId());
-                specialistDTOS.add(specialistDTO);
-
-                return ResponseEntity.ok(specialists);
-            }
-        }
+//        List<Specialist> specialists = specialistService.findById(user_id);
+//        List<SpecialistDTO> specialistDTOS = new ArrayList<>(specialists.size());
+//        if(specialists!=null){
+//            for(Specialist specialist: specialists) {
+//                User user = specialist.getUser();
+//                Company company = specialist.getCompany();
+//                UserDTO userDTO = UserDTO.builder()
+//                        .city(user.getCity())
+//                        .country(user.getCountry())
+//                        .email(user.getEmail())
+//                        .imageURL(user.getImageURL())
+//                        .name(user.getName())
+//                        .phone(user.getPhone())
+//                        .build();
+//                userDTO.setId(user.getId());
+//                CompanyDTO companyDTO = CompanyDTO.builder()
+//                        .address(company.getAddress())
+//                        .category(company.getAddress())
+//                        .city(company.getCity())
+//                        .name(company.getName())
+//                        .country(company.getCountry())
+//                        .build();
+//                companyDTO.setId(company.getId());
+//                SpecialistDTO specialistDTO = SpecialistDTO.builder()
+//                        .user(userDTO)
+//                        .company(companyDTO)
+//                        .build();
+//                specialistDTO.setId(specialist.getId());
+//                specialistDTOS.add(specialistDTO);
+//
+//                return ResponseEntity.ok(specialists);
+//            }
+//        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
     @RequestMapping(value = "/s/search/by/company/{company_id}", method = RequestMethod.GET)
@@ -124,51 +130,54 @@ public class SpecialistController {
     }
 
     @RequestMapping(value = "/s/create", method = RequestMethod.POST)
-    public ResponseEntity<SpecialistDTO> createSpecialist(@RequestParam Long userId,@RequestParam Long companyId, @RequestHeader(value = "SESSION") String token )
-    {
-        if(authStore.sessionExists(token)==false)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Token invalid try log in again").body(null);
+    public ResponseEntity<SpecialistDTO> createSpecialist(@RequestParam Long userId,@RequestParam Long companyId, @RequestHeader(value = "SESSION") String token ) { // this aint c++
 
-        User user = userService.findByEmail(authStore.getUsername(token));
-        if(user==null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Message","token invalid").body(null);
+//        if(authStore.sessionExists(token)==false)
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Token invalid try log in again").body(null);
+//
+//        User user = userService.findByEmail(authStore.getUsername(token));
+//        if(user==null)
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Message","token invalid").body(null);
+//
+//        Company company = companyService.findById(companyId);
+//        if(company==null)
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Message","Not a known company").body(null);
+//
+//        if((long)company.getOwner()!=user.getId())
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Not authenticated as an Admin or Company User").body(null);
+//
+//        Specialist specialist = Specialist.builder()
+//                .user(user)
+//                .company(company)
+//                .build();
+//        UserDTO userDTO = UserDTO.builder()
+//                .city(user.getCity())
+//                .country(user.getCountry())
+//                .email(user.getEmail())
+//                .imageURL(user.getImageURL())
+//                .name(user.getName())
+//                .phone(user.getPhone())
+//                .build();
+//        userDTO.setId(user.getId());
+//        CompanyDTO companyDTO = CompanyDTO.builder()
+//                .address(company.getAddress())
+//                .category(company.getAddress())
+//                .city(company.getCity())
+//                .name(company.getName())
+//                .country(company.getCountry())
+//                .build();
+//        companyDTO.setId(company.getId());
+//        SpecialistDTO specialistDTO = SpecialistDTO.builder()
+//                .user(userDTO)
+//                .company(companyDTO)
+//                .build();
+//        specialistDTO.setId(specialist.getId());
+//        specialistService.signSpecialist(specialist);
+//
+//        return ResponseEntity.ok(specialistDTO);
+//    }
 
-        Company company = companyService.findById(companyId);
-        if(company==null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Message","Not a known company").body(null);
-
-        if((long)company.getOwner()!=user.getId())
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Not authenticated as an Admin or Company User").body(null);
-
-        Specialist specialist = Specialist.builder()
-                .user(user)
-                .company(company)
-                .build();
-        UserDTO userDTO = UserDTO.builder()
-                .city(user.getCity())
-                .country(user.getCountry())
-                .email(user.getEmail())
-                .imageURL(user.getImageURL())
-                .name(user.getName())
-                .phone(user.getPhone())
-                .build();
-        userDTO.setId(user.getId());
-        CompanyDTO companyDTO = CompanyDTO.builder()
-                .address(company.getAddress())
-                .category(company.getAddress())
-                .city(company.getCity())
-                .name(company.getName())
-                .country(company.getCountry())
-                .build();
-        companyDTO.setId(company.getId());
-        SpecialistDTO specialistDTO = SpecialistDTO.builder()
-                .user(userDTO)
-                .company(companyDTO)
-                .build();
-        specialistDTO.setId(specialist.getId());
-        specialistService.signSpecialist(specialist);
-
-        return ResponseEntity.ok(specialistDTO);
+        return ResponseEntity.ok(null);
     }
 
     //todo:: seach for a specialist base on user_id

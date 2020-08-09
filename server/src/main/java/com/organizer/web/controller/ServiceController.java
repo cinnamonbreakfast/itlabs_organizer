@@ -31,30 +31,29 @@ public class ServiceController {
     //create
     @RequestMapping(value = "/service/create", method = RequestMethod.POST)
     public ResponseEntity<ServiceDTO> createService(@RequestParam Long companyId, @RequestHeader String token, @RequestParam String serviceName){
-        if(authStore.sessionExists(token)==false)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Token invalid try log in again").body(null);
-        User user = userService.findByEmail(authStore.getUsername(token));
-        Company company = companyService.findById(companyId);
-        if(company.getOwner()!=user.getId())
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Not an owner of the company").body(null);
+//        if(authStore.sessionExists(token)==false)
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Token invalid try log in again").body(null);
+//        User user = userService.findByEmail(authStore.getUsername(token));
+//        Company company = companyService.findById(companyId);
+//        if(company.getOwner()!=user.getId())
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Not an owner of the company").body(null);
+//
+//        Service service = Service.builder()
+//                .name(serviceName)
+//                .build();
+//        CompanyDTO companyDTO = CompanyDTO.builder()
+//                .address(company.getAddress())
+//                .category(company.getCategory())
+//                .name(company.getName())
+//                .city(company.getCity())
+//                .country(company.getCountry())
+//                .build();
+//        ServiceDTO serviceDTO = ServiceDTO.builder()
+//                .companyDTO(companyDTO)
+//                .name(serviceName).build();
+//        serviceService.signService(service);
 
-        Service service = Service.builder()
-                .name(serviceName)
-                .company(company)
-                .build();
-        CompanyDTO companyDTO = CompanyDTO.builder()
-                .address(company.getAddress())
-                .category(company.getCategory())
-                .name(company.getName())
-                .city(company.getCity())
-                .country(company.getCountry())
-                .build();
-        ServiceDTO serviceDTO = ServiceDTO.builder()
-                .companyDTO(companyDTO)
-                .name(serviceName).build();
-        serviceService.signService(service);
-
-        return ResponseEntity.ok(serviceDTO);
+        return ResponseEntity.ok(null);
     }
 
 

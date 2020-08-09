@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface SpecialistRepository extends Repository<Long, Specialist> {
     List<Specialist> findByCompany(Long company);
-    List<Specialist> findByUser(Long user);
+    Specialist findByUser(Long user);
 }

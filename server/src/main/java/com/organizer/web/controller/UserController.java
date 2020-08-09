@@ -24,6 +24,11 @@ public class UserController {
         this.authStore = authStore;
     }
 
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public ResponseEntity<String> testfnc() {
+        return new ResponseEntity<>("Hello!", HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/u/search/{email}", method = RequestMethod.GET)
     public ResponseEntity<UserDTO> findByEmail(@PathVariable(required = true) String email) {
         User find = userService.findByEmail(email);
