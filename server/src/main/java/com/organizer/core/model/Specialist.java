@@ -3,14 +3,9 @@ package com.organizer.core.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.NamedQuery;
 
 import javax.persistence.*;
-import javax.websocket.OnError;
-import java.util.ArrayList;
 import java.util.List;
 
 @Table(name="specialist",schema="public")
@@ -34,10 +29,18 @@ public class Specialist extends Entity<Long>{
     @JoinColumn(name="user_id")
     private User user;
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
-//    @JsonManagedReference
     @JsonManagedReference
     @OneToMany(mappedBy = "specialist")
-    private List<Service> services;
+    private List<SpecialistService> specialistServices ;
+
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "specialist")
+    private List<Schedule> schedules;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "specialist")
+    private List<Availability> availabilities;
+
 
 }

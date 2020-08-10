@@ -10,10 +10,7 @@ import com.organizer.web.auth.AuthStore;
 import com.organizer.web.dto.CompanyDTO;
 import com.organizer.web.dto.SpecialistDTO;
 import com.organizer.web.dto.UserDTO;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.provider.HibernateUtils;
-import org.springframework.data.jpa.repository.query.Jpa21Utils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,48 +39,18 @@ public class SpecialistController {
         return new ResponseEntity<>(specialistService.findById(id), HttpStatus.OK);
     }
 
+
     @RequestMapping(value = "/s/search/by/user/{user_id}", method = RequestMethod.GET)
-    public ResponseEntity<List<Specialist>> findSpecialistByPhone(@PathVariable(required= true)Long user_id){
+    public ResponseEntity<Specialist> findSpecialistByPhone(@PathVariable(required= true)Long user_id){
 
         /*
         if(authStore.sessionExists(token)==false)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Token invalid try log in again").body(null);
+*/
 
-         */
-//        List<Specialist> specialists = specialistService.findById(user_id);
-//        List<SpecialistDTO> specialistDTOS = new ArrayList<>(specialists.size());
-//        if(specialists!=null){
-//            for(Specialist specialist: specialists) {
-//                User user = specialist.getUser();
-//                Company company = specialist.getCompany();
-//                UserDTO userDTO = UserDTO.builder()
-//                        .city(user.getCity())
-//                        .country(user.getCountry())
-//                        .email(user.getEmail())
-//                        .imageURL(user.getImageURL())
-//                        .name(user.getName())
-//                        .phone(user.getPhone())
-//                        .build();
-//                userDTO.setId(user.getId());
-//                CompanyDTO companyDTO = CompanyDTO.builder()
-//                        .address(company.getAddress())
-//                        .category(company.getAddress())
-//                        .city(company.getCity())
-//                        .name(company.getName())
-//                        .country(company.getCountry())
-//                        .build();
-//                companyDTO.setId(company.getId());
-//                SpecialistDTO specialistDTO = SpecialistDTO.builder()
-//                        .user(userDTO)
-//                        .company(companyDTO)
-//                        .build();
-//                specialistDTO.setId(specialist.getId());
-//                specialistDTOS.add(specialistDTO);
-//
-//                return ResponseEntity.ok(specialists);
-//            }
-//        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
+        Specialist specialists = specialistService.findById(user_id);
+        return ResponseEntity.ok(specialists);
     }
     @RequestMapping(value = "/s/search/by/company/{company_id}", method = RequestMethod.GET)
     public ResponseEntity<List<SpecialistDTO>> findSpecialistsbyCompany(@PathVariable(required= true)Long company_id){
@@ -186,4 +153,5 @@ public class SpecialistController {
     //todo:: create a specialist : done
     //todo:: add a specialist an account :
     //todo:: add some kind of regex search in finds  :
+
 }

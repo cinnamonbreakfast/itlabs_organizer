@@ -1,5 +1,7 @@
 package com.organizer.web;
 
+import lombok.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -10,6 +12,9 @@ public class OrganizerApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(OrganizerApplication.class, args);
+        
+
+
     }
 
 }

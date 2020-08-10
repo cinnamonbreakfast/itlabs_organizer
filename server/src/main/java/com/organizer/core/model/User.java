@@ -1,5 +1,6 @@
 package com.organizer.core.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.NamedQuery;
 
@@ -60,4 +61,8 @@ public class User extends Entity<Long> {
     @Basic
     @Column(name = "verified_email")
     private Integer verifiedEmail;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user")
+    private List<Schedule>schedules;
 }

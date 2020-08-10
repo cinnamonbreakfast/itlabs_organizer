@@ -1,14 +1,12 @@
 package com.organizer.core.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import java.util.List;
 
-@Table(name="service",schema="public")
+@Table(name="specialistservice",schema="public")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,15 +14,19 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
-@org.hibernate.annotations.NamedQuery(name = "Service.findBySpecialist", query= " select se from Service se where se.specialist.id = ?1")
-public class Service extends Entity<Long>{
+public class SpecialistService extends Entity<Long>{
+
+    @Basic
+    @Column
+    private Float duration;
+
     @Basic
     @Column(name="service_name")
-    private String name;
+    private String serviceName;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name="specialist_id", nullable = false)
     private Specialist specialist;
+
 }
