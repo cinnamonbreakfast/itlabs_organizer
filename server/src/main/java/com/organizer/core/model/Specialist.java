@@ -33,6 +33,10 @@ public class Specialist extends Entity<Long>{
     @OneToMany(mappedBy = "specialist")
     private List<SpecialistService> specialistServices ;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "specialist")
+    private List<TimeTable> timeTables;
+
 
     @JsonManagedReference
     @OneToMany(mappedBy = "specialist")

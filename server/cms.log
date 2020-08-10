@@ -583,3 +583,12 @@ Caused by: org.hibernate.AnnotationException: @Column(s) not allowed on a @ManyT
 2020-08-10 20:49:28,478 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 3276 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
 2020-08-10 20:49:28,486 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
 2020-08-10 20:49:38,250 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 11.278 seconds (JVM running for 12.389)
+2020-08-10 21:00:43,271 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 22060 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-10 21:00:43,277 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-10 21:00:51,372 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 9.112 seconds (JVM running for 9.916)
+2020-08-10 21:00:56,836 ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper [http-nio-9000-exec-1] ERROR: column timetables0_.date does not exist
+  Hint: Perhaps you meant to reference the column "timetables0_.day".
+  Position: 112
+2020-08-10 21:01:22,946 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 9112 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-10 21:01:22,952 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-10 21:01:30,726 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 9.029 seconds (JVM running for 10.118)
