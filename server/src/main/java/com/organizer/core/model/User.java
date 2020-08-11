@@ -18,8 +18,6 @@ import java.util.Set;
 @Builder
 @NamedQuery(name = "User.findByEmailAndPassword", query = "select u from User u where u.email = ?1 and u.password = ?2")
 @NamedQuery(name = "User.findByPhone", query = "select u from User u where u.phone = ?1")
-@NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email = ?1")
-
 public class User extends Entity<Long> {
     @Basic(optional = false)
     @Column(nullable = false)

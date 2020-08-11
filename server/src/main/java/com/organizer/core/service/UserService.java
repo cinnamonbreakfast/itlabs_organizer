@@ -24,7 +24,8 @@ public class UserService {
     }
 
     public User emailAuth(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, Hash.md5(password));
+//        return userRepository.findByEmailAndPassword(email, Hash.md5(password));
+        return userRepository.findByEmailAndPassword(email, (password));
     }
 
     public User signUpEmailAndPassword(User user) {

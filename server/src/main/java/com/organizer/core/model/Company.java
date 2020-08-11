@@ -25,8 +25,6 @@ import java.util.Set;
 @NamedQuery(name="Company.findByName", query = "select c from Company c where c.name = ?1")
 @NamedQuery(name="Company.findByCity", query = "select c from Company c where c.city = ?1")
 @NamedQuery(name="Company.findByCityAndCategory",query = "select c from Company c where c.city = ?1 and c.category = ?2")
-
-
 public class Company extends Entity<Long>{
 
     @Basic(optional = false)
