@@ -16,7 +16,7 @@ import java.util.Date;
 public class TimeTable extends  Entity<Long>{
     @Basic
     @Column
-    private Date date;
+    private Date day;
 
     @Basic
     @Column(name="start_time")
@@ -25,5 +25,9 @@ public class TimeTable extends  Entity<Long>{
     @Basic
     @Column(name="end_time")
     private Date endTime;
+
+    @ManyToOne
+    @JoinColumn(name="specialist_id")
+    Specialist specialist;
 
 }
