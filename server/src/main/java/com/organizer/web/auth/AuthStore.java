@@ -24,12 +24,12 @@ public class AuthStore {
 
 
         AuthSession localSession = AuthSession.builder()
-                .token(username)
+                .token(token)
                 .loginTime(loginTime)
                 .build();
 
 
-        sessions.put(token, localSession);
+        sessions.put(username, localSession);
 
         return localSession;
     }

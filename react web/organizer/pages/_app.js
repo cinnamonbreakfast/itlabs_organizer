@@ -1,6 +1,17 @@
 import '../styles/globals.css'
 import { useRouter } from 'next/router'
 import TopNavigation from '../components/TopNavigation'
+import { PersistGate } from 'redux-persist/integration/react'
+import { Provider, useSelector } from 'react-redux'
+import { createStore } from 'redux'
+
+import { useEffect } from 'react'
+// import store from './api/appStoreRedux'
+
+import myStore, { persisted } from './api/redux/store'
+// import reducer from './api/redux/reducers'
+
+
 
 const links = [
   {
@@ -15,24 +26,31 @@ const links = [
   {
     url: '/signin',
     name: 'Sign In',
-    displayLoggedIn: false,
   },
   {
     url: '/signup',
     name: 'Sign Up',
     type: 'button',
-    displayLoggedIn: false,
+  },
+  {
+    url: '/logout',
+    name: 'Logout',
+    displayWhileLogged: true,
   },
 ]
 
 function MyApp({ Component, pageProps }) {
   console.log(useRouter().route)
 
+  
+
   return (
-    <div style={{height: '100vh'}}>
-      <TopNavigation links={links}/>
-      <Component {...pageProps} />
-    </div>
+    <Provider store={myStore} style={{height: '100vh'}}>
+      <PersistGate loading={(<div>loading</div>)} persistor={persisted}>
+        <TopNavigation links={links}/>
+        <Component {...pageProps} />
+      </PersistGate>
+    </Provider>
   )
 }
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import styles from '../styles/pages/signin.module.scss'
+import styles from '../styles/pages/auth.module.scss'
 import axios from 'axios'
 
-const SignInPage = () => {
+const SignUpPage = () => {
 
     const [errorMsg, setMessage] = useState(null);
 
@@ -71,7 +71,7 @@ const SignInPage = () => {
         <div className={styles.wrapper}>
             <div className={styles.greetings}>
                 <h1>Sign Up</h1>
-                <p>Some welcome message</p>
+                <p>Tell us who you are. Set up your account.</p>
             </div>
 
             
@@ -111,7 +111,7 @@ const SignInPage = () => {
                             <input type="password" name="password" onChange={(e) => handleInputData(e)} placeholder="Password"/>
                         </div>
 
-                        <div className={styles.formGroup, styles.formButtons}>
+                        <div className={styles.formGroup + ' ' + styles.formButtons}>
                             <input type="submit" name="submit" value="Sign Up"/>
                             <input type="button" name="submit" value="Clear"/>
                         </div>
@@ -124,4 +124,4 @@ const SignInPage = () => {
     )
 }
 
-export default SignInPage
+export default SignUpPage

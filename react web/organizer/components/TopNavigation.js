@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRouter } from 'react'
 import styles from '../styles/components/topNavigation.module.scss'
+import { useSelector } from 'react-redux'
 
 const TopNavigation = (props) => {
+    let user = useSelector(state => (state.user))
 
     return (
         <div className={styles.top_nav}>
@@ -11,9 +13,11 @@ const TopNavigation = (props) => {
                 <div className={styles.links}>
                     <ul>
                         {
-                            props.links.map((path, index) => (
-                                    <li key={index}><a className={path.type === 'button' ? 'button':null} href={path.url}>{path.name}</a></li>
-                                )
+                            props.links.map((path, index) => {
+                                    
+                                    if(path.displayWhileLogged === true && user.userLoggedIn === true) return (<li key={index}><a className={path.type === 'button' ? 'button':null} href={path.url}>{path.name}</a></li>)
+                                    else if(!path.displayWhileLogged) return (<li key={index}><a className={path.type === 'button' ? 'button':null} href={path.url}>{path.name}</a></li>)
+                                }
                             )
                         }
                     </ul>
