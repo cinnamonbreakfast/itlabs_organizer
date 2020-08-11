@@ -2,6 +2,7 @@ package com.organizer.web.controller;
 
 import com.organizer.core.model.User;
 import com.organizer.core.service.UserService;
+import com.organizer.core.utils.Hash;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.dto.SignUpDTO;
 import com.organizer.web.dto.UserDTO;
@@ -13,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class UserController {
     private final UserService userService;
@@ -58,10 +59,8 @@ public class UserController {
 
         if(authUser != null) {
             // bad credentials
-            System.out.println(authUser.getPassword());
-            System.out.println(password);
-            System.out.println(email);
-            if(!authUser.getPassword().equals(password))
+            String hashPass= Hash.md5(password);
+            if(!authUser.getPassword().equals(hashPass))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
 
             // create a token and return it
@@ -69,9 +68,10 @@ public class UserController {
 
             // headers set
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add("TOKEN", oauthPair.getToken());
-            responseHeaders.add("AUTH_TIME", oauthPair.getLoginTime().toString());
-
+            responseHeaders.set("TOKEN", oauthPair.getToken());
+            responseHeaders.set("AUTH_TIME", oauthPair.getLoginTime().toString());
+            //responseHeaders.set("TOKEN",oauthPair.getToken());
+            //responseHeaders.set("AUTH_TIME", oauthPair.getLoginTime().toString());
             // DTO set
             UserDTO authResponseUser = UserDTO.builder()
                     .email(authUser.getEmail())
