@@ -3,6 +3,7 @@ package com.organizer.web.controller;
 import com.organizer.core.model.User;
 import com.organizer.core.service.UserService;
 import com.organizer.web.auth.AuthStore;
+import com.organizer.web.dto.SignUpDTO;
 import com.organizer.web.dto.UserDTO;
 import com.organizer.web.utils.AuthSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,17 @@ public class UserController {
     }
 
     @RequestMapping(value = "u/auth", method = RequestMethod.POST)
-    public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String email, @RequestParam(required = true) String password) {
-        User authUser = userService.emailAuth(email, password);
+    public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String email, @RequestParam(required = true, name = "password") String password) {
+        User authUser = userService.findByEmail(email);
 
         if(authUser != null) {
+            // bad credentials
+            System.out.println(authUser.getPassword());
+            System.out.println(password);
+            System.out.println(email);
+            if(!authUser.getPassword().equals(password))
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
+
             // create a token and return it
             AuthSession oauthPair = authStore.createToken(authUser.getId().toString());
 
@@ -83,15 +91,22 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
     }
 
-    @RequestMapping(value = "u/signup", method = RequestMethod.POST)
-    public ResponseEntity<String> signUp(@RequestParam(required = true) String email, @RequestParam(required = true) String password) {
-        User existingUser = userService.findByEmail(email);
+    @RequestMapping(value = "u/signup", method = RequestMethod.POST, consumes = "application/json")
+    public ResponseEntity<String> signUp(@RequestBody(required = true) SignUpDTO signUpDTO) {
+        User existingUser = userService.findByEmail(signUpDTO.getEmail());
+
+        System.out.println(signUpDTO);
 
         if(existingUser == null) {
             // do sign up
             User user = User.builder()
-                    .email(email)
-                    .password(password)
+                    .email(signUpDTO.getEmail())
+                    .name(signUpDTO.getName())
+                    .phone(signUpDTO.getPhone())
+                    .role(signUpDTO.getRole())
+                    .city(signUpDTO.getCity())
+                    .country(signUpDTO.getCountry())
+                    .password(signUpDTO.getPassword())
                     .build();
 
             // attempt to create user
