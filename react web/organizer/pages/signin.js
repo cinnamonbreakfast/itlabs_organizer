@@ -37,12 +37,15 @@ const SignInPage = () => {
             }
         ).then(res => {
             if(res) {
-                console.log("Logged in", res.data)
-                
+            //AUTHENTIFICATED
+                //localStorage.setItem('AUTH_TIME',res.headers['AUTH_TIME'])
+                //localStorage.setItem('TOKEN',res.headers['TOKEN'])
+                console.log(res.headers)
                 dispatch({type: actions.SET_AUTH_STATUS, payload: true})
                 dispatch({type: actions.SET_USER_DATA, payload: res.data})
+                
             } else {
-                console.log("False info")
+                console.log("False info",res)
             }
         }).catch(err => {
             console.log(err)
@@ -56,7 +59,7 @@ const SignInPage = () => {
                 <p>Welcome back! We're glad you returned.</p>
             </div>
 
-            <form onSubmit={(event) => caller(event)}>
+            <form onSubmit={(event) => {caller(event)}}>
                 <div className={styles.formGroup}>
                     <input type="text" name="email" onChange={(e) => handleInputData(e)} placeholder="E-Mail"/>
                 </div>
