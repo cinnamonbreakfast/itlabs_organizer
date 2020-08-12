@@ -11,16 +11,11 @@ class UserController {
         let fdata = new FormData();
         fdata.set('email', credentials.email)
         fdata.set('password', credentials.password)
-        return axios.post('http://31.5.22.129:8080/u/auth', fdata,{headers:{
+        return axios.post('http://localhost:8080/u/auth', fdata,{headers:{
             'TOKEN':'f',
             'AUTH_TIME':'f'
         }})
         .then(_response => {
-            
-            
-            //localStorage.setItem('AUTH_TIME',_response.headers['AUTH_TIME'])
-            //localStorage.setItem('TOKEN',_response.headers['TOKEN'])
-            
             
             return _response;
         }).catch(_err => {
