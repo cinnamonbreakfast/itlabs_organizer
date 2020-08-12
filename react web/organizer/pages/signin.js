@@ -38,9 +38,9 @@ const SignInPage = () => {
         ).then(res => {
             if(res) {
             //AUTHENTIFICATED
-                //localStorage.setItem('AUTH_TIME',res.headers['AUTH_TIME'])
-                //localStorage.setItem('TOKEN',res.headers['TOKEN'])
-                console.log(res.headers)
+                localStorage.setItem('auth_time',res.headers['auth_time'])
+                localStorage.setItem('token',res.headers['token'])
+            
                 dispatch({type: actions.SET_AUTH_STATUS, payload: true})
                 dispatch({type: actions.SET_USER_DATA, payload: res.data})
                 
