@@ -24,4 +24,8 @@ public class SpecialistService {
     {
         return specialistRepository.save(specialist);
     }
+
+    public List<Specialist> findByCompanyTest(){
+        return specialistRepository.findByCompanyTest();
+    }
 }

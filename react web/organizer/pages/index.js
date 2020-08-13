@@ -32,7 +32,7 @@ export default function Home() {
               <option value="company">Company</option>
               <option value="service">Service</option>
             </select>
-            <input type="text" name="service" placeholder={`${criteria.charAt(0).toUpperCase()+criteria.slice(1)} name`} onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCompanySuggestions(true) }}/>
+            <input autocomplete="off" type="text" name="service" placeholder={`${criteria.charAt(0).toUpperCase()+criteria.slice(1)} name`} onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCompanySuggestions(true) }}/>
             {
               companyAutoSuggestion &&
               <div className={styles.autoSuggest + ' ' + styles.companies}>
@@ -58,7 +58,7 @@ export default function Home() {
           </div>
 
           <div className={styles.formGroup} >
-            <input type="text" value={location} name="city" placeholder="City, country" autoComplete="off" onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCitySuggestions(true)}} onChange={(e) => setLocation(e.target.value)}/>
+            <input autocomplete="off" type="text" value={location} name="city" placeholder="City, country" autoComplete="off" onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCitySuggestions(true)}} onChange={(e) => setLocation(e.target.value)}/>
             {
               cityAutoSuggestion && 
               <div className={styles.autoSuggest}>

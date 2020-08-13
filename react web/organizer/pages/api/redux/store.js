@@ -1,19 +1,19 @@
-import { createStore } from 'redux'
+import {applyMiddleware, createStore } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension';
 import counter, {increment, decrement} from './action'
 import reducer from './reducers'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-
 const persistConfig = {
     key: 'root',
-    storage,
+    storage,                
 }
    
 const persistedReducer = persistReducer(persistConfig, reducer)
 
-let store = createStore(persistedReducer)
+let store = createStore(persistedReducer,composeWithDevTools());
 
-store.subscribe(() => { console.log(store.getState()) })
+store.subscribe(() => { console.log(store.getState())})
 
 store.dispatch(increment())
 
