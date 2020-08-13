@@ -17,7 +17,12 @@ configurations {
 }
 
 repositories {
+    google()
     mavenCentral()
+    maven { url 'https://maven.google.com' }
+    gradlePluginPortal()
+    jcenter()
+
 }
 
 dependencies {
@@ -32,7 +37,10 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    }// https://mvnrepository.com/artifact/org.hibernate/hibernate-core
+
+
+
 }
 
 test {

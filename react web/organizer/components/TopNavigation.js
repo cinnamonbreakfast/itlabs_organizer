@@ -14,9 +14,12 @@ const TopNavigation = (props) => {
                     <ul>
                         {
                             props.links.map((path, index) => {
-                                    
-                                    if(path.displayWhileLogged === true && user.userLoggedIn === true) return (<li key={index}><a className={path.type === 'button' ? 'button':null} href={path.url}>{path.name}</a></li>)
-                                    else if(!path.displayWhileLogged) return (<li key={index}><a className={path.type === 'button' ? 'button':null} href={path.url}>{path.name}</a></li>)
+                                    if(path.always==true)
+                                    return (<li key={index}><a className={path.type === 'button' ? 'button':null} href={path.url}>{path.name}</a></li>);
+                                    else if(user.userLoggedIn==true && path.displayWhileLogged==true){
+                                        return (<li key={index}><a className={path.type === 'button' ? 'button':null} href={path.url}>{path.name}</a></li>);
+                                    }else
+                                    if(path.displayWhileLogged==false && user.userLoggedIn==false ) return (<li key={index}><a className={path.type === 'button' ? 'button':null} href={path.url}>{path.name}</a></li>);
                                 }
                             )
                         }

@@ -16,6 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
+
 @NamedQuery(name = "Specialist.findByCompany", query = "select s from Specialist s where s.company.id = ?1")
 @NamedQuery(name = "Specialist.findByUser", query= " select s from Specialist s where s.user.id = ?1")
 public class Specialist extends Entity<Long>{
