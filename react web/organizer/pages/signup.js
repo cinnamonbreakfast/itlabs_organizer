@@ -46,7 +46,7 @@ const SignUpPage = () => {
         console.log("event was called");
         event.preventDefault();
 
-        axios.post('http://localhost:8080/u/signup',
+        axios.post('http://31.5.22.129:8080/u/signup',
         {
             email: userEmail,
             name: userName,

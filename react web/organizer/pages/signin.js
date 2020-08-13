@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, } from 'react'
 import styles from '../styles/pages/auth.module.scss'
 import UserController from './api/userController'
 import { actions } from './api/redux/userActions'
 import { useSelector, useDispatch } from 'react-redux'
+import { useRouter } from 'next/router'
 
 const SignInPage = () => {
     const userController = new UserController();
     const dispatch = useDispatch()
+    const router = useRouter()
 
     const [authEmail, setAuthEmail] = useState('')
     const [authPassword, setAuthPassword] = useState('')
@@ -37,13 +39,12 @@ const SignInPage = () => {
             }
         ).then(res => {
             if(res) {
-            //AUTHENTIFICATED
-                localStorage.setItem('auth_time',res.headers['auth_time'])
-                localStorage.setItem('token',res.headers['token'])
-            
                 dispatch({type: actions.SET_AUTH_STATUS, payload: true})
                 dispatch({type: actions.SET_USER_DATA, payload: res.data})
-                
+                dispatch({type: actions.SET_USER_AUTH_TOKEN, payload: res.headers['token']})
+                dispatch({type: actions.SET_USER_AUTH_TIME, payload: res.headers['auth_time']})
+
+                router.push('/')
             } else {
                 console.log("False info",res)
             }
