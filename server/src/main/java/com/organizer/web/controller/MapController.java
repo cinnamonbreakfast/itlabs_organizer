@@ -40,36 +40,42 @@ public class MapController {
         this.specialistServiceService = specialistServiceService;
     }
 
-    @RequestMapping(value = "map/sugestion", method = RequestMethod.POST)
+    @RequestMapping(value = "map/sugestion/input", method = RequestMethod.POST)
     public ResponseEntity<List<MapDTO>> sugestionByType(@RequestParam String search_input, @RequestParam String second_box, @RequestParam int type) {
-        String country,city,company_name ;
-        country="";city="";company_name="";
+        String country,city;
+        country="";city="";
         try {
-            country = StringConverter.converToUpper(second_box.split(",")[1]);
+            country = StringConverter.converToUpper(second_box.split(",")[1]).substring(0,2);
             city = StringConverter.convertFirstLetterUpper(second_box.split(",")[0]);
-        }catch (Exception e){}
-        company_name = search_input;
-        System.out.println(country);
-        System.out.println(city);
-        System.out.println(company_name);
-
+        }catch (Exception e){
+            city  = StringConverter.convertFirstLetterUpper(second_box);
+        }
+        List<Company> companies = null;
         if (type == Type.SERVICE.ordinal()) {
+            String service_name ="";
+            service_name = search_input;
+            companies = companyService.findByService(service_name,country,city,0,4);
 
         } else if (type == Type.COMPANY.ordinal()) {
-
-            List<Company> companies = companyService.findByCountryAndCity(city,country,company_name,0,4);
+            String company_name ="";
+            company_name=search_input;
+            companies = companyService.findByCountryAndCity(city,country,company_name,0,4);
+        }
+        else{
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
             List<MapDTO> mapDTOS = new ArrayList<>(companies.size());
-            for(Company company : companies){
+            for(Company company : companies) {
                 List<com.organizer.core.model.SpecialistService> specialistServices = Parser.getServicesFromCompany(company);
 
                 List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
 
-                for(com.organizer.core.model.SpecialistService specialistService : specialistServices){
+                for (com.organizer.core.model.SpecialistService specialistService : specialistServices) {
                     ServiceDTO serviceDTO = ServiceDTO.builder()
                             .name(specialistService.getServiceName()).build();
                     serviceDTOS.add(serviceDTO);
                 }
-                CompanyDTO companyDTO =  CompanyDTO.builder()
+                CompanyDTO companyDTO = CompanyDTO.builder()
                         .name(company.getName())
                         .address(company.getAddress())
                         .city(company.getCity())
@@ -77,15 +83,12 @@ public class MapController {
                         .country(company.getCountry())
                         .services(serviceDTOS).build();
 
-                MapDTO mapDTO =MapDTO.builder()
+                MapDTO mapDTO = MapDTO.builder()
                         .company(companyDTO)
                         .build();
                 mapDTOS.add(mapDTO);
             }
             return ResponseEntity.ok(mapDTOS);
-        }
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
 
     }
 
