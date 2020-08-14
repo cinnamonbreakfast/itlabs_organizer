@@ -12,5 +12,4 @@ import lombok.*;
 @Builder
 public class MapDTO {
     CompanyDTO company;
-    ServiceDTO serviceDTO;
 }

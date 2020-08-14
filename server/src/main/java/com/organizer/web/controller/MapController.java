@@ -10,6 +10,7 @@ import com.organizer.web.dto.ServiceDTO;
 import com.organizer.web.dto.map.MapDTO;
 import com.organizer.web.utils.Parser;
 import com.organizer.web.utils.StringConverter;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class MapController {
         this.specialistServiceService = specialistServiceService;
     }
 
-    @RequestMapping(value = "map/sugestion/input", method = RequestMethod.POST)
+    @RequestMapping(value = "map/sugestion", method = RequestMethod.POST)
     public ResponseEntity<List<MapDTO>> sugestionByType(@RequestParam String search_input, @RequestParam String second_box, @RequestParam int type) {
         String country,city;
         country="";city="";
@@ -89,7 +90,6 @@ public class MapController {
                 mapDTOS.add(mapDTO);
             }
             return ResponseEntity.ok(mapDTOS);
-
     }
 
     @RequestMapping(value = "map/search", method = RequestMethod.POST)
