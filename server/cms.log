@@ -25,3 +25,6 @@
 2020-08-14 00:26:21,369 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 16028 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
 2020-08-14 00:26:21,374 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
 2020-08-14 00:26:31,284 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 10.767 seconds (JVM running for 12.135)
+2020-08-14 01:50:57,089 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 18188 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-14 01:50:57,094 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-14 01:51:06,093 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 9.796 seconds (JVM running for 10.94)
