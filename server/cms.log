@@ -1,3 +1,0 @@
-2020-08-13 20:03:59,513 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-ULPNVQJ with PID 11564 (C:\Users\cande\Documents\Faculta\Practiva\itlabs_organizer\server\build\classes\java\main started by cande in C:\Users\cande\Documents\Faculta\Practiva\itlabs_organizer\server)
-2020-08-13 20:03:59,529 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
-2020-08-13 20:04:10,589 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 11.92 seconds (JVM running for 14.57)

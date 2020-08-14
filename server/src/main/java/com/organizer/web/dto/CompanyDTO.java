@@ -18,4 +18,5 @@ public class CompanyDTO extends BaseDTO {
         private String category;
         private String country;
         private List<SpecialistDTO > specialistDTOList;
+        private List<ServiceDTO> services;
 }

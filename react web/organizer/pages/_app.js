@@ -18,19 +18,25 @@ const links = [
     url: '/',
     name: 'Home',
     home: true,
+    always:true
   },
   {
     url: '/about',
-    name: 'About'
+    name: 'About',
+    always: true
   },
   {
     url: '/signin',
     name: 'Sign In',
+    displayWhileLogged: false,
+    
   },
   {
     url: '/signup',
     name: 'Sign Up',
     type: 'button',
+    displayWhileLogged: false,
+  
   },
   {
     url: '/logout',
