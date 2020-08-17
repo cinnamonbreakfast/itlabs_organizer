@@ -2,9 +2,9 @@ package com.organizer.core.service;
 
 
 import com.organizer.core.model.Company;
+import com.organizer.core.utils.SearchFilter;
 import com.organizer.core.repository.CompanyRepository;
 
-import com.organizer.web.utils.StringConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -46,6 +46,16 @@ public class CompanyService {
 
         Pageable pageable = PageRequest.of(pageNumber,pageSize);
         return this.companyRepository.findByService(pageable, serviceName, country, city).getContent();
+    }
+
+    public List<Company> findByFilter(SearchFilter searchFilter, int pageNumber, int pageSize){
+        Pageable pageable = PageRequest.of(pageNumber,pageSize);
+        return this.companyRepository.findBySearchFilter(pageable,
+        searchFilter.getCompanyName(),
+        searchFilter.getServiceName(),
+        searchFilter.getCountry(),
+        searchFilter.getCity()
+        ).getContent();
     }
 
 
