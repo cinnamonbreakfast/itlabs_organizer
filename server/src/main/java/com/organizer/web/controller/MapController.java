@@ -92,15 +92,11 @@ public class MapController {
             return ResponseEntity.ok(mapDTOS);
     }
 
-    @RequestMapping(value = "map/search", method = RequestMethod.POST)
-    public ResponseEntity<String> mainSearch(@RequestParam String search)
-    {
-        System.out.println(search);
-        return ResponseEntity.ok("ook");
-    }
+
 
 
     @RequestMapping(value="testing",method = RequestMethod.GET)
-    public ResponseEntity<String> testing(){
-        return ResponseEntity.ok("ok");    }
+    public ResponseEntity<List<Company>> testing(){
+        List<Company> companies = companies = companyService.findByService("maSaj","Ro","IaSi",0,4);
+        return ResponseEntity.ok(companies);    }
 }
