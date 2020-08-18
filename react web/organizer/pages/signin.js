@@ -59,7 +59,7 @@ const SignInPage = () => {
         <div className={styles.wrapper}>
             <div className={styles.greetings}>
                 <h1>Sign In</h1>
-                <p>Welcome back! We're glad you returned.{`${publicRuntimeConfig.mySecret}`}</p>
+                <p>Welcome back! We're glad you returned.</p>
             </div>
 
             <form onSubmit={(event) => {caller(event)}}>
