@@ -38,7 +38,7 @@ const TopNavigation = (props) => {
             <div className={styles.right}>
                 
                 {
-                    true &&
+                    user.userLoggedIn ?
                     <div className={styles.userTab}>
                         <div className={styles.userControl}>
                             <h2>Andrew C.</h2>
@@ -51,6 +51,11 @@ const TopNavigation = (props) => {
                                 A
                             </div>
                         </div>
+                    </div>
+                    :
+                    <div className={styles.authTab}>
+                        <a href='/signin'>Sign in</a>
+                        <a className='button' href='/signup'>Sign Up</a>
                     </div>
                 }
             </div>

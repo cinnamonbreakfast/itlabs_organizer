@@ -4,11 +4,13 @@ import UserController from './api/userController'
 import { actions } from './api/redux/userActions'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
+import getConfig from 'next/config'
 
 const SignInPage = () => {
     const userController = new UserController();
     const dispatch = useDispatch()
     const router = useRouter()
+    const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
     const [authEmail, setAuthEmail] = useState('')
     const [authPassword, setAuthPassword] = useState('')
@@ -57,7 +59,7 @@ const SignInPage = () => {
         <div className={styles.wrapper}>
             <div className={styles.greetings}>
                 <h1>Sign In</h1>
-                <p>Welcome back! We're glad you returned.</p>
+                <p>Welcome back! We're glad you returned.{`${publicRuntimeConfig.mySecret}`}</p>
             </div>
 
             <form onSubmit={(event) => {caller(event)}}>
