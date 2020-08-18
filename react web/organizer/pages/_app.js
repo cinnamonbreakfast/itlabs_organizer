@@ -23,12 +23,14 @@ const links = [
   },
   {
     url: '/app',
-    name: 'App',
+    name: 'Download',
     props: [LINK_PROP.DISPLAY_ALWAYS]
   },
 ]
 
 function MyApp({ Component, pageProps }) {
+  console.log(process.env.REQ_HOST)
+
   return (
     <Provider store={myStore}>
       <PersistGate loading={(<div>loading</div>)} persistor={persisted}>
