@@ -59,3 +59,20 @@ input[type='password']:focus {
   outline: 0 none;
   border: 1px solid #7500D1;
 }
+
+.row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  position: relative;
+}
+
+.col-3 {
+  width: 75%;
+  position: relative;
+}
+
+.col-3 {
+  width: 25%;
+}

@@ -51,10 +51,13 @@ function MyApp({ Component, pageProps }) {
   
 
   return (
-    <Provider store={myStore} style={{height: '100vh'}}>
+    <Provider store={myStore}>
       <PersistGate loading={(<div>loading</div>)} persistor={persisted}>
         <TopNavigation links={links}/>
-        <Component {...pageProps} />
+        
+        <div style={{height: '100vh', paddingTop: '55px'}}>
+          <Component {...pageProps} />
+        </div>
       </PersistGate>
     </Provider>
   )
