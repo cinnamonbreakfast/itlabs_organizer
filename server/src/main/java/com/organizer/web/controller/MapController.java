@@ -5,6 +5,7 @@ import com.organizer.core.model.Specialist;
 import com.organizer.core.service.CompanyService;
 import com.organizer.core.service.SpecialistService;
 import com.organizer.core.service.SpecialistServiceService;
+import com.organizer.core.utils.SearchFilter;
 import com.organizer.web.dto.CompanyDTO;
 import com.organizer.web.dto.ServiceDTO;
 import com.organizer.web.dto.map.MapDTO;
@@ -12,6 +13,7 @@ import com.organizer.web.utils.Parser;
 import com.organizer.web.utils.StringConverter;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.env.SystemEnvironmentPropertySourceEnvironmentPostProcessor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -92,15 +94,41 @@ public class MapController {
             return ResponseEntity.ok(mapDTOS);
     }
 
-    @RequestMapping(value = "map/search", method = RequestMethod.POST)
-    public ResponseEntity<String> mainSearch(@RequestParam String search)
+
+    public static int pageSize = 4;
+    @RequestMapping(value="search",method = RequestMethod.GET)
+    public ResponseEntity<List<MapDTO>> companySearciveSearchFilter(SearchFilter searchFilter)
     {
-        System.out.println(search);
-        return ResponseEntity.ok("ook");
+        List<Company> companies =companyService.findByFilter(searchFilter,searchFilter.getPage(),pageSize );
+        List<MapDTO> mapDTOS = new ArrayList<>(companies.size());
+        for(Company company : companies) {
+            List<com.organizer.core.model.SpecialistService> specialistServices = Parser.getServicesFromCompany(company);
+
+            List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
+
+            for (com.organizer.core.model.SpecialistService specialistService : specialistServices) {
+                ServiceDTO serviceDTO = ServiceDTO.builder()
+                        .name(specialistService.getServiceName()).build();
+                serviceDTOS.add(serviceDTO);
+            }
+            CompanyDTO companyDTO = CompanyDTO.builder()
+                    .name(company.getName())
+                    .address(company.getAddress())
+                    .city(company.getCity())
+                    .category(company.getCategory())
+                    .country(company.getCountry())
+                    .services(serviceDTOS).build();
+
+            MapDTO mapDTO = MapDTO.builder()
+                    .company(companyDTO)
+                    .build();
+            mapDTOS.add(mapDTO);
+        }
+        return  ResponseEntity.ok(mapDTOS);
     }
 
-
     @RequestMapping(value="testing",method = RequestMethod.GET)
-    public ResponseEntity<String> testing(){
-        return ResponseEntity.ok("ok");    }
+    public ResponseEntity<List<Company>> testing(){
+        List<Company> companies = companies = companyService.findByService("maSaj","Ro","IaSi",0,4);
+        return ResponseEntity.ok(companies);    }
 }
