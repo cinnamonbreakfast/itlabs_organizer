@@ -1,21 +1,83 @@
 import React, { useState, useEffect } from 'react'
 import styles from '../styles/pages/home.module.scss'
+import { useRouter } from 'next/router'
+
+import axios from 'axios'
 
 export default function Home() {
+  const router = useRouter()
+
   const [cityAutoSuggestion, toggleCitySuggestions] = useState(false);
   const [companyAutoSuggestion, toggleCompanySuggestions] = useState(false);
 
   const[criteria, setCriteria] = useState('company')
   const[location, setLocation] = useState('')
   const[searchString, setSearchString] = useState('')
+  
+  const[searchResult, setSearchResult] = useState(null)
 
   const handleLocation = (event) => {
     event.target.innerText && setLocation(event.target.innerText)
   }
 
+  const changeCriteria = (event) => {
+    switch(event.target.value) {
+      case 'company':
+        setCriteria(0)
+      case 'service':
+        setCriteria(1)
+      default:
+        setCriteria(0)
+    }
+  }
+
   const bgOutClick = (event) => {
     toggleCitySuggestions(false)
     toggleCompanySuggestions(false)
+  }
+
+  const callForSuggestions = () => {
+    let data = new FormData();
+    data.set('type', 0)
+    data.set('search_input', searchString)
+    data.set('second_box', '')
+
+    axios.post(
+      'http://31.5.22.129:8080/map/sugestion',
+      data)
+    .then(resp => {
+      setSearchResult(resp.data.reverse())
+    }).catch(err => {
+      return false;
+    })
+  }
+
+  const handleFirstBox = (event) => {
+    setSearchString(event.target.value)
+
+    if(!event.target.value)
+    {
+      setSearchResult(null)
+    } else {
+      callForSuggestions()
+    }
+  }
+
+  const handleSecondBox = (event) => {
+    setLocation(event.target.value)
+    
+    if(!event.target.value)
+    {
+      setSearchResult(null)
+    } else {
+      callForSuggestions()
+    }
+  }
+
+  const submitToSearch = (event) => {
+    event.preventDefault()
+
+    router.push
   }
 
   return (
@@ -26,51 +88,49 @@ export default function Home() {
       </div>
 
       <div className={styles.searchForm}>
-        <form onSubmit={(e) => e.preventDefault()}>
+        <form action="/search">
           <div className={styles.formGroup}>
-            <select id="cars" onChange={(e) => setCriteria(event.target.value)}>
+            <select name="criteria" id="criteria" onChange={(e) => changeCriteria(e)}>
               <option value="company">Company</option>
               <option value="service">Service</option>
             </select>
-            <input autocomplete="off" type="text" name="service" placeholder={`${criteria.charAt(0).toUpperCase()+criteria.slice(1)} name`} onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCompanySuggestions(true) }}/>
+            <input type="text" value={searchString} name="search" autoComplete="off" placeholder="Name" onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCompanySuggestions(true) }} onChange={(e) => handleFirstBox(e)}/>
             {
-              companyAutoSuggestion &&
+              Array.isArray(searchResult) && companyAutoSuggestion &&
               <div className={styles.autoSuggest + ' ' + styles.companies}>
                 <ul>
-                  {/* TODO: click pe companie */}
-                  <li>
-                    <h2>Company name</h2>
-                    <p>Cluj-Napoca, RO &bull; Tuns, Barbierit...</p>
+                  
+                  {
+                  Array.isArray(searchResult) && searchResult.map((each) => { return (<li>
+                    <h2>{each.company.name}</h2>
+                    <p>{`${each.company.city}, ${each.company.country}`} &bull; Tuns, Barbierit...</p>
                   </li>
+                  )}
+                  )}
 
-                  <li>
-                    <h2>Company name</h2>
-                    <p>Location &bull; Tuns, Barbierit, Pensat ...</p>
-                  </li>
-
-                  <li>
-                    <h2>Company name</h2>
-                    <p>Location &bull; Tuns, Barbierit, Pensat ...</p>
-                  </li>
                 </ul>
               </div>
             }
           </div>
 
           <div className={styles.formGroup} >
-            <input autocomplete="off" type="text" value={location} name="city" placeholder="City, country" autoComplete="off" onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCitySuggestions(true)}} onChange={(e) => setLocation(e.target.value)}/>
+            <input type="text" value={location} name="city" placeholder="City, country" autoComplete="off" onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCitySuggestions(true)}} onChange={(e) => handleSecondBox(e)}/>
             {
-              cityAutoSuggestion && 
+              Array.isArray(searchResult) && cityAutoSuggestion && 
               <div className={styles.autoSuggest}>
                 <ul>
-                  <li onClick={(e) => handleLocation(e)}>Cluj-Napoca, RO</li>
+                  {
+                    searchResult.map((each) => {
+                      return (<li onClick={(e) => handleLocation(e)}>{`${each.company.city}, ${each.company.country}`}</li>)
+                    })
+                  }
                 </ul>
               </div>
             }
           </div>
 
           <div className={styles.formGroup}>
-            <input type="submit" name="submit" value="Search"/>
+            <input type="submit" value="Search"/>
           </div>
         </form>
       </div>
