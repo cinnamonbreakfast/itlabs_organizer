@@ -94,11 +94,7 @@ export default function Home() {
               <option value="company">Company</option>
               <option value="service">Service</option>
             </select>
-<<<<<<< HEAD
             <input type="text" value={searchString} name="search" autoComplete="off" placeholder="Name" onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCompanySuggestions(true) }} onChange={(e) => handleFirstBox(e)}/>
-=======
-            <input type="text" value={searchString} name="service" autoComplete="off" placeholder={`${criteria.charAt(0).toUpperCase()+criteria.slice(1)} name`} onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCompanySuggestions(true) }} onChange={(e) => handleFirstBox(e)}/>
->>>>>>> 39448c8755081435bcc50b2e0e2a4d537480d66d
             {
               Array.isArray(searchResult) && companyAutoSuggestion &&
               <div className={styles.autoSuggest + ' ' + styles.companies}>

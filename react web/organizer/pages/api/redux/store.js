@@ -13,7 +13,7 @@ const persistedReducer = persistReducer(persistConfig, reducer)
 
 let store = createStore(persistedReducer);
 
-store.subscribe(() => { console.log(store.getState())})
+// store.subscribe(() => { console.log(store.getState())})
 
 store.dispatch(increment())
 

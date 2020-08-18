@@ -1,55 +1,34 @@
 import '../styles/globals.css'
 import { useRouter } from 'next/router'
-import TopNavigation from '../components/TopNavigation'
+import TopNavigation, { LINK_PROP } from '../components/TopNavigation'
 import { PersistGate } from 'redux-persist/integration/react'
-import { Provider, useSelector } from 'react-redux'
-import { createStore } from 'redux'
-
-import { useEffect } from 'react'
-// import store from './api/appStoreRedux'
-
+import { Provider } from 'react-redux'
 import myStore, { persisted } from './api/redux/store'
-// import reducer from './api/redux/reducers'
-
-
 
 const links = [
   {
     url: '/',
     name: 'Home',
-    home: true,
-    always:true
+    props: [LINK_PROP.IS_HOME, LINK_PROP.DISPLAY_ALWAYS]
   },
   {
     url: '/about',
     name: 'About',
-    always: true
+    props: [LINK_PROP.DISPLAY_ALWAYS]
   },
   {
-    url: '/signin',
-    name: 'Sign In',
-    displayWhileLogged: false,
-    
+    url: '/company',
+    name: 'My company',
+    props: [LINK_PROP.DISPLAY_ALWAYS]
   },
   {
-    url: '/signup',
-    name: 'Sign Up',
-    type: 'button',
-    displayWhileLogged: false,
-  
-  },
-  {
-    url: '/logout',
-    name: 'Logout',
-    displayWhileLogged: true,
+    url: '/app',
+    name: 'App',
+    props: [LINK_PROP.DISPLAY_ALWAYS]
   },
 ]
 
 function MyApp({ Component, pageProps }) {
-  console.log(useRouter().route)
-
-  
-
   return (
     <Provider store={myStore}>
       <PersistGate loading={(<div>loading</div>)} persistor={persisted}>
