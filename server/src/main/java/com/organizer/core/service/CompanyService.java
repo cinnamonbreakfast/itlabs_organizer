@@ -2,12 +2,14 @@ package com.organizer.core.service;
 
 
 import com.organizer.core.model.Company;
+import com.organizer.core.utils.SearchFilter;
 import com.organizer.core.repository.CompanyRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CompanyService {
@@ -32,31 +34,30 @@ public class CompanyService {
         return companyRepository.findByName(name);
     }
 
-    public List<Company> findByCountryAndCity(String country, String city,int pageNumber){
-
-        Company company = Company.builder()
-                .city(city)
-                .country(country)
-                .build();
-
-
-        ExampleMatcher customExampleMatcher = ExampleMatcher.matchingAny()
-                .withMatcher("city",ExampleMatcher.GenericPropertyMatchers.startsWith() .ignoreCase())
-                .withMatcher("country",ExampleMatcher.GenericPropertyMatchers.startsWith().ignoreCase());
-
-        Example<Company> example = Example.of(company,customExampleMatcher);
-
-
-
-        Pageable page = PageRequest.of(pageNumber,5);
-
-        
-        Page<Company> companyPage =this.companyRepository.findAll(example,page);
-        return companyPage.getContent();
+    public List<Company> findByCountryAndCity(String city, String country,String company,int pageNumber,int pageSize){
+        Pageable page = PageRequest.of(pageNumber,pageSize);
+        return this.companyRepository.findByCountryAndCity(page,city,country,company).getContent();
     }
     public Company findById(Long id){
         return companyRepository.findById(id).get();
-
     }
+
+    public List<Company> findByService(String serviceName,String country, String city,int pageNumber, int pageSize){
+
+        Pageable pageable = PageRequest.of(pageNumber,pageSize);
+        return this.companyRepository.findByService(pageable, serviceName, country, city).getContent();
+    }
+
+    public List<Company> findByFilter(SearchFilter searchFilter, int pageNumber, int pageSize){
+        Pageable pageable = PageRequest.of(pageNumber,pageSize);
+        return this.companyRepository.findBySearchFilter(pageable,
+        searchFilter.getCompanyName(),
+        searchFilter.getServiceName(),
+        searchFilter.getCountry(),
+        searchFilter.getCity()
+        ).getContent();
+    }
+
+
 
 }

@@ -56,7 +56,7 @@ public class CompanyController {
         if(!authStore.sessionExists(token))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 
-        List<Company> companies = companyService.findByCountryAndCity(country,city,0);
+        List<Company> companies = null;
 
         List<CompanyDTO> companyDTOList = companies.stream()
                 .map(x->CompanyDTO.builder()
