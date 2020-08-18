@@ -152,6 +152,17 @@
     }
 
     .logo {
+        display: flex;
+        flex-direction: row;
 
+        h2 {
+            font-size: 15px;
+            color: rgb(237, 125, 38);
+        }
+        
+        img {
+            height: 100%;
+            margin-right: 10px;
+        }
     }
 }

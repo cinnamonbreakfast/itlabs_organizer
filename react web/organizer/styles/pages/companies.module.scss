@@ -33,10 +33,97 @@
 
     .company {
         width: 30%;
-        height: 250px;
+        height: 260px;
         background: #F8F8F8;
         border-radius: 5px;
         margin-right: 10px;
         margin-bottom: 10px;
+
+        &.new {
+            background-color: transparent;
+            border: 1px dashed #d9d9d9;
+            border-spacing: 15px 50px;
+            cursor: pointer;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            h1 {
+                font-size: 20px;
+                font-weight: 500;
+                color: #818181;
+            }
+        }
+
+        .identity {
+            position: relative;
+
+            .picture {
+                position: absolute;
+                width: 60px;
+                height: 60px;
+                overflow: hidden;
+                border-radius: 60px;
+                top: 30px;
+                left: 25px;
+                border: 3px solid #fff;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            .cover {
+                width: 100%;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                    height: 124px;
+                }
+            }
+        }
+        
+        .info {
+            padding: 10px 15px;
+            h2 {
+                font-size: 20px;
+                margin: 0px;
+                margin-bottom: 10px;
+            }
+
+            p {
+                margin: 0px;
+                padding: 0px;
+            }
+
+            .controls {
+                margin-top: 10px;
+
+                button {
+                    margin-right: 5px;
+                    background-color: rgb(237, 125, 38);
+                }
+            }
+        }
+    }
+}
+
+.createFloat {
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    background-color: rgba(0,0,0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .content {
+        width: 450px;
     }
 }
