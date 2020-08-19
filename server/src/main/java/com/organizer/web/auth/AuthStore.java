@@ -11,14 +11,14 @@ import java.util.Map;
 
 @Component
 public class AuthStore {
-    Map<String, AuthSession> sessions;
+    Map<Long, AuthSession> sessions;
     private final Integer EXPIRATION_TIME = 1; // days
 
     public AuthStore() {
         this.sessions = new HashMap<>();
     }
 
-    public AuthSession createToken(String username) {
+    public AuthSession createToken(Long userID) {
         String token = RandomStringUtils.randomAlphabetic(20);
         LocalDateTime loginTime = LocalDateTime.now();
 
@@ -29,7 +29,7 @@ public class AuthStore {
                 .build();
 
 
-        sessions.put(username, localSession);
+        sessions.put(userID, localSession);
 
         return localSession;
     }
@@ -40,7 +40,7 @@ public class AuthStore {
         return true;
     }
 
-    public String getUsername(String token) {
+    public Long getUsername(String token) {
         return sessions.get(token).getToken();
     }
 
