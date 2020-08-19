@@ -3,19 +3,12 @@ import { useSelector } from 'react-redux'
 import { useRouter } from 'next/router'
 import styles from '../styles/pages/companies.module.scss'
 
-import CreateCompany from '../components/createCompany'
-
 const Companies = () => {
     const router = useRouter()
     const user = useSelector(state => (state.user))
-    const [inCreationMode, setCreationMode] = useState(false)
 
     if (!user.userLoggedIn) {
         router.push('/signin')
-    }
-
-    const cancelNewCreation = () => {
-        setCreationMode(false)
     }
 
     return (
@@ -26,9 +19,9 @@ const Companies = () => {
             </div>
 
             <div className={styles.companiesList}>
-                <div className={styles.company + ' ' + styles.new}>
+                <div className={styles.company + ' ' + styles.new} onClick={() => router.push('/companies/new')}>
                     <h1>New company</h1>
-                    <button onClick={() => setCreationMode(true)}>+Add</button>
+                    <button>+Add</button>
                 </div>
 
                 <div className={styles.company}>
@@ -136,12 +129,6 @@ const Companies = () => {
                     </div>
                 </div>
             </div>
-
-            {inCreationMode && <div className={styles.createFloat}>
-                <div className={styles.content}>
-                    <CreateCompany cancel={cancelNewCreation}/>
-                </div>
-            </div>}
         </div>
     )
 }
