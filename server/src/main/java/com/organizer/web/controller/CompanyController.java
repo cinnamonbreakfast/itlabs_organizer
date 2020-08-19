@@ -32,10 +32,10 @@ public class CompanyController {
     @RequestMapping(value = "c/create",method = RequestMethod.POST)
     public ResponseEntity<String> addNewCompany(@RequestBody CompanyDTO newCompany, @RequestHeader(name = "token") String token){
         Company existingCompany = companyService.findByName(newCompany.getName());
-        Long userId = authStore.getUsername(token);
+        //Long userId = authStore.getUsername(token);
         User owner;
 
-        username != null ? userService.findById(userId) : null;
+        //username != null ? userService.findById(userId) : null;
 
         if(existingCompany == null){
             Company company = Company.builder()

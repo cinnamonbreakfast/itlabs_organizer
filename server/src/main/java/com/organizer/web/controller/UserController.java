@@ -55,7 +55,7 @@ public class UserController {
 
     @RequestMapping(value = "u/auth", method = RequestMethod.POST)
     public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String email, @RequestParam(required = true, name = "password") String password) {
-        User authUser = userService.findByEmail(email);
+       /* User authUser = userService.findByEmail(email);
 
         if(authUser != null) {
             // bad credentials
@@ -64,7 +64,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
 
             // create a token and return it
-            AuthSession oauthPair = authStore.createToken(authUser.getId().toString());
+            //AuthSession oauthPair = authStore.createToken(authUser.getId().toString());
 
             // headers set
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -87,7 +87,7 @@ public class UserController {
                     .body(authResponseUser);
         }
 
-        // bad credentials
+        // bad credentials*/
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
     }
 
