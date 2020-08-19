@@ -52,6 +52,15 @@ button:hover,
   cursor: pointer;
 }
 
+input[type='submit']:disabled,
+input[type='button']:disabled,
+button:disabled,
+.button:disabled {
+  background-color: #818181;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
 input[type='text']:active,
 input[type='text']:focus,
 input[type='password']:active,
