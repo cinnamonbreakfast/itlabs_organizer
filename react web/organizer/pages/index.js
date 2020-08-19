@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import styles from '../styles/pages/home.module.scss'
 import { useRouter } from 'next/router'
-
 import axios from 'axios'
+import generator from '../utils/generator'
 
 export default function Home() {
   const router = useRouter()
@@ -10,7 +10,7 @@ export default function Home() {
   const [cityAutoSuggestion, toggleCitySuggestions] = useState(false);
   const [companyAutoSuggestion, toggleCompanySuggestions] = useState(false);
 
-  const[criteria, setCriteria] = useState('company')
+  const[criteria, setCriteria] = useState(0)
   const[location, setLocation] = useState('')
   const[searchString, setSearchString] = useState('')
   
@@ -21,14 +21,15 @@ export default function Home() {
   }
 
   const changeCriteria = (event) => {
-    switch(event.target.value) {
-      case 'company':
-        setCriteria(0)
-      case 'service':
-        setCriteria(1)
-      default:
-        setCriteria(0)
+    if(event.target.value=='company')
+    {
+      setCriteria(0);
+    }else if(event.target.value=='service')
+    {
+      setCriteria(1);
     }
+    else
+    setCriteria(0);
   }
 
   const bgOutClick = (event) => {
@@ -36,17 +37,18 @@ export default function Home() {
     toggleCompanySuggestions(false)
   }
 
-  const callForSuggestions = () => {
+  const callForSuggestions = () => {  
     let data = new FormData();
-    data.set('type', 0)
+    console.log(criteria,location);
+    data.set('type', criteria)
     data.set('search_input', searchString)
-    data.set('second_box', '')
+    data.set('second_box', location)
 
     axios.post(
-      'http://31.5.22.129:8080/map/sugestion',
+      process.env.REQ_HOST+'/map/sugestion',
       data)
     .then(resp => {
-      setSearchResult(resp.data.reverse())
+     { return  setSearchResult(resp.data.reverse())}
     }).catch(err => {
       return false;
     })
@@ -65,19 +67,35 @@ export default function Home() {
 
   const handleSecondBox = (event) => {
     setLocation(event.target.value)
-    
+    callForSuggestions()
+    /*
     if(!event.target.value)
     {
       setSearchResult(null)
     } else {
       callForSuggestions()
-    }
+    }*/
   }
 
   const submitToSearch = (event) => {
     event.preventDefault()
 
     router.push
+  }
+  const setTextHandler = (event)=>{
+    let child = event.target;
+    let parent =child;
+    while(parent.tagName.toString()!='LI')
+    {
+        parent = child.parentElement
+        child=parent;
+        console.log(parent)
+    }
+  
+    let d = document.getElementById(parent.id)
+    let firstChild = d.firstElementChild
+    setSearchString(firstChild.textContent)
+    console.log(parent.childNodes)
   }
 
   return (
@@ -94,16 +112,22 @@ export default function Home() {
               <option value="company">Company</option>
               <option value="service">Service</option>
             </select>
-            <input type="text" value={searchString} name="search" autoComplete="off" placeholder="Name" onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCompanySuggestions(true) }} onChange={(e) => handleFirstBox(e)}/>
+            <input id = "search_box" type="text" value={searchString} name="search" autoComplete="off" placeholder={searchString} onClick={(e) => { e.stopPropagation(); bgOutClick();callForSuggestions(); toggleCompanySuggestions(true) }} onChange={(e) => handleFirstBox(e)}/>
             {
               Array.isArray(searchResult) && companyAutoSuggestion &&
               <div className={styles.autoSuggest + ' ' + styles.companies}>
                 <ul>
                   
                   {
-                  Array.isArray(searchResult) && searchResult.map((each) => { return (<li>
-                    <h2>{each.company.name}</h2>
-                    <p>{`${each.company.city}, ${each.company.country}`} &bull; Tuns, Barbierit...</p>
+                  Array.isArray(searchResult) && searchResult.map((each) => { 
+                    
+                    return (<li id = {each.company.id} onClick={setTextHandler}>
+                    <h2 >{each.company.name}</h2>
+                    <p>{`${each.company.city}, ${each.company.country}`} &bull;
+                    {
+                      each.company.services.map(el=>{return el.name+' '})
+                    }
+                     </p>
                   </li>
                   )}
                   )}
@@ -114,7 +138,7 @@ export default function Home() {
           </div>
 
           <div className={styles.formGroup} >
-            <input type="text" value={location} name="city" placeholder="City, country" autoComplete="off" onClick={(e) => { e.stopPropagation(); bgOutClick(); toggleCitySuggestions(true)}} onChange={(e) => handleSecondBox(e)}/>
+            <input type="text" value={location} name="city" placeholder="City, country" autoComplete="off" onClick={(e) => { e.stopPropagation(); bgOutClick();callForSuggestions(); toggleCitySuggestions(true)}} onChange={(e) => handleSecondBox(e)}/>
             {
               Array.isArray(searchResult) && cityAutoSuggestion && 
               <div className={styles.autoSuggest}>

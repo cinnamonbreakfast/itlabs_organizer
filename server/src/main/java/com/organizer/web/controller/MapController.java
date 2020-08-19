@@ -1,28 +1,23 @@
 package com.organizer.web.controller;
 
 import com.organizer.core.model.Company;
-import com.organizer.core.model.Specialist;
 import com.organizer.core.service.CompanyService;
 import com.organizer.core.service.SpecialistService;
 import com.organizer.core.service.SpecialistServiceService;
-import com.organizer.core.utils.SearchFilter;
+import com.organizer.web.dto.SearchFilter;
 import com.organizer.web.dto.CompanyDTO;
 import com.organizer.web.dto.ServiceDTO;
 import com.organizer.web.dto.map.MapDTO;
 import com.organizer.web.utils.Parser;
 import com.organizer.web.utils.StringConverter;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.env.SystemEnvironmentPropertySourceEnvironmentPostProcessor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.directory.SearchResult;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class MapController {
@@ -69,7 +64,24 @@ public class MapController {
         }
             List<MapDTO> mapDTOS = new ArrayList<>(companies.size());
             for(Company company : companies) {
-                List<com.organizer.core.model.SpecialistService> specialistServices = Parser.getServicesFromCompany(company);
+
+                List<com.organizer.core.model.SpecialistService> specialistServices;
+                if(type==Type.COMPANY.ordinal()) {
+                    try {
+                        specialistServices = Parser.getServicesFromCompany(company).subList(0, 3);
+                    }
+                    catch (Exception e){
+                        specialistServices = Parser.getServicesFromCompany(company);
+                    }
+                }
+                else{
+                    try {
+                        specialistServices = Parser.getServicesFromCompany(company).stream().filter(e -> e.getServiceName().toLowerCase().contains(search_input.toLowerCase())).collect(Collectors.toList()).subList(0, 3);
+                    }
+                    catch (Exception e){
+                        specialistServices = Parser.getServicesFromCompany(company).stream().filter(er -> er.getServiceName().toLowerCase().contains(search_input.toLowerCase())).collect(Collectors.toList());
+                    }
+                }
 
                 List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
 
@@ -85,6 +97,7 @@ public class MapController {
                         .category(company.getCategory())
                         .country(company.getCountry())
                         .services(serviceDTOS).build();
+                companyDTO.setId(company.getId());
 
                 MapDTO mapDTO = MapDTO.builder()
                         .company(companyDTO)
@@ -99,6 +112,7 @@ public class MapController {
     @RequestMapping(value="search",method = RequestMethod.GET)
     public ResponseEntity<List<MapDTO>> companySearciveSearchFilter(SearchFilter searchFilter)
     {
+        System.out.println(searchFilter);
         List<Company> companies =companyService.findByFilter(searchFilter,searchFilter.getPage(),pageSize );
         List<MapDTO> mapDTOS = new ArrayList<>(companies.size());
         for(Company company : companies) {
@@ -118,6 +132,7 @@ public class MapController {
                     .category(company.getCategory())
                     .country(company.getCountry())
                     .services(serviceDTOS).build();
+            companyDTO.setId(company.getId());
 
             MapDTO mapDTO = MapDTO.builder()
                     .company(companyDTO)

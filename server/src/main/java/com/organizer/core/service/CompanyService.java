@@ -2,7 +2,7 @@ package com.organizer.core.service;
 
 
 import com.organizer.core.model.Company;
-import com.organizer.core.utils.SearchFilter;
+import com.organizer.web.dto.SearchFilter;
 import com.organizer.core.repository.CompanyRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;

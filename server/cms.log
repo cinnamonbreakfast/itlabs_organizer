@@ -1,91 +1,199 @@
-2020-08-19 17:33:38,470 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-ULPNVQJ with PID 21412 (C:\Users\cande\Documents\Faculta\Practiva\itlabs_organizer\server\build\classes\java\main started by cande in C:\Users\cande\Documents\Faculta\Practiva\itlabs_organizer\server)
-2020-08-19 17:33:38,487 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
-2020-08-19 17:33:47,584 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 9.906 seconds (JVM running for 12.49)
-2020-08-19 17:36:41,717 ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper [http-nio-8080-exec-4] ERROR: null value in column "owner" violates not-null constraint
-  Detail: Failing row contains (19, test city, test cat, test adr, test country, null, Test company).
-2020-08-19 17:36:41,796 ERROR org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/].[dispatcherServlet] [http-nio-8080-exec-4] Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [owner]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement] with root cause
-org.postgresql.util.PSQLException: ERROR: null value in column "owner" violates not-null constraint
-  Detail: Failing row contains (19, test city, test cat, test adr, test country, null, Test company).
-	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2532)
-	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2267)
-	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:312)
-	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:448)
-	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:369)
-	at org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:153)
-	at org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:119)
-	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
-	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
-	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:197)
-	at org.hibernate.dialect.identity.GetGeneratedKeysDelegate.executeAndExtract(GetGeneratedKeysDelegate.java:57)
-	at org.hibernate.id.insert.AbstractReturningDelegate.performInsert(AbstractReturningDelegate.java:43)
-	at org.hibernate.persister.entity.AbstractEntityPersister.insert(AbstractEntityPersister.java:3153)
-	at org.hibernate.persister.entity.AbstractEntityPersister.insert(AbstractEntityPersister.java:3759)
-	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:84)
-	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:645)
-	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:282)
-	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:263)
-	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:317)
-	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:330)
-	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:287)
-	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:193)
-	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:123)
-	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:185)
-	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:128)
-	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:55)
-	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:102)
-	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:721)
-	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:707)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
-	at org.springframework.orm.jpa.ExtendedEntityManagerCreator$ExtendedEntityManagerInvocationHandler.invoke(ExtendedEntityManagerCreator.java:366)
-	at com.sun.proxy.$Proxy108.persist(Unknown Source)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
-	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:314)
-	at com.sun.proxy.$Proxy108.persist(Unknown Source)
-	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:554)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
-	at org.springframework.data.repository.core.support.ImplementationInvocationMetadata.invoke(ImplementationInvocationMetadata.java:72)
-	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:382)
-	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:205)
-	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:549)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
-	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:155)
-	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:130)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
-	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:80)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:367)
-	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
-	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:139)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
-	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:178)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
-	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:95)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
-	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212)
-	at com.sun.proxy.$Proxy116.save(Unknown Source)
-	at com.organizer.core.service.CompanyService.addNewCompany(CompanyService.java:25)
-	at com.organizer.web.controller.CompanyController.addNewCompany(CompanyController.java:42)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:878)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:792)
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+2020-08-19 11:08:32,222 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 17244 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:08:32,255 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:08:35,942 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [restartedMain] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'spring.servlet.multipart.max-request-size' to org.springframework.util.unit.DataSize:
+
+    Property: spring.servlet.multipart.max-request-size
+    Value: 500KB 
+    Origin: class path resource [application.properties]:28:43
+    Reason: failed to convert java.lang.String to org.springframework.util.unit.DataSize
+
+Action:
+
+Update your application's configuration
+
+2020-08-19 11:09:17,429 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 16160 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:09:17,433 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:09:19,317 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [restartedMain] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'spring.servlet.multipart.max-request-size' to org.springframework.util.unit.DataSize:
+
+    Property: spring.servlet.multipart.max-request-size
+    Value: 500KB 
+    Origin: class path resource [application.properties]:28:43
+    Reason: failed to convert java.lang.String to org.springframework.util.unit.DataSize
+
+Action:
+
+Update your application's configuration
+
+2020-08-19 11:10:13,470 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 9836 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:10:13,475 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:10:16,090 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [restartedMain] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'spring.servlet.multipart.max-request-size' to org.springframework.util.unit.DataSize:
+
+    Property: spring.servlet.multipart.max-request-size
+    Value: 500KB 
+    Origin: class path resource [application.properties]:28:43
+    Reason: failed to convert java.lang.String to org.springframework.util.unit.DataSize
+
+Action:
+
+Update your application's configuration
+
+2020-08-19 11:10:39,095 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 7812 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:10:39,100 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:10:41,312 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [restartedMain] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'spring.servlet.multipart.max-request-size' to org.springframework.util.unit.DataSize:
+
+    Property: spring.servlet.multipart.max-request-size
+    Value: 500KB 
+    Origin: class path resource [application.properties]:28:43
+    Reason: failed to convert java.lang.String to org.springframework.util.unit.DataSize
+
+Action:
+
+Update your application's configuration
+
+2020-08-19 11:11:42,581 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 20356 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:11:42,586 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:11:44,889 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [restartedMain] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'spring.servlet.multipart.max-request-size' to org.springframework.util.unit.DataSize:
+
+    Property: spring.servlet.multipart.max-request-size
+    Value: 500KB 
+    Origin: class path resource [application.properties]:28:43
+    Reason: failed to convert java.lang.String to org.springframework.util.unit.DataSize
+
+Action:
+
+Update your application's configuration
+
+2020-08-19 11:11:55,858 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 10672 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:11:55,863 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:11:58,261 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [restartedMain] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'spring.servlet.multipart.max-request-size' to org.springframework.util.unit.DataSize:
+
+    Property: spring.servlet.multipart.max-request-size
+    Value: 500KB 
+    Origin: class path resource [application.properties]:28:43
+    Reason: failed to convert java.lang.String to org.springframework.util.unit.DataSize
+
+Action:
+
+Update your application's configuration
+
+2020-08-19 11:14:43,769 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 3200 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:14:43,774 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:14:46,395 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [restartedMain] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'spring.servlet.multipart.max-request-size' to org.springframework.util.unit.DataSize:
+
+    Property: spring.servlet.multipart.max-request-size
+    Value: 1000KB 
+    Origin: class path resource [application.properties]:28:43
+    Reason: failed to convert java.lang.String to org.springframework.util.unit.DataSize
+
+Action:
+
+Update your application's configuration
+
+2020-08-19 11:14:50,889 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 12184 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:14:50,894 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:14:53,136 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [restartedMain] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'spring.servlet.multipart.max-request-size' to org.springframework.util.unit.DataSize:
+
+    Property: spring.servlet.multipart.max-request-size
+    Value: 1000KB 
+    Origin: class path resource [application.properties]:28:43
+    Reason: failed to convert java.lang.String to org.springframework.util.unit.DataSize
+
+Action:
+
+Update your application's configuration
+
+2020-08-19 11:15:18,182 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 22212 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:15:18,186 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:15:27,061 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 9.418 seconds (JVM running for 10.165)
+2020-08-19 11:16:12,127 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 14344 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:16:12,132 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:16:20,508 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 9.168 seconds (JVM running for 10.334)
+2020-08-19 11:17:17,111 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 15064 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 11:17:17,116 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 11:17:27,733 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 11.513 seconds (JVM running for 12.808)
+2020-08-19 17:10:51,002 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 23132 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 17:10:51,007 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 17:11:01,787 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 11.553 seconds (JVM running for 12.908)
+2020-08-19 17:17:31,284 ERROR org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/].[dispatcherServlet] [http-nio-8080-exec-2] Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is org.springframework.http.InvalidMediaTypeException: Invalid mime type "/": does not contain subtype after '/'] with root cause
+org.springframework.util.InvalidMimeTypeException: Invalid mime type "/": does not contain subtype after '/'
+	at org.springframework.util.MimeTypeUtils.parseMimeTypeInternal(MimeTypeUtils.java:219)
+	at org.springframework.util.MimeTypeUtils$ConcurrentLruCache.get(MimeTypeUtils.java:469)
+	at org.springframework.util.MimeTypeUtils.parseMimeType(MimeTypeUtils.java:200)
+	at org.springframework.http.MediaType.parseMediaType(MediaType.java:584)
+	at org.springframework.http.MediaType.parseMediaTypes(MediaType.java:613)
+	at org.springframework.data.rest.webmvc.BasePathAwareHandlerMapping.lookupHandlerMethod(BasePathAwareHandlerMapping.java:95)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.getHandlerInternal(AbstractHandlerMethodMapping.java:367)
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.getHandlerInternal(RequestMappingInfoHandlerMapping.java:110)
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.getHandlerInternal(RequestMappingInfoHandlerMapping.java:59)
+	at org.springframework.web.servlet.handler.AbstractHandlerMapping.getHandler(AbstractHandlerMapping.java:395)
+	at org.springframework.data.rest.webmvc.support.DelegatingHandlerMapping$HandlerSelectionResult.from(DelegatingHandlerMapping.java:118)
+	at org.springframework.data.rest.webmvc.support.DelegatingHandlerMapping.getHandler(DelegatingHandlerMapping.java:76)
+	at org.springframework.web.servlet.DispatcherServlet.getHandler(DispatcherServlet.java:1234)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1016)
 	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
 	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
 	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
@@ -116,4 +224,7 @@ org.postgresql.util.PSQLException: ERROR: null value in column "owner" violates 
 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
-	at java.base/java.lang.Thread.run(Thread.java:834)
+	at java.base/java.lang.Thread.run(Thread.java:830)
+2020-08-19 17:18:17,277 INFO com.organizer.web.OrganizerApplication [restartedMain] Starting OrganizerApplication on DESKTOP-72I71JG with PID 21524 (C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server\build\classes\java\main started by krelo in C:\Users\krelo\Desktop\PRACTICA\scheduler\server_cipy\itlabs_organizer\server)
+2020-08-19 17:18:17,281 INFO com.organizer.web.OrganizerApplication [restartedMain] No active profile set, falling back to default profiles: default
+2020-08-19 17:18:27,912 INFO com.organizer.web.OrganizerApplication [restartedMain] Started OrganizerApplication in 11.201 seconds (JVM running for 12.583)

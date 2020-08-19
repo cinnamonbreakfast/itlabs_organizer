@@ -45,6 +45,9 @@ dependencies {
 
     implementation group: 'org.hibernate', name: 'hibernate-search-orm', version: '5.8.2.Final'
 
+    compile 'com.google.apis:google-api-services-drive:v3-rev20200723-1.30.10'
+    compile 'com.google.api-client:google-api-client:1.30.10'
+
 
 }
 
