@@ -1,9 +1,9 @@
 package com.organizer.web.controller;
 
+import com.organizer.core.model.AnimeList;
 import com.organizer.core.model.Company;
-import com.organizer.core.service.CompanyService;
-import com.organizer.core.service.SpecialistService;
-import com.organizer.core.service.SpecialistServiceService;
+import com.organizer.core.model.CountryList;
+import com.organizer.core.service.*;
 import com.organizer.web.dto.SearchFilter;
 import com.organizer.web.dto.CompanyDTO;
 import com.organizer.web.dto.ServiceDTO;
@@ -30,12 +30,15 @@ public class MapController {
     private final SpecialistService specialistService;
     private final CompanyService companyService;
     private final SpecialistServiceService specialistServiceService;
-
+    private final AnimeService animeService;
+    private final CountryListService countryListService;
     @Autowired
-    public MapController(SpecialistService specialistService, CompanyService companyService, SpecialistServiceService specialistServiceService) {
+    public MapController(SpecialistService specialistService, CompanyService companyService, SpecialistServiceService specialistServiceService,AnimeService animeService,CountryListService countryListService) {
         this.companyService = companyService;
         this.specialistService = specialistService;
         this.specialistServiceService = specialistServiceService;
+        this.animeService= animeService;
+        this.countryListService=countryListService;
     }
 
     @RequestMapping(value = "map/sugestion", method = RequestMethod.POST)
@@ -146,4 +149,14 @@ public class MapController {
     public ResponseEntity<List<Company>> testing(){
         List<Company> companies = companies = companyService.findByService("maSaj","Ro","IaSi",0,4);
         return ResponseEntity.ok(companies);    }
+
+    @RequestMapping(value="fetch/animelist",method = RequestMethod.GET)
+    public ResponseEntity<List<AnimeList>> getAnimeList(@RequestParam int page,@RequestParam String name){
+        return ResponseEntity.ok(animeService.getAnimeList(page,name));
+    }
+
+    @RequestMapping(value="fetch/countrylist",method = RequestMethod.GET)
+    public ResponseEntity<List<CountryList>> getCountryList(@RequestParam int page, @RequestParam String country){
+        return ResponseEntity.ok(countryListService.getCountryListByCountry(page,country));
+    }
 }

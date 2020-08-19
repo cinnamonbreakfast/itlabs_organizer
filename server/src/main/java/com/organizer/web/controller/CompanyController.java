@@ -5,11 +5,13 @@ import com.organizer.core.model.User;
 import com.organizer.core.service.CompanyService;
 import com.organizer.core.service.UserService;
 import com.organizer.web.auth.AuthStore;
+import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.CompanyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,30 +31,31 @@ public class CompanyController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "c/create",method = RequestMethod.POST)
-    public ResponseEntity<String> addNewCompany(@RequestBody CompanyDTO newCompany, @RequestHeader(name = "token") String token){
-        Company existingCompany = companyService.findByName(newCompany.getName());
-        //Long userId = authStore.getUsername(token);
-        User owner;
+    @RequestMapping(value = "c/create",method = RequestMethod.POST,consumes = {"multipart/form-data"})
+        public ResponseEntity<String> addNewCompany(@RequestParam("uploadedFile") MultipartFile multipart, @RequestBody CompanyDTO newCompany, @RequestHeader(name = "token") String token){
+        String mail =  JWToken.checkToken(token);
+        if(mail == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
 
-        //username != null ? userService.findById(userId) : null;
+        Company company = companyService.findByNameAndCity(newCompany.getName(),newCompany.getCity());
 
-        if(existingCompany == null){
-            Company company = Company.builder()
-                    .name(newCompany.getName())
-                    .city(newCompany.getCity())
-                    .address(newCompany.getAddress())
-                    .category(newCompany.getCategory())
-                    .country(newCompany.getCountry())
-                    .build();
+        if(company!=null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Company name already taken");
 
-            if(companyService.addNewCompany(company) != null)
-                return ResponseEntity.status(HttpStatus.OK).body("Company was successfully added.");
+        //valid token
+        User user = userService.findByEmail(mail);
+        company = Company.builder().address(newCompany.getAddress())
+                .category(newCompany.getCategory())
+                .city(newCompany.getCity())
+                .country(newCompany.getCity())
+                .owner(user)
+                .name(newCompany.getName())
+                .build();
 
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("There was a problem with your registration. Try again later.");
-        }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("This company name is already used.");
+
+        return ResponseEntity.ok("done");
+
     }
 
 

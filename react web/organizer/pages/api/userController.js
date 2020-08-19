@@ -15,7 +15,7 @@ class UserController {
         .then(_response => {
             return _response;
         }).catch(_err => {
-            console.log(_err.response.headers)
+            console.log(_err)
             return false
         })
     }
