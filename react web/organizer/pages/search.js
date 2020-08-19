@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import styles from '../styles/pages/search.module.scss'
 import { useRouter } from 'next/router'
+import axios from 'axios';
+import querystring from 'querystring'
 
 const Search = () => {
     const router = useRouter()
@@ -8,23 +10,48 @@ const Search = () => {
     const [s_company, setSearchCompany] = useState('') 
     const [s_service, setSearchService] = useState('') 
     const [s_location, setSearchLocation] = useState('') 
+    const [s_page,setSearchPage] = useState(0)
+    const [searchResult,setSearchResult]= useState(null)
 
     useEffect(() => {
         if(router.query['criteria']) {
-            if(router.query['criteria'] === 'company') {
+            if(router.query['criteria'] == 'company') {
+                callForSearch(0,'',router.query['search'],router.query['city'])
                 setSearchCompany(router.query['search'])
             } else {
+                callForSearch(0,router.query['search'],'',router.query['city'])
                 setSearchService(router.query['search'])
             }
             setSearchLocation(router.query['city'])
         }
-        else {
-            setSearchLocation(router.query['location'])
-            setSearchCompany(router.query['company'])
-            setSearchService(router.query['services'])
+    },[router])
+    const callForSearch=(page,service,company,location)=>{
+        
+        let city='';
+        let country='';
+        
+        try{
+            city = location.split(',')[0];
+            country=location.split(',')[1];
         }
-    })
-
+        catch(e){
+            city = location;
+        }
+        
+        const data ={
+            'page':page,
+            'serviceName':service,
+            'companyName':company,
+            'city':city,
+            'country':country   
+        }
+        let query = querystring.stringify(data);
+        axios.get( process.env.REQ_HOST+'/search?'+query).
+          then(e=>{
+           return setSearchResult(e.data)})
+          .catch(err=>false);
+    }
+    
     return (
         <div className={styles.pageWrapper}>
             <div className="row">
@@ -46,7 +73,10 @@ const Search = () => {
                             </div>
 
                             <div className={styles.formGroup}>
-                                <input type="submit" value="Display"/>
+                                <input type="submit" value="Display" onClick={(e)=>{
+                                    e.preventDefault()
+                                    callForSearch(s_page,s_service,s_company,s_location)
+                                }}/>
                             </div>
                         </form>
                     </div>
@@ -54,65 +84,31 @@ const Search = () => {
 
                 <div className={"col-9 " + styles.results}>
                     <div>
-                        <p>Search results for <strong>{router.query['search']}</strong>{router.query['city'] && ` in ${router.query['city']}`}</p>
+                        <p>Search results for <strong> {s_service}</strong>{s_location}</p>
                     </div>
 
                     
                     <ul>
-                        <li>
-                            <div className={styles.title}>
-                                <h1>Company name</h1>
-                                <p>Location, CO</p>
-                            </div>
-
-                            {router.query['services'] && <p>This company has {router.query['services']} services.</p>}
                         
-                            <button>Schedule</button>
-                        </li>
+                        { Array.isArray(searchResult) && searchResult.map(e=>{ 
+                           
+                                return (
+                                    <li>
+                                        <div className={styles.title}>
+                                            <h1>{e.company.name}</h1>
+                                <p>{e.company.city}, {e.company.country}</p>
+                                       
 
-                        <li>
-                            <div className={styles.title}>
-                                <h1>Company name</h1>
-                                <p>Location, CO</p>
-                            </div>
+                                    <p>Services: {e.company.services.map(el=>{return el.name+' '})}</p> 
+                                    <p>Category: {e.company.category}</p> 
+                                    </div>
+                                    <button>Schedule</button>
+                                    </li>
+                                )
+                            })
+                        }
 
-                            {router.query['services'] && <p>This company has {router.query['services']} services.</p>}
-                        
-                            <button>Schedule</button>
-                        </li>
-
-                        <li>
-                            <div className={styles.title}>
-                                <h1>Company name</h1>
-                                <p>Location, CO</p>
-                            </div>
-
-                            {router.query['services'] && <p>This company has {router.query['services']} services.</p>}
-                        
-                            <button>Schedule</button>
-                        </li>
-
-                        <li>
-                            <div className={styles.title}>
-                                <h1>Company name</h1>
-                                <p>Location, CO</p>
-                            </div>
-
-                            {router.query['services'] && <p>This company has {router.query['services']} services.</p>}
-                        
-                            <button>Schedule</button>
-                        </li>
-
-                        <li>
-                            <div className={styles.title}>
-                                <h1>Company name</h1>
-                                <p>Location, CO</p>
-                            </div>
-
-                            {router.query['services'] && <p>This company has {router.query['services']} services.</p>}
-                        
-                            <button>Schedule</button>
-                        </li>
+                    
                     </ul>
                 </div>
             </div>

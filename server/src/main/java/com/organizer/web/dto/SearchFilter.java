@@ -1,9 +1,8 @@
-package com.organizer.core.utils;
+package com.organizer.web.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+@Data
 @Setter
 @Getter
 @Builder

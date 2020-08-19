@@ -14,10 +14,10 @@ module.exports = {
     },
 
     serverRuntimeConfig: {
-        REQ_HOST: 'http://31.5.22.129',
+        REQ_HOST: 'http://192.168.0.2',
     },
 
     env: {
-        REQ_HOST: 'http://31.5.22.129:8080',
+        REQ_HOST: 'http://192.168.0.2:8080',
     },
 }
