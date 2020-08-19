@@ -4,6 +4,7 @@ import com.organizer.core.model.User;
 import com.organizer.core.service.UserService;
 import com.organizer.core.utils.Hash;
 import com.organizer.web.auth.AuthStore;
+import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.SignUpDTO;
 import com.organizer.web.dto.UserDTO;
 import com.organizer.web.utils.AuthSession;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class UserController {
@@ -55,7 +58,7 @@ public class UserController {
 
     @RequestMapping(value = "u/auth", method = RequestMethod.POST)
     public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String email, @RequestParam(required = true, name = "password") String password) {
-       /* User authUser = userService.findByEmail(email);
+        User authUser = userService.findByEmail(email);
 
         if(authUser != null) {
             // bad credentials
@@ -64,15 +67,13 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
 
             // create a token and return it
-            //AuthSession oauthPair = authStore.createToken(authUser.getId().toString());
 
-            // headers set
+            String token = JWToken.create(authUser.getEmail());
+            Date authTime = new Date(JWToken.ttlMillis+System.currentTimeMillis());
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("TOKEN", oauthPair.getToken());
-            responseHeaders.set("AUTH_TIME", oauthPair.getLoginTime().toString());
-            //responseHeaders.set("TOKEN",oauthPair.getToken());
-            //responseHeaders.set("AUTH_TIME", oauthPair.getLoginTime().toString());
-            // DTO set
+            responseHeaders.set("TOKEN", token);
+            responseHeaders.set("AUTH_TIME", authTime.toString());
+
             UserDTO authResponseUser = UserDTO.builder()
                     .email(authUser.getEmail())
                     .name(authUser.getName())
@@ -87,7 +88,6 @@ public class UserController {
                     .body(authResponseUser);
         }
 
-        // bad credentials*/
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
     }
 

@@ -6,16 +6,17 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-
+@Component
 public class JWToken {
     static String secret= "SUPER_SECRET_KEY";
     static Algorithm algorithm = Algorithm.HMAC256(secret);
-    static long ttlMillis=86400 * 1000;
+   public static long ttlMillis=86400 * 1000;
     public static String create(String mail){
-        Date date = new Date(ttlMillis);
+        Date date = new Date(ttlMillis+System.currentTimeMillis());
         try{
             String token = JWT.create()
                     .withIssuer("auth0")
