@@ -121,4 +121,10 @@ public class UserController {
         // user already exists
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("This E-mail address is already used.");
     }
+
+    @RequestMapping(value = "u/changeName",method = RequestMethod.PUT)
+    public ResponseEntity<String>changeName(@RequestParam String email,@RequestParam String name){
+        userService.findByEmail(email).setName(name);
+        return ResponseEntity.status(HttpStatus.OK).body("Name changed.");
+    }
 }
