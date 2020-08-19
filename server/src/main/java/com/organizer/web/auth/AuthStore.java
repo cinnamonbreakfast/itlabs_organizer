@@ -40,7 +40,7 @@ public class AuthStore {
         return true;
     }
 
-    public Long getUsername(String token) {
+    public String getUsername(String token) {
         return sessions.get(token).getToken();
     }
 
