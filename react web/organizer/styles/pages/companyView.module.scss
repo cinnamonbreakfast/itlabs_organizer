@@ -1,0 +1,107 @@
+.pageWrapper {
+    background-color: #FFFFFF;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 10% 20px;
+
+    .cover {
+        width: 100%;
+        position: relative;
+
+        &>img {
+            width: 100%;
+        }
+
+        .controls {
+            position: absolute;
+            right: 30px;
+            bottom: 20px;
+
+            button {
+                margin: 5px;
+            }
+        }
+
+        .adminControls {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+
+            button {
+                margin: 5px;
+            }
+        }
+
+        .companyLogo {
+            position: absolute;
+            bottom: 10px;
+            left: 30px;
+
+            width: 160px;
+            height: 160px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 5px 10px rgba(100,0,0, 0.1);
+        }
+
+        .companyTitle {
+            padding: 10px 210px;
+
+            h1 {
+                margin: 0px;
+            }
+
+            p {
+                margin: 0px;
+                color: #818181;
+            }
+        }
+    }
+
+    .pageContent {
+        padding-top: 40px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 250px auto;
+        column-gap: 10px;
+    }
+
+    .board {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        margin: 0px;
+
+        h2 {
+            margin: 0px;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 10px;
+            color: #818181;
+        }
+
+        .timeTable {
+            list-style-type: none;
+            margin: 0px;
+            padding: 10px;
+
+            li {
+                padding: 5px 5px;
+
+                &:nth-child(even) {
+                    background-color: #fcfcfc;
+                }
+
+                &.closed {
+                    background-color: red !important;
+                }
+            }
+        }
+
+        .servicesList {
+            list-style-type: none;
+        }
+    }
+}

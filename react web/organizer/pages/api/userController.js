@@ -21,8 +21,9 @@ class UserController {
     }
 
     logout() {
-        this.dispatcher({type: actions.SET_AUTH_STATUS, payload: false})
-        this.dispatcher({type: actions.SET_USER_DATA, payload: null})
+        // this.dispatcher({type: actions.SET_AUTH_STATUS, payload: false})
+        // this.dispatcher({type: actions.SET_USER_DATA, payload: null})
+        this.dispatcher({type: actions.LOGOUT})
 
         return true;
     }
