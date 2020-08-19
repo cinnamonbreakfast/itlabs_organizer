@@ -14,11 +14,12 @@ module.exports = {
     },
 
     serverRuntimeConfig: {
-        REQ_HOST: 'http://31.5.22.129',
+        REQ_HOST: 'http://192.168.0.2',
     },
 
     env: {
         REQ_HOST: 'http://31.5.22.129:8080',
-        STATIC_FRONT_RESOURCES: '/photo/logos',
+        STATIC_FRONT_RESOURCES: '/photo/logos'
+
     },
 }
