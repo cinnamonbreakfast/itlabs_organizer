@@ -4,7 +4,6 @@ import TopNavigation, { LINK_PROP } from '../components/TopNavigation'
 import { PersistGate } from 'redux-persist/integration/react'
 import { Provider } from 'react-redux'
 import myStore, { persisted } from './api/redux/store'
-
 const links = [
   {
     url: '/',

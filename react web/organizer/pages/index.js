@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import styles from '../styles/pages/home.module.scss'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import generator from '../utils/generator'
 
 export default function Home() {
   const router = useRouter()
