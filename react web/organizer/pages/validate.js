@@ -23,7 +23,16 @@ const ValidationForm = (props) => {
     return (
         <form className={styles.form} onSubmit={e => submitForm(e)}>
             <div className={styles.formGroup}>
-                <input type="text" name="code" placeholder="Code"/>
+                <input type="text" maxLength="6" name="code" placeholder="Code"/>
+            
+                <div className={styles.dashes}>
+                    <div/>
+                    <div/>
+                    <div/>
+                    <div/>
+                    <div/>
+                    <div/>
+                </div>
             </div>
 
             <input type="submit" value="Validate"/>
