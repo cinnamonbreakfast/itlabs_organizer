@@ -49,11 +49,11 @@ const PageContent = (props) => {
                     <h2>Services</h2>
 
                     <ul className={styles.servicesList}>
-                        <li>
-                            <div className={styles.serviceName}>Tuns</div>
-                            <div>30 min</div>
-                            <div>10$</div>
-                        </li>
+                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
                     </ul>
                 </div>
 
