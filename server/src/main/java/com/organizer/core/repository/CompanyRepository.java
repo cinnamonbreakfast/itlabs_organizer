@@ -12,7 +12,12 @@ import java.util.List;
 
 public interface CompanyRepository extends Repository<Long, Company>  {
     Company findByName(String name);
+
+    @Query("select c from Company c where c.name=?1 and c.city=?2")
+    Company findByNameAndCityAnd(String name,String city);
+
     List<Company> findByCity(String city);
+
     Page<Company> findAll(Example e, Pageable page);
 
     @Query(value ="select b from Company b " +

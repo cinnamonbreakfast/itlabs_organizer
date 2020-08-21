@@ -58,6 +58,10 @@ public class CompanyService {
         ).getContent();
     }
 
+    public Company findByNameAndCity(String name, String city){
+        return this.companyRepository.findByNameAndCityAnd(name,city);
+    }
+
 
 
 }
