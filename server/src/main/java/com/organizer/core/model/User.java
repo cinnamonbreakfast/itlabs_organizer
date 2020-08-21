@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.NamedQuery;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
-import java.util.Set;
 
 @Table(name="users", schema="public")
 @javax.persistence.Entity
