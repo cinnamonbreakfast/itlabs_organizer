@@ -1,18 +1,23 @@
 package com.organizer.web.controller;
 
+import com.organizer.core.model.CityList;
 import com.organizer.core.model.Company;
+import com.organizer.core.model.CountryList;
 import com.organizer.core.model.User;
-import com.organizer.core.service.CompanyService;
-import com.organizer.core.service.UserService;
+import com.organizer.core.service.*;
+import com.organizer.core.service.file.FileService;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.CompanyDTO;
+import com.organizer.web.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,26 +28,55 @@ public class CompanyController {
     private final CompanyService companyService;
     private final AuthStore authStore;
     private final UserService userService;
-
+    private final FileService fileService;
+    private final AnimeService animeService;
+    private final CityListService cityListService;
+    private final CountryListService countryListService;
     @Autowired
-    public CompanyController(CompanyService companyService, AuthStore authStore, UserService userService) {
+    public CompanyController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, AnimeService animeService, CityListService cityListService, CountryListService countryListService) {
         this.companyService = companyService;
         this.authStore = authStore;
         this.userService = userService;
+        this.fileService=fileService;
+        this.animeService=animeService;
+        this.cityListService=cityListService;
+        this.countryListService=countryListService;
     }
 
     @RequestMapping(value = "c/create",method = RequestMethod.POST,consumes = {"multipart/form-data"})
-        public ResponseEntity<String> addNewCompany(@RequestParam("uploadedFile") MultipartFile multipart, @RequestBody CompanyDTO newCompany, @RequestHeader(name = "token") String token){
+        //public ResponseEntity<String> addNewCompany(@RequestParam("file") MultipartFile file, @RequestBody CompanyDTO newCompany, @RequestHeader(name = "token") String token){
+    public ResponseEntity<String> addNewCompany(@RequestParam("file") MultipartFile file,
+CompanyDTO newCompany,@RequestHeader String token ){
+
         String mail =  JWToken.checkToken(token);
+        //valid token
         if(mail == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
 
-        Company company = companyService.findByNameAndCity(newCompany.getName(),newCompany.getCity());
-
+        String username = newCompany.getName()+"."+newCompany.getCity();
+        Company company = companyService.findByUsername(username);
+        // validate company_name
         if(company!=null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Company name already taken");
 
-        //valid token
+        //todo:validate image
+
+        //validate category
+        String category = newCompany.getCategory();
+        if(animeService.getCount(category)!=1){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Give a category from database");
+        }
+        //validate country & city
+        String country = newCompany.getCountry();
+        String city = newCompany.getCity();
+        if(cityListService.getCount(country,city)!=1){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Give a country and city from database");
+        }
+        //get category, country & city from db
+        category = animeService.findByList(category).getList();
+        country= countryListService.findByCountry(country).getAbbreviation();
+        city = cityListService.findByCity(city).getCity();
+
         User user = userService.findByEmail(mail);
         company = Company.builder().address(newCompany.getAddress())
                 .category(newCompany.getCategory())
@@ -50,40 +84,68 @@ public class CompanyController {
                 .country(newCompany.getCity())
                 .owner(user)
                 .name(newCompany.getName())
+                .username(username)
                 .build();
 
-
-
-        return ResponseEntity.ok("done");
-
+        String [] list = file.getOriginalFilename() .split("[.]");
+        if(list.length==1) {
+            fileService.uploadDir(file, company.getImage_url() + "." + list[0]);
+            company.setImage_url(username);
+        }
+        else if(list.length>1) {
+            fileService.uploadDir(file, company.getImage_url() + "." + list[list.length - 1]);
+            company.setImage_url(username);
+        }
+        else{
+            company.setImage_url("default_company");
+        }
+        companyService.save(company);
+        return ResponseEntity.ok("Created a company");
     }
 
+    @RequestMapping(value = "c/findByOwner",method = RequestMethod.GET)
+    public ResponseEntity<List<CompanyDTO>> listByCompanyOwner(@RequestHeader(value = "token") String token){
+        String mail = JWToken.checkToken(token);
+        if(mail==null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        User user = userService.findByEmail(mail);
 
+        List<Company> companies = companyService.findByOwner(user);
 
+        List<CompanyDTO> companyDTOList = new ArrayList<>(companies.size());
+        for(Company company : companies){
 
+            UserDTO userDTO = UserDTO.builder()
+                    .phone(user.getPhone())
+                    .email(user.getEmail())
+                    .build();
 
-    @RequestMapping(value = "c/find",method = RequestMethod.GET)
-    public ResponseEntity<List<CompanyDTO>> getFirstFiveBestResults(@RequestParam(required = false) String city,@RequestParam(required = false ) String country,@RequestHeader(value = "SESSION") String token){
-        if(!authStore.sessionExists(token))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-        List<Company> companies = null;
-
-        List<CompanyDTO> companyDTOList = companies.stream()
-                .map(x->CompanyDTO.builder()
-                        .city(x.getCity())
-                        .country(x.getCountry())
-                        .name(x.getName())
-                        .build())
-                .collect(Collectors.toList());
+            CompanyDTO companyDTO =CompanyDTO.builder()
+                    .country(company.getCountry())
+                    .name(company.getName())
+                    .category(company.getCategory())
+                    .address(company.getAddress())
+                    .city(company.getCity())
+                    .image_url(company.getImage_url())
+                    .userDTO(userDTO)
+                    .build();
+            companyDTOList.add(companyDTO);
+        }
 
         return ResponseEntity.ok(companyDTOList);
     }
 
     @RequestMapping(value = "c/getId/{id}",method = RequestMethod.GET)
     public ResponseEntity<Company> findCompanyId(@PathVariable Long id ){
-        System.out.println("Here");
         Company company = companyService.findById(id);
+        return ResponseEntity.ok(company);
+    }
+    @RequestMapping(value = "c/{username}",method = RequestMethod.GET)
+    public ResponseEntity<Company> findUsername(@PathVariable String username ){
+        System.out.println(username);
+        Company company = companyService.findByUsername(username);
+        if(company==null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         return ResponseEntity.ok(company);
     }
 }

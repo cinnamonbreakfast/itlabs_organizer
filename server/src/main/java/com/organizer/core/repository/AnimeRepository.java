@@ -9,4 +9,8 @@ public interface AnimeRepository extends Repository<Long, AnimeList>{
     @Query("select a from AnimeList a where lower(a.list) like concat('%',lower(?1),'%') ")
     Page<AnimeList> getAnimeList(Pageable pageable,String value);
 
+    Long countByList(String list );
+
+    AnimeList findByList(String list);
+
 }

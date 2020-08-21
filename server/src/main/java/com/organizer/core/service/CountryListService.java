@@ -17,8 +17,12 @@ public class CountryListService {
         this.countryListRepository= countryListRepository;
     }
 
-    public List<CountryList> getCountryListByCountry(int pageNr,String country){
+    public List<CountryList> getCountryListByCountry(int pageNr,String country,String city){
         Pageable pageable = PageRequest.of(pageNr,5);
-        return countryListRepository.getCountryListByCountry(pageable,country).getContent();
+        return countryListRepository.getCountryListByCountry(pageable,country,city).getContent();
+    }
+
+    public CountryList findByCountry(String country){
+        return countryListRepository.findByCountry(country);
     }
 }

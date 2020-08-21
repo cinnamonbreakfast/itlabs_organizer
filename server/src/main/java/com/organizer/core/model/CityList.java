@@ -1,15 +1,12 @@
 package com.organizer.core.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.List;
 
-@Table(name="countrylist",schema="public")
+@Table(name="citylist",schema="public")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,15 +14,12 @@ import java.util.List;
 @Builder
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CountryList  extends  Entity<Long>
-{
+public class CityList extends Entity<Long>{
+    @Basic
+    @Column
+    String city;
+
     @Basic
     @Column
     String country;
-
-    @Basic
-    @Column
-    String abbreviation;
-
-
 }

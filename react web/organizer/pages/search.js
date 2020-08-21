@@ -33,11 +33,16 @@ const Search = () => {
         try{
             city = location.split(',')[0];
             country=location.split(',')[1];
+            city = city.trim()
+            country=country.trim()
         }
         catch(e){
             city = location;
+            city = city.trim()
         }
-        
+        company=company.trim()
+        location=location.trim()
+        service= service.trim()
         const data ={
             'page':page,
             'serviceName':service,

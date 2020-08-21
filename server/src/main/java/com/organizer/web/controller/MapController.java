@@ -1,6 +1,7 @@
 package com.organizer.web.controller;
 
 import com.organizer.core.model.AnimeList;
+import com.organizer.core.model.CityList;
 import com.organizer.core.model.Company;
 import com.organizer.core.model.CountryList;
 import com.organizer.core.service.*;
@@ -32,13 +33,15 @@ public class MapController {
     private final SpecialistServiceService specialistServiceService;
     private final AnimeService animeService;
     private final CountryListService countryListService;
+    private final CityListService cityListService;
     @Autowired
-    public MapController(SpecialistService specialistService, CompanyService companyService, SpecialistServiceService specialistServiceService,AnimeService animeService,CountryListService countryListService) {
+    public MapController(SpecialistService specialistService, CompanyService companyService, SpecialistServiceService specialistServiceService,AnimeService animeService,CountryListService countryListService,CityListService cityListService) {
         this.companyService = companyService;
         this.specialistService = specialistService;
         this.specialistServiceService = specialistServiceService;
         this.animeService= animeService;
         this.countryListService=countryListService;
+        this.cityListService=cityListService;
     }
 
     @RequestMapping(value = "map/sugestion", method = RequestMethod.POST)
@@ -115,7 +118,15 @@ public class MapController {
     @RequestMapping(value="search",method = RequestMethod.GET)
     public ResponseEntity<List<MapDTO>> companySearciveSearchFilter(SearchFilter searchFilter)
     {
-        System.out.println(searchFilter);
+        try {
+            searchFilter.setCity(searchFilter.getCity().trim());
+            searchFilter.setCompanyName(searchFilter.getCompanyName().trim());
+            searchFilter.setServiceName(searchFilter.getServiceName().trim());
+            searchFilter.setCountry(searchFilter.getCountry().trim());
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
         List<Company> companies =companyService.findByFilter(searchFilter,searchFilter.getPage(),pageSize );
         List<MapDTO> mapDTOS = new ArrayList<>(companies.size());
         for(Company company : companies) {
@@ -156,7 +167,14 @@ public class MapController {
     }
 
     @RequestMapping(value="fetch/countrylist",method = RequestMethod.GET)
-    public ResponseEntity<List<CountryList>> getCountryList(@RequestParam int page, @RequestParam String country){
-        return ResponseEntity.ok(countryListService.getCountryListByCountry(page,country));
+    public ResponseEntity<List<CountryList>> getCountryList(@RequestParam int page, @RequestParam String country,@RequestParam String city){
+        System.out.println(country+" "+city+"country");
+        return ResponseEntity.ok(countryListService.getCountryListByCountry(page,country,city));
+    }
+
+    @RequestMapping(value="fetch/citylist",method = RequestMethod.GET)
+    public ResponseEntity<List<CityList>> getCityList(@RequestParam int page, @RequestParam String country, @RequestParam String city){
+        System.out.println(country+" "+city+"city");
+        return ResponseEntity.ok(cityListService.getCityList(page,country,city));
     }
 }
