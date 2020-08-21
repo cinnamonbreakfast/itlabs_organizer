@@ -10,5 +10,7 @@ public interface CountryListRepository extends  Repository<Long, CountryList> {
     @Query("select distinct c from CountryList c join CityList l on c.abbreviation = l.country where lower(c.country) like concat('%',lower(?1),'%') and lower(l.city) like concat('%',lower(?2),'%') ")
     Page<CountryList> getCountryListByCountry(Pageable pageable, String country,String city);
 
+
+    @Query("select c from CountryList c  where lower(c.country) like concat('%',lower(?1),'%') ")
     CountryList findByCountry(String country);
 }

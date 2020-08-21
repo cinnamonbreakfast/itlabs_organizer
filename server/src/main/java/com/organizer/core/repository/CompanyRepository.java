@@ -46,4 +46,7 @@ public interface CompanyRepository extends Repository<Long, Company>  {
     Company findByUsername(String username);
 
     List<Company> findByOwner(User user);
+
+
+
 }

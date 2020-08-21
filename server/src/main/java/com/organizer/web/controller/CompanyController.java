@@ -45,7 +45,7 @@ public class CompanyController {
 
     @RequestMapping(value = "c/create",method = RequestMethod.POST,consumes = {"multipart/form-data"})
         //public ResponseEntity<String> addNewCompany(@RequestParam("file") MultipartFile file, @RequestBody CompanyDTO newCompany, @RequestHeader(name = "token") String token){
-    public ResponseEntity<String> addNewCompany(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<String> addNewCompany(@RequestParam(name="file",required = false) MultipartFile file,
 CompanyDTO newCompany,@RequestHeader String token ){
 
         String mail =  JWToken.checkToken(token);
@@ -73,6 +73,8 @@ CompanyDTO newCompany,@RequestHeader String token ){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Give a country and city from database");
         }
         //get category, country & city from db
+        System.out.println(newCompany);
+        System.out.println(city);
         category = animeService.findByList(category).getList();
         country= countryListService.findByCountry(country).getAbbreviation();
         city = cityListService.findByCity(city).getCity();
@@ -87,16 +89,20 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 .username(username)
                 .build();
 
-        String [] list = file.getOriginalFilename() .split("[.]");
-        if(list.length==1) {
-            fileService.uploadDir(file, company.getImage_url() + "." + list[0]);
-            company.setImage_url(username);
+        try {
+            String[] list = file.getOriginalFilename().split("[.]");
+            if (list.length == 1) {
+                fileService.uploadDir(file, company.getImage_url() + "." + list[0]);
+                company.setImage_url(username);
+            } else if (list.length > 1) {
+                fileService.uploadDir(file, company.getImage_url() + "." + list[list.length - 1]);
+                company.setImage_url(username);
+            } else {
+                company.setImage_url("default_company");
+            }
         }
-        else if(list.length>1) {
-            fileService.uploadDir(file, company.getImage_url() + "." + list[list.length - 1]);
-            company.setImage_url(username);
-        }
-        else{
+        catch (Exception e )
+        {
             company.setImage_url("default_company");
         }
         companyService.save(company);
@@ -116,7 +122,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
         for(Company company : companies){
 
             UserDTO userDTO = UserDTO.builder()
-                    .phone(user.getPhone())
+                    .phone(user. getPhone())
                     .email(user.getEmail())
                     .build();
 
@@ -147,5 +153,70 @@ CompanyDTO newCompany,@RequestHeader String token ){
         if(company==null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         return ResponseEntity.ok(company);
+    }
+    @RequestMapping(value = "c/changeDetails", method=RequestMethod.PUT)
+    public ResponseEntity<String> updateDetails(@RequestParam(name="file",required = false) MultipartFile file,
+                                                    CompanyDTO updateCompany,@RequestHeader String token )
+    {
+            String mail = JWToken.checkToken(token);
+            if(mail==null){
+                ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");
+            }
+            User user = userService.findByEmail(mail);
+            String username = updateCompany.getUsername();
+            Company company = companyService.findByUsername(username);
+            if(company==null){
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known company");
+            }
+            if(company.getOwner().getEmail().equals(user.getEmail())==false){
+                ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not the owner of the company");
+            }
+        // validate company_name
+        if(company!=null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Company name already taken");
+
+        //todo:validate image
+
+        //validate category
+        String category = updateCompany.getCategory();
+        if(animeService.getCount(category)!=1){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Give a category from database");
+        }
+        //validate country & city
+        String country = updateCompany.getCountry();
+        String city = updateCompany.getCity();
+        if(cityListService.getCount(country,city)!=1){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Give a country and city from database");
+        }
+        //get category, country & city from db
+        category = animeService.findByList(category).getList();
+        country= countryListService.findByCountry(country).getAbbreviation();
+        city = cityListService.findByCity(city).getCity();
+        String name = updateCompany.getName();
+        String address = updateCompany.getAddress();
+
+        company.setAddress(address);
+        company.setName(name);
+        company.setCity(city);
+        company.setCountry(country);
+        company.setCategory(category);
+        try {
+                String[] list = file.getOriginalFilename().split("[.]");
+                if (list.length == 1) {
+                    fileService.uploadDir(file, company.getImage_url() + "." + list[0]);
+                    company.setImage_url(username);
+                } else if (list.length > 1) {
+                    fileService.uploadDir(file, company.getImage_url() + "." + list[list.length - 1]);
+                    company.setImage_url(username);
+                } else {
+
+                }
+            }
+            catch (Exception e )
+            {
+
+            }
+        companyService.save(company);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Updated company");
     }
 }
