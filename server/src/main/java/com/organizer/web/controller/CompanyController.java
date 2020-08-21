@@ -147,7 +147,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
         Company company = companyService.findById(id);
         return ResponseEntity.ok(company);
     }
-    @RequestMapping(value = "c/{username}",method = RequestMethod.GET)
+    @RequestMapping(value = "c/{username:.+}",method = RequestMethod.GET)
     public ResponseEntity<CompanyDTO> findUsername(@PathVariable String username ){
 
         Company company = companyService.findByUsername(username);
