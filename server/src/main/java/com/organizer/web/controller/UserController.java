@@ -110,6 +110,8 @@ public class UserController {
                     .city(signUpDTO.getCity())
                     .country(signUpDTO.getCountry())
                     .password(signUpDTO.getPassword())
+                    .verifiedEmail(0)
+                    .verifiedPhone(0)
                     .build();
 
             // attempt to create user

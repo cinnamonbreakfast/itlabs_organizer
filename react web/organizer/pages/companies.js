@@ -43,7 +43,7 @@ const Companies = () => {
                 
                 {
                     Array.isArray(s_search.data)&&s_search.data.map(e=>{
-                        testRequest('Valid Company.Foxborough')
+
                         return(
                             <div className={styles.company}>
                                 <div className={styles.identity}>
@@ -51,7 +51,7 @@ const Companies = () => {
                                     <img src={`${process.env.STATIC_FRONT_RESOURCES}/milestone_cover.png`}/>
                                     </div>
                                     <div className={styles.picture}>
-                                        <img src={`${process.env.STATIC_FRONT_RESOURCES}/milestone.png`}/>
+                                        <img src={process.env.REQ_HOST+'/img/'+e.image_url}/>
                                     </div>
                                 </div>
 

@@ -28,4 +28,7 @@ public class SpecialistService {
     public List<Specialist> findByCompanyTest(){
         return specialistRepository.findByCompanyTest();
     }
+    public List<Specialist> findByCompanyUsername(String username) {
+        return specialistRepository.findByUsername( username);
+    }
 }
