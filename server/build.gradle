@@ -53,7 +53,11 @@ dependencies {
     compile group: 'org.toile-libre.libe', name: 'curl', version: '0.0.38'
 
 
+//    implementation 'org.springframework.boot', name: 'spring-context-support', '5.2.5.RELEASE'
+//    implementation 'org.springframework.boot', name: 'spring-boot-starter-mail', '2.2.5.RELEASE'
 
+    implementation 'org.springframework:spring-context-support'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useRouter } from 'next/router'
 import styles from '../styles/pages/companies.module.scss'
@@ -26,6 +26,24 @@ const Companies = () => {
     },[])
     if (!user.userLoggedIn) {
         router.push('/signin')
+    }
+
+    useEffect(() => {
+        console.log(router.query['name'])
+    })
+
+    const testBtn = () => {
+        // router.push(
+        //     '/companies',
+        //     '/c/@Barbershop',
+        //     {
+        //         query: {
+        //             name: 'Test'
+        //         }
+        //     }    
+        // )
+
+        router.push('/c/[name]', '/c/lol')
     }
 
     return (
@@ -71,6 +89,8 @@ const Companies = () => {
                 
 
             </div>
+
+            <button onClick={() => testBtn()}>Test</button>
         </div>
     )
 }
