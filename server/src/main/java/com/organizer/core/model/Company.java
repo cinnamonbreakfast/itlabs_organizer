@@ -48,6 +48,10 @@ public class Company extends Entity<Long>{
     @Basic(optional = false)
     private String country;
 
+    @Basic
+    @Column(name="username")
+    private String username;
+
     @OneToOne
     @JoinColumn(name = "owner")
     private User owner;
@@ -55,4 +59,10 @@ public class Company extends Entity<Long>{
     @JsonManagedReference
     @OneToMany(mappedBy = "company")
     private List<Specialist> specialists;
+
+    @Basic
+    @Column
+    String image_url;
+
+
 }

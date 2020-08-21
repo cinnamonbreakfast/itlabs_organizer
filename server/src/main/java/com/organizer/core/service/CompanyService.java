@@ -2,6 +2,7 @@ package com.organizer.core.service;
 
 
 import com.organizer.core.model.Company;
+import com.organizer.core.model.User;
 import com.organizer.web.dto.SearchFilter;
 import com.organizer.core.repository.CompanyRepository;
 
@@ -20,11 +21,6 @@ public class CompanyService {
     {
         this.companyRepository = repository;
     }
-
-    public Company addNewCompany(Company company){
-        return companyRepository.save(company);
-    }
-
 
     public List<Company> findByCity(String city){
         return companyRepository.findByCity(city);
@@ -62,6 +58,16 @@ public class CompanyService {
         return this.companyRepository.findByNameAndCityAnd(name,city);
     }
 
+    public Company findByUsername(String username){
+        return this.companyRepository.findByUsername(username);
+    }
+    public Company save(Company company){
+        return this.companyRepository.save(company);
+    }
 
+    public List<Company> findByOwner(User user )
+    {
+        return companyRepository.findByOwner(user);
+    }
 
 }

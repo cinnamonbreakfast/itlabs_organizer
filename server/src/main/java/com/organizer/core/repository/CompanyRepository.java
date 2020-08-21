@@ -2,6 +2,7 @@ package com.organizer.core.repository;
 
 import com.organizer.core.model.Company;
 import com.organizer.core.model.Specialist;
+import com.organizer.core.model.User;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,5 +42,8 @@ public interface CompanyRepository extends Repository<Long, Company>  {
             "and lower (c.city) like concat('%',lower(?4),'%')")
     Page <Company> findBySearchFilter(Pageable pageable, String companyName, String serviceName,String country,String city);
 
+    @Query( value= "select c from Company c where c.username like ?1")
+    Company findByUsername(String username);
 
+    List<Company> findByOwner(User user);
 }

@@ -18,4 +18,6 @@ public class UserDTO extends BaseDTO {
     private String imageURL;
     private String city;
     private String country;
+    private String token;
+    private String authTime;
 }

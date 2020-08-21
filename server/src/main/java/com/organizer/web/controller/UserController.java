@@ -81,7 +81,10 @@ public class UserController {
                     .role(authUser.getRole())
                     .imageURL(authUser.getImageURL())
                     .city(authUser.getCity())
-                    .country(authUser.getCountry()).build();
+                    .country(authUser.getCountry())
+                    .token(token)
+                    .authTime(authTime.toString())
+                    .build();
 
             return ResponseEntity.ok()
                     .headers(responseHeaders)
