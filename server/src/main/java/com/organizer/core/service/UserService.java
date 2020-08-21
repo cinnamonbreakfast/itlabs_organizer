@@ -33,6 +33,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public void remove(User user) {
+        this.userRepository.delete(user);
+    }
+
     public User findById(Long id){
         return userRepository.findById(id).get();
     }
