@@ -20,4 +20,11 @@ public class AnimeService {
         Pageable pageable = PageRequest.of(pageNumber,5);
         return this.animeRepository.getAnimeList(pageable,value).getContent();
     }
+    public Long getCount(String list){
+        return animeRepository.countByList(list);
+    }
+
+    public AnimeList findByList(String list){
+        return animeRepository.findByList(list);
+    }
 }
