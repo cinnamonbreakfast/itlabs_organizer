@@ -11,5 +11,6 @@ public interface CityListRepository extends Repository<Long, CityList>{
     @Query("select count(l) from CityList l join CountryList c on c.abbreviation=l.country where lower(c.country) like concat('%',lower(?1),'%') and lower(l.city) like concat('%',lower(?2),'%') ")
     Long countByCityAndCountry(String country,String city);
 
+    @Query("select l from CityList l  where lower(l.city) like concat('%',lower(?1),'%') ")
     CityList findByCity(String city);
 }

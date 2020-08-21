@@ -31,6 +31,7 @@ public class FileService {
     public Resource loadFileAsResource(String fileName) {
         try {
             Path filePath = Paths.get(uploadDir+File.separator + fileName);
+            System.out.println(filePath.toUri());
             Resource resource = new UrlResource(filePath.toUri());
             if(resource.exists()) {
                 return resource;
