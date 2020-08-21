@@ -13,4 +13,8 @@ public interface SpecialistRepository extends Repository<Long, Specialist>{
     @Query(value = "select s from Company c join Specialist s on c=s.company")
     List<Specialist> findByCompanyTest();
 
+
+
+    @Query("select s from Company  c join Specialist  s on s.company=c where c.username=?1")
+    List<Specialist> findByUsername(String company_username);
 }

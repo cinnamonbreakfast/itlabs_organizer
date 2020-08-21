@@ -49,6 +49,9 @@ dependencies {
     compile 'com.google.api-client:google-api-client:1.30.10'
     // https://mvnrepository.com/artifact/com.auth0/java-jwt
     implementation group: 'com.auth0', name: 'java-jwt', version: '3.10.3'
+    // https://mvnrepository.com/artifact/org.toile-libre.libe/curl
+    compile group: 'org.toile-libre.libe', name: 'curl', version: '0.0.38'
+
 
 //    implementation 'org.springframework.boot', name: 'spring-context-support', '5.2.5.RELEASE'
 //    implementation 'org.springframework.boot', name: 'spring-boot-starter-mail', '2.2.5.RELEASE'

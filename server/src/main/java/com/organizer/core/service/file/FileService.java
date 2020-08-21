@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,9 +30,17 @@ public class FileService {
         }
     }
     public Resource loadFileAsResource(String fileName) {
+
+        File f = new File(uploadDir);
+        File[] matchingFiles = f.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith(fileName);
+            }
+        });
+        String pathFile = matchingFiles[0].getAbsolutePath();
+
         try {
-            Path filePath = Paths.get(uploadDir+File.separator + fileName);
-            System.out.println(filePath.toUri());
+            Path filePath = Paths.get(pathFile);
             Resource resource = new UrlResource(filePath.toUri());
             if(resource.exists()) {
                 return resource;
