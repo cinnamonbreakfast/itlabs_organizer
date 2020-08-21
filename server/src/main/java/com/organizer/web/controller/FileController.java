@@ -27,12 +27,12 @@ public class FileController {
     @RequestMapping(value ="img/{image_url}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String image_url, HttpServletRequest request)
     {
-        Resource resource = fileService.loadFileAsResource(image_url);
-        try {
-            System.out.println(resource.contentLength());
+        Resource resource=null;
+        try{
+        resource = fileService.loadFileAsResource(image_url);
         }
         catch (Exception e){
-
+            resource  = fileService.loadFileAsResource("default_company.png");
         }
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")

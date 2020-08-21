@@ -1,15 +1,15 @@
 package com.organizer.web.controller;
 
-import com.organizer.core.model.CityList;
-import com.organizer.core.model.Company;
-import com.organizer.core.model.CountryList;
-import com.organizer.core.model.User;
+import com.organizer.core.model.*;
 import com.organizer.core.service.*;
 import com.organizer.core.service.file.FileService;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.CompanyDTO;
+import com.organizer.web.dto.ServiceDTO;
+import com.organizer.web.dto.SpecialistDTO;
 import com.organizer.web.dto.UserDTO;
+import com.organizer.web.utils.Parser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +53,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
         if(mail == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
 
-        String username = newCompany.getName()+"."+newCompany.getCity();
+        String username = newCompany.getName()+"-"+newCompany.getCity();
         Company company = companyService.findByUsername(username);
         // validate company_name
         if(company!=null)
@@ -81,9 +81,9 @@ CompanyDTO newCompany,@RequestHeader String token ){
 
         User user = userService.findByEmail(mail);
         company = Company.builder().address(newCompany.getAddress())
-                .category(newCompany.getCategory())
-                .city(newCompany.getCity())
-                .country(newCompany.getCity())
+                .category(category)
+                .city(city)
+                .country(country)
                 .owner(user)
                 .name(newCompany.getName())
                 .username(username)
@@ -92,10 +92,10 @@ CompanyDTO newCompany,@RequestHeader String token ){
         try {
             String[] list = file.getOriginalFilename().split("[.]");
             if (list.length == 1) {
-                fileService.uploadDir(file, company.getImage_url() + "." + list[0]);
+                fileService.uploadDir(file, username+ "." + list[0]);
                 company.setImage_url(username);
             } else if (list.length > 1) {
-                fileService.uploadDir(file, company.getImage_url() + "." + list[list.length - 1]);
+                fileService.uploadDir(file, username + "." + list[list.length - 1]);
                 company.setImage_url(username);
             } else {
                 company.setImage_url("default_company");
@@ -134,6 +134,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
                     .city(company.getCity())
                     .image_url(company.getImage_url())
                     .userDTO(userDTO)
+                    .username(company.getUsername())
                     .build();
             companyDTOList.add(companyDTO);
         }
@@ -147,12 +148,32 @@ CompanyDTO newCompany,@RequestHeader String token ){
         return ResponseEntity.ok(company);
     }
     @RequestMapping(value = "c/{username}",method = RequestMethod.GET)
-    public ResponseEntity<Company> findUsername(@PathVariable String username ){
-        System.out.println(username);
+    public ResponseEntity<CompanyDTO> findUsername(@PathVariable String username ){
+
         Company company = companyService.findByUsername(username);
         if(company==null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        return ResponseEntity.ok(company);
+        List<com.organizer.core.model.SpecialistService> specialistServices = Parser.getServicesFromCompany(company);
+
+        List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
+
+        for (com.organizer.core.model.SpecialistService specialistService : specialistServices) {
+            ServiceDTO serviceDTO = ServiceDTO.builder()
+                    .name(specialistService.getServiceName()).build();
+            serviceDTOS.add(serviceDTO);
+        }
+      List<SpecialistDTO> specialistDTOS = Parser.getSpecialisDTOtFromCompany(company);
+        CompanyDTO companyDTO = CompanyDTO.builder()
+                .name(company.getName())
+                .address(company.getAddress())
+                .city(company.getCity())
+                .category(company.getCategory())
+                .country(company.getCountry())
+                .username(company.getUsername())
+                .specialistDTOList(specialistDTOS)
+                .services(serviceDTOS).build();
+        companyDTO.setId(company.getId());
+        return ResponseEntity.ok(companyDTO);
     }
     @RequestMapping(value = "c/changeDetails", method=RequestMethod.PUT)
     public ResponseEntity<String> updateDetails(@RequestParam(name="file",required = false) MultipartFile file,
@@ -203,18 +224,18 @@ CompanyDTO newCompany,@RequestHeader String token ){
         try {
                 String[] list = file.getOriginalFilename().split("[.]");
                 if (list.length == 1) {
-                    fileService.uploadDir(file, company.getImage_url() + "." + list[0]);
+                    fileService.uploadDir(file, username+ "." + list[0]);
                     company.setImage_url(username);
                 } else if (list.length > 1) {
-                    fileService.uploadDir(file, company.getImage_url() + "." + list[list.length - 1]);
+                    fileService.uploadDir(file, username + "." + list[list.length - 1]);
                     company.setImage_url(username);
                 } else {
-
+                    company.setImage_url("default_company");
                 }
             }
             catch (Exception e )
             {
-
+                company.setImage_url("default_company");
             }
         companyService.save(company);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Updated company");

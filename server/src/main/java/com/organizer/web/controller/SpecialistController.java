@@ -7,6 +7,7 @@ import com.organizer.core.service.CompanyService;
 import com.organizer.core.service.SpecialistService;
 import com.organizer.core.service.UserService;
 import com.organizer.web.auth.AuthStore;
+import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.CompanyDTO;
 import com.organizer.web.dto.SpecialistDTO;
 import com.organizer.web.dto.UserDTO;
@@ -51,15 +52,10 @@ public class SpecialistController {
         Specialist specialists = specialistService.findById(user_id);
         return ResponseEntity.ok(specialists);
     }
-    @RequestMapping(value = "/s/search/by/company/{company_id}", method = RequestMethod.GET)
-    public ResponseEntity<List<SpecialistDTO>> findSpecialistsbyCompany(@PathVariable(required= true)Long company_id){
-        //TODo : token validation...
-        /*
-        if(authStore.sessionExists(token)==false)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Token invalid try log in again").body(null);
-        */
+    @RequestMapping(value = "/s/search/by/company/{username}", method = RequestMethod.GET)
+    public ResponseEntity<List<SpecialistDTO>> findSpecialistsbyCompany(@PathVariable(required= true)String username){
 
-        List<Specialist> specialists = specialistService.findByCompany(company_id);
+        List<Specialist> specialists = specialistService.findByCompanyUsername(username);
         if(specialists!=null) {
             List<SpecialistDTO> specialistDTOS = new ArrayList<>(specialists.size());
             for (Specialist specialist : specialists) {
