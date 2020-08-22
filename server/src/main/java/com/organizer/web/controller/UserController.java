@@ -28,6 +28,7 @@ public class UserController {
     private final Emailer emailer;
     private final ValidationCodeService validationCodeService;
     private final Smser smser;
+
     @Autowired
     public UserController(UserService userService, AuthStore authStore, Emailer emailer, ValidationCodeService validationCodeService, Smser smser) {
         this.userService = userService;
@@ -102,10 +103,36 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
     }
 
-    @RequestMapping(value = "u/validate", method = RequestMethod.POST, consumes = "multipart/form")
-    public ResponseEntity<String> validate(@RequestParam(name = "code") Integer code, @RequestParam(name = "purpose") String purpose) {
+    @RequestMapping(value = "u/validate", method = RequestMethod.POST, consumes = "multipart/form-data")
+    public ResponseEntity<String> validate(@RequestParam Integer code, @RequestParam String purpose, @RequestParam String contact) {
         ValidationCode dbCode = this.validationCodeService.find(code);
-        return null;
+
+        if(dbCode != null && dbCode.getPurpose().equals(purpose) && dbCode.getAccount().getPhone().equals(contact)) {
+            return ResponseEntity.status(HttpStatus.OK).body("Code still valid.");
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid code.");
+    }
+
+    @RequestMapping(value = "u/presigup", method = RequestMethod.POST, consumes = "multipart/form-data")
+    public ResponseEntity<String> signUpCodeRequest(@RequestParam String phone) {
+        if(phone != null && phone.length() == 12) {
+            User target = this.userService.findByPhone(phone);
+
+            if(target != null && target.getVerifiedPhone() != null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("This phone number is already in use.");
+            }
+
+            target = User.builder().phone(phone).build();
+            target = this.userService.saveOrUpdate(target);
+            ValidationCode code = this.validationCodeService.createNewCode(target, "sign_up");
+
+//            this.smser.sendSms(phone, code.getCode().toString());
+
+            return ResponseEntity.status(HttpStatus.OK).body("A code has been sent to this phone number.");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please enter a valid phone number.");
     }
 
     @RequestMapping(value = "u/signup", method = RequestMethod.POST, consumes = "application/json")

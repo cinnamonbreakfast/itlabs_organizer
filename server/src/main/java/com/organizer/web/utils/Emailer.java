@@ -15,8 +15,7 @@ public class Emailer {
         this.emailSender = emailSender;
     }
 
-    public void sendSimpleMessage(
-            String to, String subject, String text) {
+    public void sendSimpleMessage(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("projectitlabs@gmail.com");
         message.setTo(to);
