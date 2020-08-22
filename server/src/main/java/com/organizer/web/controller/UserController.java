@@ -54,7 +54,6 @@ public class UserController {
                     .email(find.getEmail())
                     .imageURL(find.getImageURL())
                     .phone(find.getPhone())
-                    .role(find.getRole())
                     .country(find.getCountry())
                     .city(find.getCity())
                     .build();
@@ -72,14 +71,14 @@ public class UserController {
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .imageURL(user.getImageURL())
-                .role(user.getRole())
                 .verifiedEmail(user.getVerifiedEmail())
                 .verifiedPhone(user.getVerifiedPhone())
                 .city(user.getCity())
                 .country(user.getCountry())
                 .build();
+        data.setId(user.getId());
 
-        String token = JWToken.create(user.getId().);
+        String token = JWToken.create(user.getId());
         Date authTime = new Date(JWToken.ttlMillis+System.currentTimeMillis());
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("TOKEN", token);
@@ -96,44 +95,28 @@ public class UserController {
                 );
     }
 
-    @RequestMapping(value = "u/auth", method = RequestMethod.POST)
-    public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String contact, @RequestParam(required = true, name = "password") String password) {
-        User authUser = userService.findByEmailOrPhone(contact,contact);
+    @RequestMapping(value = "u/signin", method = RequestMethod.POST)
+    public ResponseEntity<ResponseDTO<UserDTO>> authenticate(@RequestParam String contact, @RequestParam String prefix, @RequestParam String password) {
+        User authUser = userService.findByEmailOrPhone(contact, contact);
 
         if(authUser != null) {
-            // bad credentials
-            String hashPass= Hash.md5(password);
+            String hashPass = Hash.md5(password);
+
             if(!authUser.getPassword().equals(hashPass))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
 
             // create a token and return it
 
-            String token = JWToken.create(authUser.getId());
-            Date authTime = new Date(JWToken.ttlMillis+System.currentTimeMillis());
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("TOKEN", token);
-            responseHeaders.set("AUTH_TIME", authTime.toString());
-
-            UserDTO authResponseUser = UserDTO.builder()
-                    .email(authUser.getEmail())
-                    .name(authUser.getName())
-                    .phone(authUser.getPhone())
-                    .role(authUser.getRole())
-                    .imageURL(authUser.getImageURL())
-                    .city(authUser.getCity())
-                    .country(authUser.getCountry())
-                    .token(token)
-                    .authTime(authTime.toString())
-                    .build();
-
-            return ResponseEntity.ok()
-                    .headers(responseHeaders)
-                    .body(authResponseUser);
+            return makeASession(authUser);
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("MESSAGE", "Wrong username or password.").body(null);
+        return ResponseEntity.ok()
+                .body(
+                        ResponseDTO.<UserDTO>builder().message("Invalid email, phone or password.").code(400).build()
+                );
     }
 
+    // TODO: add prefix
     @RequestMapping(value = "u/validate", method = RequestMethod.POST, consumes = "multipart/form-data")
     public ResponseEntity<ResponseDTO<Integer>> validate(@RequestParam Integer code, @RequestParam String purpose, @RequestParam String contact) {
         ValidationCode dbCode = this.validationCodeService.find(code);
@@ -151,25 +134,25 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         ResponseDTO.<Integer>builder()
-                        .message("Invalid code.")
-                        .build()
+                                .message("Invalid code.")
+                                .build()
                 );
     }
 
     @RequestMapping(value = "u/presigup", method = RequestMethod.POST, consumes = "multipart/form-data")
-    public ResponseEntity<ResponseDTO<Integer>> signUpCodeRequest(@RequestParam String phone) {
-        if(phone != null && phone.length() == 12) {
-            User target = this.userService.findByPhone(phone);
+    public ResponseEntity<ResponseDTO<Integer>> signUpCodeRequest(@RequestParam(required = true) String phone, @RequestParam(required = true) String prefix) {
+        if((prefix+phone).length() == 12) {
+            User target = this.userService.findByPhone(prefix+phone);
 
             if(target != null && target.getVerifiedPhone() != null) {
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("This phone number is already in use.").code(400).build());
             }
 
-            target = User.builder().phone(phone).build();
+            target = User.builder().phone(prefix+phone).verifiedEmail(false).verifiedPhone(false).build();
             target = this.userService.saveOrUpdate(target);
-            ValidationCode code = this.validationCodeService.createNewCode(target, "sign_up");
+            ValidationCode code = this.validationCodeService.createNewCode(target, "sign_up", LocalDateTime.now().plusHours(1));
 
-            this.smser.sendSms(phone, code.getCode().toString() + " is the code for sign up process on AppointmentApp.");
+            this.smser.sendSms(prefix+phone, code.getCode().toString() + " is the code for sign up process on AppointmentApp.");
 
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("A code has been sent to this phone number").code(200).build());
         }
@@ -177,11 +160,89 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Please, enter a valid phone number").code(400).build());
     }
 
+    @RequestMapping(value = "u/recoveraction", method = RequestMethod.POST, consumes = "multipart/form-data")
+    public ResponseEntity<ResponseDTO<Integer>> recoverAction(@RequestParam String code, @RequestParam String password) {
+        ValidationCode existingCode = this.validationCodeService.find(Integer.parseInt(code));
+
+        if(existingCode == null) {
+            return ResponseEntity.ok(ResponseDTO.<Integer>builder().message("This validation code is invalid.").code(HttpStatus.FORBIDDEN.value()).build());
+        }
+
+        if(!existingCode.getPurpose().equals("pass_recover") || existingCode.getDueDate().isBefore(LocalDateTime.now())) {
+            this.validationCodeService.cancel(existingCode);
+
+            return ResponseEntity.ok(ResponseDTO.<Integer>builder().message("This validation code is invalid.").code(HttpStatus.FORBIDDEN.value()).build());
+        }
+
+        // todo: maybe check if it's the old password
+
+        User target = existingCode.getAccount();
+        target.setPassword(Hash.md5(password));
+        this.userService.saveOrUpdate(target);
+
+        this.validationCodeService.cancel(existingCode);
+
+        return ResponseEntity.ok(ResponseDTO.<Integer>builder().message("Your new password has been set. You can sign in now.").code(200).build());
+    }
+
+    @RequestMapping(value = "u/recoverask", method = RequestMethod.POST, consumes = "multipart/form-data")
+    public ResponseEntity<ResponseDTO<Integer>> recoverAsk(@RequestParam String method, @RequestParam String contact, @RequestParam String prefix) {
+        if(method.equals("phone")) {
+            // todo: validare
+            User target = this.userService.findByPhone(prefix+contact);
+
+            if(target == null) {
+                return ResponseEntity.ok()
+                        .body(
+                                ResponseDTO.<Integer>builder().code(400).message("No user found by this phone number.").build()
+                        );
+            }
+
+            ValidationCode phoneCode = this.validationCodeService.createNewCode(target, "pass_recover", LocalDateTime.now().plusHours(1));
+
+            if(this.smser.sendSms(prefix+contact, phoneCode.getCode() + " is the validation code for password recovery process on AppointmentApp.") != null) {
+                return ResponseEntity.ok()
+                        .body(
+                                ResponseDTO.<Integer>builder().message("A validation code has been sent to your phone number.").code(200).build()
+                        );
+            }
+
+            return ResponseEntity.ok()
+                    .body(
+                            ResponseDTO.<Integer>builder().message("An unknown error has occured. Try again later.").build()
+                    );
+        } else if (method.equals("email")) {
+            // todo: validare
+            User target = this.userService.findByEmail(contact);
+
+            if(target == null) {
+                return ResponseEntity.ok().body(
+                        ResponseDTO.<Integer>builder().message("No user found by this email.").code(400).build()
+                );
+            }
+
+            ValidationCode emailCode = this.validationCodeService.createNewCode(target, "pass_recover", LocalDateTime.now().plusHours(2));
+
+            this.emailer.sendSimpleMessage(contact, "Password recovery", emailCode.getCode() + " is the validation code for password recovery process on AppointmentApp.");
+
+            return ResponseEntity.ok(ResponseDTO.<Integer>builder().message("An email containing recover methods has been sent to your email.").code(200).build());
+        }
+
+        return null;
+    }
+
     @RequestMapping(value = "u/signup", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<ResponseDTO<UserDTO>> signUp(@RequestBody(required = true) SignUpDTO signUpDTO) {
         User existingUser = userService.findByPhone(signUpDTO.getPhone());
 
-        if (!existingUser.getVerifiedPhone().equals(1)) {
+        if(existingUser == null) {
+            return ResponseEntity.ok()
+                    .body(
+                            ResponseDTO.<UserDTO>builder().message("Invalid sign up process. Try again later.").code(400).build()
+                    );
+        }
+
+        if (existingUser.getVerifiedPhone().equals(false)) {
             ValidationCode code = this.validationCodeService.find(signUpDTO.getCode());
 
             if(code == null) {
@@ -191,22 +252,8 @@ public class UserController {
                         );
             }
 
-<<<<<<< HEAD
             if(code.getDueDate().isBefore(LocalDateTime.now())) {
                 this.validationCodeService.cancel(code);
-=======
-            User user = User.builder()
-                    .email(signUpDTO.getEmail())
-                    .name(signUpDTO.getName())
-                    .phone(signUpDTO.getPhone())
-                    .role(signUpDTO.getRole())
-                    .city(signUpDTO.getCity())
-                    .country(signUpDTO.getCountry())
-                    .password(signUpDTO.getPassword())
-                    .build();
-
-            // attempt to create user
->>>>>>> server_cipy
 
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(
@@ -223,18 +270,21 @@ public class UserController {
 
             existingUser.setName(signUpDTO.getName());
             existingUser.setEmail(signUpDTO.getEmail());
-            existingUser.setPassword(signUpDTO.getPassword());
-            existingUser.setVerifiedPhone(1);
+            existingUser.setPassword(Hash.md5(signUpDTO.getPassword()));
+            existingUser.setVerifiedPhone(true);
             existingUser.setCity(signUpDTO.getCity());
             existingUser.setCountry(signUpDTO.getCountry());
 
             if(this.userService.saveOrUpdate(existingUser) != null) {
                 this.validationCodeService.cancel(code);
 
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(
-                                ResponseDTO.<UserDTO>builder().code(200).message("Account registered successfully. You will be signed in.").build()
-                        );
+                if(existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
+                    ValidationCode emailCode = this.validationCodeService.createNewCode(existingUser, "email", LocalDateTime.now().plusDays(15));
+
+                    this.emailer.sendSimpleMessage(existingUser.getEmail(), "Code for Email Validation on AppointmentApp.", emailCode.getCode() + " is the code for your email validation on AppointmentApp. Remember, this code will expire in 15 days.");
+                }
+
+                return makeASession(existingUser);
             }
         }
 
@@ -253,96 +303,4 @@ public class UserController {
         else
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something happened");
     }
-<<<<<<< HEAD
-=======
-
-//
-    @RequestMapping(value = "u/reset/{method}",method = RequestMethod.POST)
-    public ResponseEntity<String>  resetPassword(@PathVariable String method,@RequestBody String contact)
-    {
-        if(method != null && !method.isEmpty()) {
-            if(method.equals("phone")) {
-                User target = this.userService.findByPhone(contact);
-
-                if(target != null) {
-
-                    if(target.getVerifiedPhone()==false)
-                    {
-                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a verified phone number");
-                    }
-
-                    ValidationCode code = this.validationCodeService.createNewCode(target, "reset_pass");
-
-                    if(code != null) {
-                        this.smser.sendSms(contact, code.getCode() + " is the code for password reset on AppointmentApp, " + target.getName() + ".");
-
-                        return ResponseEntity.status(HttpStatus.OK).body("Validation code sent to " + contact + ".");
-                    }
-
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong. Try again later or contact the admins.");
-                }
-
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No user found by this phone number.");
-            }
-            else if(method.equals("email")) {
-                User target = this.userService.findByEmail(contact);
-
-
-                if(target != null) {
-
-                    if(target.getVerifiedEmail()==false){
-                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a verified mail specified");
-                    }
-                    ValidationCode code = this.validationCodeService.createNewCode(target, "reset_pass");
-
-                    if(code != null) {
-                        this.emailer.sendSimpleMessage(contact, "Password reset link",  code.getCode() + " is the code for password reset on AppointmentApp, " + target.getName() + ".");
-
-                        return ResponseEntity.status(HttpStatus.OK).body("Validation code sent to " + contact + ".");
-                    }
-
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong. Try again later or contact the admins.");
-                }
-
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No user found by this email.");
-            }
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recover method not specified.");
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Try again later.");
-    }
-    @RequestMapping(value ="u/resetChect")
-    public ResponseEntity<String> checkResetCode(@RequestParam String method,String contact,Integer code){
-
-        if(method != null && !method.isEmpty()) {
-            if(method.equals("phone")){
-                User target = userService.findByPhone(contact);
-                if(target ==null){
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known phone number");
-                }
-                if(target.getVerifiedPhone()==false)
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a verified phone number");
-               ValidationCode validationCode = validationCodeService.findByCodeAndPhone(code,contact);
-
-               if(validationCode==null){
-                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a valid code");
-               }
-               LocalDate currDate = LocalDate.now();
-
-
-
-            }else if(method.equals("mail")){
-                User target = userService.findByPhone(contact);
-
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recover method not specified");
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Try again later.");
-    }
-
-
-
->>>>>>> server_cipy
 }

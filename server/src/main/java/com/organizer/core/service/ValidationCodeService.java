@@ -36,6 +36,23 @@ public class ValidationCodeService {
         return this.validationCodesRepository.save(newCode);
     }
 
+    public ValidationCode createNewCode(User target, String purpose, LocalDateTime expire) {
+        Integer code = ThreadLocalRandom.current().nextInt(100000, 1000000);
+
+        ValidationCode newCode = ValidationCode.builder()
+                .account(target)
+                .purpose(purpose)
+                .code(code)
+                .dueDate(expire)
+                .build();
+
+        return this.validationCodesRepository.save(newCode);
+    }
+
+    public void cancel(ValidationCode code) {
+        this.validationCodesRepository.delete(code);
+    }
+
     public ValidationCode findByCodeAndEmail(Integer code, String mail){
         return validationCodesRepository.findByCodeAndEmail(code,mail);
     }
