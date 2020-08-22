@@ -79,7 +79,7 @@ public class UserController {
                 .country(user.getCountry())
                 .build();
 
-        String token = JWToken.create(user.getId().toString());
+        String token = JWToken.create(user.getId().);
         Date authTime = new Date(JWToken.ttlMillis+System.currentTimeMillis());
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("TOKEN", token);
