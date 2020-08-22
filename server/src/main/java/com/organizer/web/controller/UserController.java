@@ -97,7 +97,7 @@ public class UserController {
 
     @RequestMapping(value = "u/signin", method = RequestMethod.POST)
     public ResponseEntity<ResponseDTO<UserDTO>> authenticate(@RequestParam String contact, @RequestParam String prefix, @RequestParam String password) {
-        User authUser = userService.findByEmailOrPhone(contact);
+        User authUser = userService.findByEmailOrPhone(contact, contact);
 
         if(authUser != null) {
             String hashPass = Hash.md5(password);
@@ -134,8 +134,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         ResponseDTO.<Integer>builder()
-                        .message("Invalid code.")
-                        .build()
+                                .message("Invalid code.")
+                                .build()
                 );
     }
 

@@ -43,7 +43,7 @@ public class UserService {
     public User saveOrUpdate(User user ){
         return userRepository.save(user);
     }
-    public User findByEmailOrPhone(String mail, String phone){
-        return userRepository.findByEmailOrPhone(mail,phone);
+    public User findByEmailOrPhone(String email, String phone){
+        return userRepository.findByEmailOrPhone(email, phone);
     }
 }

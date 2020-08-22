@@ -34,10 +34,6 @@ public class User extends Entity<Long> {
     private String phone;
 
     @Basic
-    @Column
-    private Integer role;
-
-    @Basic
     @Column(name = "image_url")
     private String imageURL;
 
