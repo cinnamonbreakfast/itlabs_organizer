@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AndroidCompanyController {
     private final CompanyService companyService;
     private final AuthStore authStore;
-    private final UserService userService;
+    private final   UserService userService;
     private final FileService fileService;
     private final AnimeService animeService;
     private final CityListService cityListService;
@@ -41,9 +41,9 @@ public class AndroidCompanyController {
     //public ResponseEntity<String> addNewCompany(@RequestParam("file") MultipartFile file, @RequestBody CompanyDTO newCompany, @RequestHeader(name = "token") String token){
     public ResponseEntity<String> addNewCompany(CompanyDTO newCompany, @RequestHeader String token ){
 
-        String mail =  JWToken.checkToken(token);
+        Long id =  JWToken.checkToken(token);
         //valid token
-        if(mail == null)
+        if(id == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
 
         String username = newCompany.getName()+"-"+newCompany.getCity();
@@ -72,7 +72,7 @@ public class AndroidCompanyController {
         country= countryListService.findByCountry(country).getAbbreviation();
         city = cityListService.findByCity(city).getCity();
 
-        User user = userService.findByEmail(mail);
+        User user = userService.findById(id);
         company = Company.builder().address(newCompany.getAddress())
                 .category(category)
                 .city(city)
@@ -90,11 +90,11 @@ public class AndroidCompanyController {
     @RequestMapping(value = "c/andoird/changeDetails", method=RequestMethod.PUT)
     public ResponseEntity<String> updateDetails(CompanyDTO updateCompany,@RequestHeader String token )
     {
-        String mail = JWToken.checkToken(token);
-        if(mail==null){
+        Long id  = JWToken.checkToken(token);
+        if(id==null){
             ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");
         }
-        User user = userService.findByEmail(mail);
+        User user = userService.findById(id);
         String username = updateCompany.getUsername();
         Company company = companyService.findByUsername(username);
         if(company==null){

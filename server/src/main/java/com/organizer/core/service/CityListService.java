@@ -22,8 +22,7 @@ public class CityListService {
         return cityListRepository.getCityList(pageable,country,city).getContent();
     }
     public Long getCount(String country,String city){
-        //return cityListRepository.countByCityAndCountry(country,city);
-        return 1L;
+        return cityListRepository.countByCityAndCountry(country,city);
     }
     public CityList findByCity(String city){
         return cityListRepository.findByCity(city);

@@ -48,9 +48,9 @@ public class CompanyController {
     public ResponseEntity<String> addNewCompany(@RequestParam(name="file",required = false) MultipartFile file,
 CompanyDTO newCompany,@RequestHeader String token ){
 
-        String mail =  JWToken.checkToken(token);
+        Long id =  JWToken.checkToken(token);
         //valid token
-        if(mail == null)
+        if(id== null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
 
         String username = newCompany.getName()+"-"+newCompany.getCity();
@@ -79,7 +79,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
         country= countryListService.findByCountry(country).getAbbreviation();
         city = cityListService.findByCity(city).getCity();
 
-        User user = userService.findByEmail(mail);
+        User user = userService.findById(id);
         company = Company.builder().address(newCompany.getAddress())
                 .category(category)
                 .city(city)
@@ -88,7 +88,6 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 .name(newCompany.getName())
                 .username(username)
                 .build();
-
         try {
             String[] list = file.getOriginalFilename().split("[.]");
             if (list.length == 1) {
@@ -106,15 +105,15 @@ CompanyDTO newCompany,@RequestHeader String token ){
             company.setImage_url("default_company");
         }
         companyService.save(company);
-        return ResponseEntity.ok("Created a company");
+        return ResponseEntity.ok("Company has been created, wait for an admin validation");
     }
 
     @RequestMapping(value = "c/findByOwner",method = RequestMethod.GET)
     public ResponseEntity<List<CompanyDTO>> listByCompanyOwner(@RequestHeader(value = "token") String token){
-        String mail = JWToken.checkToken(token);
-        if(mail==null)
+       Long id  = JWToken.checkToken(token);
+        if(id==null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        User user = userService.findByEmail(mail);
+        User user = userService.findById(id);
 
         List<Company> companies = companyService.findByOwner(user);
 
@@ -179,11 +178,11 @@ CompanyDTO newCompany,@RequestHeader String token ){
     public ResponseEntity<String> updateDetails(@RequestParam(name="file",required = false) MultipartFile file,
                                                     CompanyDTO updateCompany,@RequestHeader String token )
     {
-            String mail = JWToken.checkToken(token);
-            if(mail==null){
+            Long id = JWToken.checkToken(token);
+            if(id==null){
                 ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");
             }
-            User user = userService.findByEmail(mail);
+            User user = userService.findById(id);
             String username = updateCompany.getUsername();
             Company company = companyService.findByUsername(username);
             if(company==null){

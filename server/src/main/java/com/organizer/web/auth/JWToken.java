@@ -28,13 +28,13 @@ public class JWToken {
             return null;
         }
     }
-    public static String checkToken(String token){
+    public static Long checkToken(String token){
         try {
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer("auth0")
                     .build(); //Reusable verifier instance
             DecodedJWT jwt = verifier.verify(token);
-            return jwt.getClaim("id").asString();
+            return jwt.getClaim("id").asLong();
         } catch (JWTVerificationException exception){
             return null;
         }
