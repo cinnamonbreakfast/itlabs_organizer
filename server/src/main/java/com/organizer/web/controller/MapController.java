@@ -1,10 +1,8 @@
 package com.organizer.web.controller;
 
-import com.organizer.core.model.AnimeList;
-import com.organizer.core.model.CityList;
-import com.organizer.core.model.Company;
-import com.organizer.core.model.CountryList;
+import com.organizer.core.model.*;
 import com.organizer.core.service.*;
+import com.organizer.core.service.SpecialistService;
 import com.organizer.web.dto.SearchFilter;
 import com.organizer.web.dto.CompanyDTO;
 import com.organizer.web.dto.ServiceDTO;
@@ -34,14 +32,16 @@ public class MapController {
     private final AnimeService animeService;
     private final CountryListService countryListService;
     private final CityListService cityListService;
+    private final PrefixService prefixService;
     @Autowired
-    public MapController(SpecialistService specialistService, CompanyService companyService, SpecialistServiceService specialistServiceService,AnimeService animeService,CountryListService countryListService,CityListService cityListService) {
+    public MapController(SpecialistService specialistService, CompanyService companyService, SpecialistServiceService specialistServiceService, AnimeService animeService, CountryListService countryListService, CityListService cityListService, PrefixService prefixService) {
         this.companyService = companyService;
         this.specialistService = specialistService;
         this.specialistServiceService = specialistServiceService;
         this.animeService= animeService;
         this.countryListService=countryListService;
         this.cityListService=cityListService;
+        this.prefixService = prefixService;
     }
 
     @RequestMapping(value = "map/sugestion", method = RequestMethod.POST)
@@ -174,7 +174,10 @@ public class MapController {
 
     @RequestMapping(value="fetch/citylist",method = RequestMethod.GET)
     public ResponseEntity<List<CityList>> getCityList(@RequestParam int page, @RequestParam String country, @RequestParam String city){
-        System.out.println(country+" "+city+"city");
         return ResponseEntity.ok(cityListService.getCityList(page,country,city));
+    }
+    @RequestMapping(value ="fetch/prefixes",method = RequestMethod.GET)
+    public ResponseEntity<List<Prefix>> getPrefixes(@RequestParam int page, @RequestParam String prefix){
+        return  ResponseEntity.ok(prefixService.findByCountryOrPrefix(page,prefix));
     }
 }

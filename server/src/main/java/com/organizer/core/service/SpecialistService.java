@@ -31,4 +31,8 @@ public class SpecialistService {
     public List<Specialist> findByCompanyUsername(String username) {
         return specialistRepository.findByUsername( username);
     }
+
+    public List<Specialist> findByCompanyAndServiceName(String service,String username){
+        return specialistRepository.findByCompanyAndServiceName(service,username);
+    }
 }
