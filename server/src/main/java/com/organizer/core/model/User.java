@@ -3,6 +3,7 @@ package com.organizer.core.model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.NamedQuery;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -56,6 +57,10 @@ public class User extends Entity<Long> {
     @Basic
     @Column(name = "verified_email")
     private Boolean verifiedEmail;
+
+    @Basic
+    @Column
+    private Boolean admin;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user")

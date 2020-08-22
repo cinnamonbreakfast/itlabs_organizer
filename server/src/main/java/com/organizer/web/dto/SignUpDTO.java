@@ -12,7 +12,6 @@ public class SignUpDTO extends BaseDTO {
     private String email;
     private String name;
     private String phone;
-    private Integer role;
     private String city;
     private String country;
     private String password;

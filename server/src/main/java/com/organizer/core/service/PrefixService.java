@@ -22,4 +22,8 @@ public class PrefixService {
         Pageable pageable = PageRequest.of(pageNr,10);
         return prefixRepository.findPrefixByCountryOrPrefix(pageable,value).getContent();
     }
+    public Prefix findByPrefix(String prefix){
+        return prefixRepository.findPrefixByPrefix(prefix);
+
+    }
 }

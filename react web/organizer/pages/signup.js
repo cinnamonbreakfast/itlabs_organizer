@@ -60,7 +60,8 @@ const SignUpPage = () => {
             'Content-Type': 'application/json',
         })
         .then(response => {
-            setMessage({type: "ok", message: response.data})
+            console.log(response)
+            setMessage({type: "ok", message: response.data.message})
         })
         .catch(error => {
             console.log(error)

@@ -63,4 +63,8 @@ public class Company extends Entity<Long>{
     String cui;
 
 
+    @Basic
+    @Column
+    Boolean validated;
+
 }

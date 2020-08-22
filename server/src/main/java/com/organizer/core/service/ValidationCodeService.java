@@ -59,4 +59,7 @@ public class ValidationCodeService {
     public ValidationCode findByCodeAndPhone(Integer code,String phone){
         return validationCodesRepository.findByCodeAndPhone(code,phone);
     }
+    public void remove(ValidationCode code){
+         validationCodesRepository.delete(code);
+    }
 }

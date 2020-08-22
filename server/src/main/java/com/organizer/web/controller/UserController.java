@@ -1,7 +1,9 @@
 package com.organizer.web.controller;
 
+import com.organizer.core.model.Prefix;
 import com.organizer.core.model.User;
 import com.organizer.core.model.ValidationCode;
+import com.organizer.core.service.PrefixService;
 import com.organizer.core.service.UserService;
 import com.organizer.core.service.ValidationCodeService;
 import com.organizer.core.utils.Hash;
@@ -11,7 +13,10 @@ import com.organizer.web.dto.ResponseDTO;
 import com.organizer.web.dto.SignUpDTO;
 import com.organizer.web.dto.UserDTO;
 import com.organizer.web.utils.Emailer;
+import com.organizer.web.utils.Regex;
 import com.organizer.web.utils.Smser;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,14 +34,17 @@ public class UserController {
     private final Emailer emailer;
     private final ValidationCodeService validationCodeService;
     private final Smser smser;
-
+    private final Regex regex;
+    private final PrefixService prefixService;
     @Autowired
-    public UserController(UserService userService, AuthStore authStore, Emailer emailer, ValidationCodeService validationCodeService, Smser smser) {
+    public UserController(UserService userService, AuthStore authStore, Emailer emailer, ValidationCodeService validationCodeService, Smser smser, Regex regex, PrefixService prefixService) {
         this.userService = userService;
         this.authStore = authStore;
         this.emailer = emailer;
         this.validationCodeService = validationCodeService;
         this.smser = smser;
+        this.regex=regex;
+        this.prefixService = prefixService;
     }
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
@@ -96,9 +104,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "u/signin", method = RequestMethod.POST)
-    public ResponseEntity<ResponseDTO<UserDTO>> authenticate(@RequestParam String contact, @RequestParam String prefix, @RequestParam String password) {
+    public ResponseEntity<ResponseDTO<UserDTO>> authenticate(@RequestParam String contact, @RequestParam String password) {
         User authUser = userService.findByEmailOrPhone(contact, contact);
-
+        System.out.println(authUser);
         if(authUser != null) {
             String hashPass = Hash.md5(password);
 
@@ -139,25 +147,54 @@ public class UserController {
                 );
     }
 
-    @RequestMapping(value = "u/presigup", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @RequestMapping(value = "u/presignup", method = RequestMethod.POST, consumes = "multipart/form-data")
     public ResponseEntity<ResponseDTO<Integer>> signUpCodeRequest(@RequestParam(required = true) String phone, @RequestParam(required = true) String prefix) {
-        if((prefix+phone).length() == 12) {
-            User target = this.userService.findByPhone(prefix+phone);
+
+            Prefix prefix1 = prefixService.findByPrefix(prefix);
+            if(prefix1==null){
+                return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Not a valid prefix").code(400).build());
+            }
+            int m = regex.phoneMatcher(prefix,phone);
+            if(m==0){
+                return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Bring a valid phone number.").code(400).build());
+            }
+            String tel = "+"+prefix+phone.substring(m,phone.length());
+            User target = this.userService.findByPhone(tel);
 
             if(target != null && target.getVerifiedPhone() != null) {
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("This phone number is already in use.").code(400).build());
             }
-
-            target = User.builder().phone(prefix+phone).verifiedEmail(false).verifiedPhone(false).build();
+            target= User.builder().phone(tel).
+                    build();
             target = this.userService.saveOrUpdate(target);
             ValidationCode code = this.validationCodeService.createNewCode(target, "sign_up", LocalDateTime.now().plusHours(1));
 
-            this.smser.sendSms(prefix+phone, code.getCode().toString() + " is the code for sign up process on AppointmentApp.");
+            String data = this.smser.sendSms(tel, code.getCode().toString() + " is the code for sign up process on AppointmentApp.");
+            if(data ==null){
+                try {
+                    userService.remove(target);
+                    validationCodeService.remove(code);
+                }
+                catch (Exception e){ }
+                return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Please, enter a valid phone number").code(400).build());
+            }
+            System.out.println(data);
+            Object obj = JSONValue.parse(data);
+            JSONObject jsonObject = (JSONObject) obj ;
+            Object o = jsonObject.get("status");
+            String str =o.toString();
+            if(str.equals("200")){
+                return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("A code has been sent to this phone number").code(200).build());
+            }
+            else{
+                try {
+                    userService.remove(target);
+                    validationCodeService.remove(code);
+                }
+                catch (Exception e){ }
+                return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Please, enter a valid phone number").code(400).build());
+            }
 
-            return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("A code has been sent to this phone number").code(200).build());
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Please, enter a valid phone number").code(400).build());
     }
 
     @RequestMapping(value = "u/recoveraction", method = RequestMethod.POST, consumes = "multipart/form-data")
@@ -234,7 +271,7 @@ public class UserController {
     @RequestMapping(value = "u/signup", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<ResponseDTO<UserDTO>> signUp(@RequestBody(required = true) SignUpDTO signUpDTO) {
         User existingUser = userService.findByPhone(signUpDTO.getPhone());
-
+        System.out.println(existingUser);
         if(existingUser == null) {
             return ResponseEntity.ok()
                     .body(
@@ -303,4 +340,18 @@ public class UserController {
         else
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something happened");
     }
+
+    /*
+    @RequestMapping(value = "u/createAdmin",method = RequestMethod.POST)
+    public  ResponseEntity<String > createAdmin(@RequestParam String password){
+
+
+        User user  = User.builder()
+                .email("testest")
+                .password(Hash.md5(password))
+                .phone("07-naN")
+                .build();
+        userService.saveOrUpdate(user);
+        return ResponseEntity.ok("made an admin");
+    }*/
 }
