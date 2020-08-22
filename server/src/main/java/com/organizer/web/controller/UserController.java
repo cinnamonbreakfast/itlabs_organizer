@@ -97,8 +97,8 @@ public class UserController {
     }
 
     @RequestMapping(value = "u/auth", method = RequestMethod.POST)
-    public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String email, @RequestParam(required = true, name = "password") String password) {
-        User authUser = userService.findByEmail(email);
+    public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String contact, @RequestParam(required = true, name = "password") String password) {
+        User authUser = userService.findByEmailOrPhone(contact,contact);
 
         if(authUser != null) {
             // bad credentials
@@ -108,7 +108,7 @@ public class UserController {
 
             // create a token and return it
 
-            String token = JWToken.create(authUser.getEmail());
+            String token = JWToken.create(authUser.getId());
             Date authTime = new Date(JWToken.ttlMillis+System.currentTimeMillis());
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("TOKEN", token);
@@ -191,8 +191,22 @@ public class UserController {
                         );
             }
 
+<<<<<<< HEAD
             if(code.getDueDate().isBefore(LocalDateTime.now())) {
                 this.validationCodeService.cancel(code);
+=======
+            User user = User.builder()
+                    .email(signUpDTO.getEmail())
+                    .name(signUpDTO.getName())
+                    .phone(signUpDTO.getPhone())
+                    .role(signUpDTO.getRole())
+                    .city(signUpDTO.getCity())
+                    .country(signUpDTO.getCountry())
+                    .password(signUpDTO.getPassword())
+                    .build();
+
+            // attempt to create user
+>>>>>>> server_cipy
 
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(
@@ -239,4 +253,96 @@ public class UserController {
         else
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something happened");
     }
+<<<<<<< HEAD
+=======
+
+//
+    @RequestMapping(value = "u/reset/{method}",method = RequestMethod.POST)
+    public ResponseEntity<String>  resetPassword(@PathVariable String method,@RequestBody String contact)
+    {
+        if(method != null && !method.isEmpty()) {
+            if(method.equals("phone")) {
+                User target = this.userService.findByPhone(contact);
+
+                if(target != null) {
+
+                    if(target.getVerifiedPhone()==false)
+                    {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a verified phone number");
+                    }
+
+                    ValidationCode code = this.validationCodeService.createNewCode(target, "reset_pass");
+
+                    if(code != null) {
+                        this.smser.sendSms(contact, code.getCode() + " is the code for password reset on AppointmentApp, " + target.getName() + ".");
+
+                        return ResponseEntity.status(HttpStatus.OK).body("Validation code sent to " + contact + ".");
+                    }
+
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong. Try again later or contact the admins.");
+                }
+
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No user found by this phone number.");
+            }
+            else if(method.equals("email")) {
+                User target = this.userService.findByEmail(contact);
+
+
+                if(target != null) {
+
+                    if(target.getVerifiedEmail()==false){
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a verified mail specified");
+                    }
+                    ValidationCode code = this.validationCodeService.createNewCode(target, "reset_pass");
+
+                    if(code != null) {
+                        this.emailer.sendSimpleMessage(contact, "Password reset link",  code.getCode() + " is the code for password reset on AppointmentApp, " + target.getName() + ".");
+
+                        return ResponseEntity.status(HttpStatus.OK).body("Validation code sent to " + contact + ".");
+                    }
+
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong. Try again later or contact the admins.");
+                }
+
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No user found by this email.");
+            }
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recover method not specified.");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Try again later.");
+    }
+    @RequestMapping(value ="u/resetChect")
+    public ResponseEntity<String> checkResetCode(@RequestParam String method,String contact,Integer code){
+
+        if(method != null && !method.isEmpty()) {
+            if(method.equals("phone")){
+                User target = userService.findByPhone(contact);
+                if(target ==null){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known phone number");
+                }
+                if(target.getVerifiedPhone()==false)
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a verified phone number");
+               ValidationCode validationCode = validationCodeService.findByCodeAndPhone(code,contact);
+
+               if(validationCode==null){
+                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a valid code");
+               }
+               LocalDate currDate = LocalDate.now();
+
+
+
+            }else if(method.equals("mail")){
+                User target = userService.findByPhone(contact);
+
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recover method not specified");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Try again later.");
+    }
+
+
+
+>>>>>>> server_cipy
 }

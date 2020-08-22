@@ -21,12 +21,16 @@ public class Smser {
     @Value("${sms.service.sender}")
     String SENDER;
 
-    private final RestTemplate restTemplate;
+    private RestTemplate restTemplate = null;
     @Autowired
     public Smser(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
+
+    
+    public String sendSms (String to, String body){
+        String requestURL = buildURL(to,body);
         try {
             return restTemplate.getForEntity(requestURL, String.class).getBody();
         }
