@@ -36,7 +36,10 @@ public class ValidationCodeService {
         return this.validationCodesRepository.save(newCode);
     }
 
-    public void cancel(ValidationCode code) {
-        this.validationCodesRepository.delete(code);
+    public ValidationCode findByCodeAndEmail(Integer code, String mail){
+        return validationCodesRepository.findByCodeAndEmail(code,mail);
+    }
+    public ValidationCode findByCodeAndPhone(Integer code,String phone){
+        return validationCodesRepository.findByCodeAndPhone(code,phone);
     }
 }

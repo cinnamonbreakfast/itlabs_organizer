@@ -6,14 +6,6 @@ class UserController {
         this.dispatcher = dispatcher
     }
 
-    validate(code, purpose) {
-        let data = new FormData();
-        data.set('code', code)
-        data.set('purpose', purpose)
-
-        return axios.post(process.env.REQ_HOST + '/u/validate/', data)
-    }
-
     signInWithEmail(credentials) {
         let fdata = new FormData();
         fdata.set('email', credentials.email)
@@ -26,10 +18,13 @@ class UserController {
             console.log(_err)
             return false
         })
+        
     }
 
     logout() {
-        this.dispatcher({type: actions.LOGOUT})
+        this.dispatcher({type: actions.SET_AUTH_STATUS, payload: false})
+        this.dispatcher({type: actions.SET_USER_DATA, payload: null})
+
         return true;
     }
 }
