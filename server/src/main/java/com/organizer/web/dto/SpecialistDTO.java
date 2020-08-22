@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @Setter
 public class SpecialistDTO extends BaseDTO {
-   private ServiceDTO serviceDTO;
+   private List<ServiceDTO> servicesDTO;
    private UserDTO user;
    private CompanyDTO company;
 }
