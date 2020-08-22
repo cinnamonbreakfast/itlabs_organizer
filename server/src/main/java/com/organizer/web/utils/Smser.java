@@ -27,9 +27,6 @@ public class Smser {
         this.restTemplate = restTemplate;
     }
 
-    public String  sendSms(String to, String body){
-        String requestURL = buildURL(to, body);
-
         try {
             return restTemplate.getForEntity(requestURL, String.class).getBody();
         }

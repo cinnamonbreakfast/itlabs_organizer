@@ -63,6 +63,7 @@ const SignUpPage = () => {
             setMessage({type: "ok", message: response.data})
         })
         .catch(error => {
+            console.log(error)
             setMessage({type:"error", message: error.response.data})
         })
     }

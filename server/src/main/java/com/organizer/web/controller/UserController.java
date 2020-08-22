@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -142,6 +143,8 @@ public class UserController {
 
         if(existingUser == null) {
             // do sign up
+
+
             User user = User.builder()
                     .email(signUpDTO.getEmail())
                     .name(signUpDTO.getName())
@@ -156,15 +159,25 @@ public class UserController {
 
             // attempt to create user
 
-            user = userService.signUpEmailAndPassword(user);
+            try {
+                user = userService.signUpEmailAndPassword(user);
+            }
+            catch (Exception e){
+                return ResponseEntity.status(HttpStatus.OK).body("Uniq constrain violation");
+            }
 
             if(user != null) {
                 ValidationCode code = this.validationCodeService.createNewCode(user, "signup");
 
                 if(code != null) {
-                    this.emailer.sendSimpleMessage(user.getEmail(), "Hey, " + user.getName() + "! Your Validation Code arrived.", "Code: " + code.getCode());
+                    //this.emailer.sendSimpleMessage(user.getEmail(), "Hey, " + user.getName() + "! Your Validation Code arrived.", "Code: " + code.getCode());
+                    try {
+                        this.smser.sendSms("+4"+user.getPhone(), "Hey " + user.getName() + " this is the verification code : " + code.getCode());
+                        return ResponseEntity.status(HttpStatus.OK).body("Registration complete. You can sign in now.");
+                    }
+                    catch (Exception e){
 
-                    return ResponseEntity.status(HttpStatus.OK).body("Registration complete. You can sign in now.");
+                    }
                 }
                 // New code generation failed for some CHECK CONSOLE reason
 
@@ -190,4 +203,93 @@ public class UserController {
         else
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something happened");
     }
+
+//
+    @RequestMapping(value = "u/reset/{method}",method = RequestMethod.POST)
+    public ResponseEntity<String>  resetPassword(@PathVariable String method,@RequestBody String contact)
+    {
+        if(method != null && !method.isEmpty()) {
+            if(method.equals("phone")) {
+                User target = this.userService.findByPhone(contact);
+
+                if(target != null) {
+
+                    if(target.getVerifiedPhone()!=1)
+                    {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a verified phone number");
+                    }
+
+                    ValidationCode code = this.validationCodeService.createNewCode(target, "reset_pass");
+
+                    if(code != null) {
+                        this.smser.sendSms(contact, code.getCode() + " is the code for password reset on AppointmentApp, " + target.getName() + ".");
+
+                        return ResponseEntity.status(HttpStatus.OK).body("Validation code sent to " + contact + ".");
+                    }
+
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong. Try again later or contact the admins.");
+                }
+
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No user found by this phone number.");
+            }
+            else if(method.equals("email")) {
+                User target = this.userService.findByEmail(contact);
+
+
+                if(target != null) {
+
+                    if(target.getVerifiedEmail()!=1){
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a verified mail specified");
+                    }
+                    ValidationCode code = this.validationCodeService.createNewCode(target, "reset_pass");
+
+                    if(code != null) {
+                        this.emailer.sendSimpleMessage(contact, "Password reset link",  code.getCode() + " is the code for password reset on AppointmentApp, " + target.getName() + ".");
+
+                        return ResponseEntity.status(HttpStatus.OK).body("Validation code sent to " + contact + ".");
+                    }
+
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong. Try again later or contact the admins.");
+                }
+
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No user found by this email.");
+            }
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recover method not specified.");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Try again later.");
+    }
+    @RequestMapping(value ="u/resetChect")
+    public ResponseEntity<String> checkResetCode(@RequestParam String method,String contact,Integer code){
+
+        if(method != null && !method.isEmpty()) {
+            if(method.equals("phone")){
+                User target = userService.findByPhone(contact);
+                if(target ==null){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known phone number");
+                }
+                if(target.getVerifiedPhone()!=1)
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a verified phone number");
+               ValidationCode validationCode = validationCodeService.findByCodeAndPhone(code,contact);
+
+               if(validationCode==null){
+                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a valid code");
+               }
+               LocalDate currDate = LocalDate.now();
+
+
+
+            }else if(method.equals("mail")){
+                User target = userService.findByPhone(contact);
+
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recover method not specified");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Try again later.");
+    }
+
+
+
 }
