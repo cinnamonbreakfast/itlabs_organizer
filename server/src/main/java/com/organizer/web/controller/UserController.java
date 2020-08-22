@@ -7,6 +7,7 @@ import com.organizer.core.service.ValidationCodeService;
 import com.organizer.core.utils.Hash;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.auth.JWToken;
+import com.organizer.web.dto.ResponseDTO;
 import com.organizer.web.dto.SignUpDTO;
 import com.organizer.web.dto.UserDTO;
 import com.organizer.web.utils.Emailer;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -64,6 +66,36 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
+    private ResponseEntity<ResponseDTO<UserDTO>> makeASession(User user) {
+        UserDTO data = UserDTO.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .imageURL(user.getImageURL())
+                .role(user.getRole())
+                .verifiedEmail(user.getVerifiedEmail())
+                .verifiedPhone(user.getVerifiedPhone())
+                .city(user.getCity())
+                .country(user.getCountry())
+                .build();
+
+        String token = JWToken.create(user.getId().toString());
+        Date authTime = new Date(JWToken.ttlMillis+System.currentTimeMillis());
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("TOKEN", token);
+        responseHeaders.set("AUTH_TIME", authTime.toString());
+
+        return ResponseEntity.ok()
+                .headers(responseHeaders)
+                .body(
+                        ResponseDTO.<UserDTO>builder()
+                                .message("User authenticated successfully!")
+                                .code(200)
+                                .data(data)
+                                .build()
+                );
+    }
+
     @RequestMapping(value = "u/auth", method = RequestMethod.POST)
     public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String email, @RequestParam(required = true, name = "password") String password) {
         User authUser = userService.findByEmail(email);
@@ -103,82 +135,99 @@ public class UserController {
     }
 
     @RequestMapping(value = "u/validate", method = RequestMethod.POST, consumes = "multipart/form-data")
-    public ResponseEntity<String> validate(@RequestParam Integer code, @RequestParam String purpose, @RequestParam String contact) {
+    public ResponseEntity<ResponseDTO<Integer>> validate(@RequestParam Integer code, @RequestParam String purpose, @RequestParam String contact) {
         ValidationCode dbCode = this.validationCodeService.find(code);
 
         if(dbCode != null && dbCode.getPurpose().equals(purpose) && dbCode.getAccount().getPhone().equals(contact)) {
-            return ResponseEntity.status(HttpStatus.OK).body("Code still valid.");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(
+                            ResponseDTO.<Integer>builder()
+                                    .message("This code is still valid.")
+                                    .code(200)
+                                    .build()
+                    );
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid code.");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        ResponseDTO.<Integer>builder()
+                        .message("Invalid code.")
+                        .build()
+                );
     }
 
     @RequestMapping(value = "u/presigup", method = RequestMethod.POST, consumes = "multipart/form-data")
-    public ResponseEntity<String> signUpCodeRequest(@RequestParam String phone) {
+    public ResponseEntity<ResponseDTO<Integer>> signUpCodeRequest(@RequestParam String phone) {
         if(phone != null && phone.length() == 12) {
             User target = this.userService.findByPhone(phone);
 
             if(target != null && target.getVerifiedPhone() != null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("This phone number is already in use.");
+                return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("This phone number is already in use.").code(400).build());
             }
 
             target = User.builder().phone(phone).build();
             target = this.userService.saveOrUpdate(target);
             ValidationCode code = this.validationCodeService.createNewCode(target, "sign_up");
 
-//            this.smser.sendSms(phone, code.getCode().toString());
+            this.smser.sendSms(phone, code.getCode().toString() + " is the code for sign up process on AppointmentApp.");
 
-            return ResponseEntity.status(HttpStatus.OK).body("A code has been sent to this phone number.");
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("A code has been sent to this phone number").code(200).build());
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please enter a valid phone number.");
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Please, enter a valid phone number").code(400).build());
     }
 
     @RequestMapping(value = "u/signup", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity<String> signUp(@RequestBody(required = true) SignUpDTO signUpDTO) {
-        User existingUser = userService.findByEmail(signUpDTO.getEmail());
+    public ResponseEntity<ResponseDTO<UserDTO>> signUp(@RequestBody(required = true) SignUpDTO signUpDTO) {
+        User existingUser = userService.findByPhone(signUpDTO.getPhone());
 
-        System.out.println(signUpDTO);
+        if (!existingUser.getVerifiedPhone().equals(1)) {
+            ValidationCode code = this.validationCodeService.find(signUpDTO.getCode());
 
-        if(existingUser == null) {
-            // do sign up
-            User user = User.builder()
-                    .email(signUpDTO.getEmail())
-                    .name(signUpDTO.getName())
-                    .phone(signUpDTO.getPhone())
-                    .role(signUpDTO.getRole())
-                    .city(signUpDTO.getCity())
-                    .country(signUpDTO.getCountry())
-                    .password(signUpDTO.getPassword())
-                    .verifiedEmail(0)
-                    .verifiedPhone(0)
-                    .build();
-
-            // attempt to create user
-
-            user = userService.signUpEmailAndPassword(user);
-
-            if(user != null) {
-                ValidationCode code = this.validationCodeService.createNewCode(user, "signup");
-
-                if(code != null) {
-                    this.emailer.sendSimpleMessage(user.getEmail(), "Hey, " + user.getName() + "! Your Validation Code arrived.", "Code: " + code.getCode());
-
-                    return ResponseEntity.status(HttpStatus.OK).body("Registration complete. You can sign in now.");
-                }
-                // New code generation failed for some CHECK CONSOLE reason
-
-                userService.remove(user); // kinda-like a roll back
-
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Something went wrong. Please, contact platform admin.");
+            if(code == null) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                ResponseDTO.<UserDTO>builder().code(400).message("This validation code that you entered does not exist.").build()
+                        );
             }
 
-            // non traced error
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("There was a problem with your registration. Try again later.");
+            if(code.getDueDate().isBefore(LocalDateTime.now())) {
+                this.validationCodeService.cancel(code);
+
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                ResponseDTO.<UserDTO>builder().code(400).message("Validation code is expired. Please, request for a new one.").build()
+                        );
+            }
+
+            if(!code.getPurpose().equals("sign_up")) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                ResponseDTO.<UserDTO>builder().code(400).message("This code is not valid. Try getting a new one again.").build()
+                        );
+            }
+
+            existingUser.setName(signUpDTO.getName());
+            existingUser.setEmail(signUpDTO.getEmail());
+            existingUser.setPassword(signUpDTO.getPassword());
+            existingUser.setVerifiedPhone(1);
+            existingUser.setCity(signUpDTO.getCity());
+            existingUser.setCountry(signUpDTO.getCountry());
+
+            if(this.userService.saveOrUpdate(existingUser) != null) {
+                this.validationCodeService.cancel(code);
+
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                ResponseDTO.<UserDTO>builder().code(200).message("Account registered successfully. You will be signed in.").build()
+                        );
+            }
         }
 
-        // user already exists
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("This E-mail address is already used.");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        ResponseDTO.<UserDTO>builder().message("This user already exists.").build()
+                );
     }
 
     @RequestMapping(value = "u/changeName",method = RequestMethod.PUT)

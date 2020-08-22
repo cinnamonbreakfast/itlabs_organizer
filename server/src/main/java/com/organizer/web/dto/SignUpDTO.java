@@ -16,4 +16,5 @@ public class SignUpDTO extends BaseDTO {
     private String city;
     private String country;
     private String password;
+    private Integer code;
 }

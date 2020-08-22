@@ -20,4 +20,6 @@ public class UserDTO extends BaseDTO {
     private String country;
     private String token;
     private String authTime;
+    private Integer verifiedEmail;
+    private Integer verifiedPhone;
 }

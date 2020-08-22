@@ -40,7 +40,19 @@ public class UserService {
     public User findById(Long id){
         return userRepository.findById(id).get();
     }
+
     public User saveOrUpdate(User user ){
         return userRepository.save(user);
+    }
+
+    public Boolean userExistsValidPhone(String phone) {
+        User user = this.userRepository.findByPhone(phone);
+
+        if(user != null) {
+            // Phone number = null or 0 => invalid
+            return user.getVerifiedPhone().equals(1);
+        }
+
+        return false;
     }
 }
