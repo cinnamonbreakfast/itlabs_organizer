@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import javax.servlet.FilterRegistration;
 
 @Configuration
-@PropertySource("classpath:app.properties")
+@PropertySource("classpath:api.properties")
 @EnableWebMvc
 public class WebConfig {
 
