@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState ,useEffect} from 'react'
 import { useSelector } from 'react-redux'
 import { useRouter } from 'next/router'
 import styles from '../styles/pages/companies.module.scss'
-import {useEffect} from 'react'
+
 import axios from 'axios'
 const Companies = () => {
     const router = useRouter()
@@ -28,24 +28,6 @@ const Companies = () => {
         router.push('/signin')
     }
 
-    useEffect(() => {
-        console.log(router.query['name'])
-    })
-
-    const testBtn = () => {
-        // router.push(
-        //     '/companies',
-        //     '/c/@Barbershop',
-        //     {
-        //         query: {
-        //             name: 'Test'
-        //         }
-        //     }    
-        // )
-
-        router.push('/c/[name]', '/c/lol')
-    }
-
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.title}>
@@ -61,7 +43,6 @@ const Companies = () => {
                 
                 {
                     Array.isArray(s_search.data)&&s_search.data.map(e=>{
-
                         return(
                             <div className={styles.company}>
                                 <div className={styles.identity}>
@@ -89,8 +70,6 @@ const Companies = () => {
                 
 
             </div>
-
-            <button onClick={() => testBtn()}>Test</button>
         </div>
     )
 }

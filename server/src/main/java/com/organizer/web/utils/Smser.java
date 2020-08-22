@@ -16,7 +16,7 @@ public class Smser {
     public Smser(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-
+    //https://app.smso.ro/api/v1/send?sender=4&to=+40740067087&body=helloboi&apiKey=mTr3xmoP3M9usuncicnqdD57DbxHlXWTpz4uePpz
     public String  sendSms(String receiver, String body){
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(URL);
         builder.queryParam("sender","4");
