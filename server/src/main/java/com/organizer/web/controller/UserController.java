@@ -66,8 +66,8 @@ public class UserController {
     }
 
     @RequestMapping(value = "u/auth", method = RequestMethod.POST)
-    public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String email, @RequestParam(required = true, name = "password") String password) {
-        User authUser = userService.findByEmail(email);
+    public ResponseEntity<UserDTO> authenticate(@RequestParam(required = true) String contact, @RequestParam(required = true, name = "password") String password) {
+        User authUser = userService.findByEmailOrPhone(contact,contact);
 
         if(authUser != null) {
             // bad credentials
@@ -77,7 +77,7 @@ public class UserController {
 
             // create a token and return it
 
-            String token = JWToken.create(authUser.getEmail());
+            String token = JWToken.create(authUser.getId());
             Date authTime = new Date(JWToken.ttlMillis+System.currentTimeMillis());
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("TOKEN", token);
@@ -153,8 +153,6 @@ public class UserController {
                     .city(signUpDTO.getCity())
                     .country(signUpDTO.getCountry())
                     .password(signUpDTO.getPassword())
-                    .verifiedEmail(0)
-                    .verifiedPhone(0)
                     .build();
 
             // attempt to create user
@@ -214,7 +212,7 @@ public class UserController {
 
                 if(target != null) {
 
-                    if(target.getVerifiedPhone()!=1)
+                    if(target.getVerifiedPhone()==false)
                     {
                         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a verified phone number");
                     }
@@ -238,7 +236,7 @@ public class UserController {
 
                 if(target != null) {
 
-                    if(target.getVerifiedEmail()!=1){
+                    if(target.getVerifiedEmail()==false){
                         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a verified mail specified");
                     }
                     ValidationCode code = this.validationCodeService.createNewCode(target, "reset_pass");
@@ -269,7 +267,7 @@ public class UserController {
                 if(target ==null){
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known phone number");
                 }
-                if(target.getVerifiedPhone()!=1)
+                if(target.getVerifiedPhone()==false)
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a verified phone number");
                ValidationCode validationCode = validationCodeService.findByCodeAndPhone(code,contact);
 

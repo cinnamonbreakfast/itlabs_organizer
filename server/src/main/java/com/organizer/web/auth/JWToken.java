@@ -15,12 +15,12 @@ public class JWToken {
     static String secret= "SUPER_SECRET_KEY";
     static Algorithm algorithm = Algorithm.HMAC256(secret);
    public static long ttlMillis=86400 * 1000;
-    public static String create(String mail){
+    public static String create(Long id){
         Date date = new Date(ttlMillis+System.currentTimeMillis());
         try{
             String token = JWT.create()
                     .withIssuer("auth0")
-                    .withClaim("id",mail)
+                    .withClaim("id",id)
                     .withExpiresAt(date)
                     .sign(algorithm);
             return  token;

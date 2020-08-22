@@ -55,11 +55,11 @@ public class User extends Entity<Long> {
 
     @Basic
     @Column(name = "verified_phone")
-    private Integer verifiedPhone;
+    private Boolean verifiedPhone;
 
     @Basic
     @Column(name = "verified_email")
-    private Integer verifiedEmail;
+    private Boolean verifiedEmail;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user")

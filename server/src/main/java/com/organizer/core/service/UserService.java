@@ -43,4 +43,7 @@ public class UserService {
     public User saveOrUpdate(User user ){
         return userRepository.save(user);
     }
+    public User findByEmailOrPhone(String mail, String phone){
+        return userRepository.findByEmailOrPhone(mail,phone);
+    }
 }

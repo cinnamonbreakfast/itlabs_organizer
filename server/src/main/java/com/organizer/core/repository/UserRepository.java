@@ -6,4 +6,5 @@ public interface UserRepository extends Repository<Long, User> {
     User  findByEmailAndPassword(String username, String password);
     User findByPhone(String phone);
     User findByEmail(String email);
+    User findByEmailOrPhone(String email, String phone);
 }
