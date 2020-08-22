@@ -5,10 +5,12 @@ import com.organizer.core.model.Specialist;
 import com.organizer.core.model.User;
 import com.organizer.core.service.CompanyService;
 import com.organizer.core.service.SpecialistService;
+import com.organizer.core.service.SpecialistServiceService;
 import com.organizer.core.service.UserService;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.CompanyDTO;
+import com.organizer.web.dto.ServiceDTO;
 import com.organizer.web.dto.SpecialistDTO;
 import com.organizer.web.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,8 +141,53 @@ public class SpecialistController {
 //        return ResponseEntity.ok(specialistDTO);
 //    }
 
+
         return ResponseEntity.ok(null);
     }
+    //company  and service
+    @RequestMapping(value = "/s/find", method = RequestMethod.POST)
+    public ResponseEntity <List<SpecialistDTO>> findSpecialistByCompany(@RequestBody String username,@RequestBody String serviceName){
+        Company company = companyService.findByUsername(username);
+        if(company== null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        List<Specialist> specialists =specialistService.findByCompanyAndServiceName(serviceName,username);
+
+        List<SpecialistDTO> specialistDTOS = new ArrayList<>(specialists.size());
+
+        for(Specialist specialist : specialists){
+
+            List<com.organizer.core.model.SpecialistService> specialistServices = specialist.getSpecialistServices();
+            List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
+            for(com.organizer.core.model.SpecialistService specialistService : specialistServices){
+                ServiceDTO serviceDTO = ServiceDTO.builder()
+                        .name(specialistService.getServiceName())
+                        .build();
+                serviceDTO.setId(specialistService.getId());
+                serviceDTOS.add(serviceDTO);
+            }
+
+            User user = specialist.getUser();
+            UserDTO userDTO = UserDTO.builder()
+                    .imageURL(user.getImageURL())
+                    .city(user.getCity())
+                    .country(user.getCountry())
+                    .name(user.getName())
+                    .phone(user.getPhone())
+                    .email(user.getEmail())
+                    .build();
+            userDTO.setId(user.getId());
+
+            SpecialistDTO specialistDTO = SpecialistDTO.builder()
+                    .servicesDTO(serviceDTOS)
+                    .user(userDTO)
+                    .build();
+            specialistDTO.setId(specialist.getId());
+            specialistDTOS.add(specialistDTO);
+        }
+        return ResponseEntity.ok(specialistDTOS);
+    }
+
 
     //todo:: seach for a specialist base on user_id
     //todo:: search for a specialist base on company id

@@ -57,6 +57,10 @@ public class Company extends Entity<Long>{
     @Basic
     @Column
     String image_url;
+    
+    @Basic
+    @Column
+    String cui;
 
 
 }
