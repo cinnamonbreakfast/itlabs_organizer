@@ -27,17 +27,24 @@ public class Smser {
         this.restTemplate = restTemplate;
     }
 
-    public String  sendSms(String receiver, String body){
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(URL);
-        builder.queryParam("sender",SENDER);
-        builder.queryParam("to", receiver);
-        builder.queryParam("body", body);
-        builder.queryParam("apiKey",API_KEY);
+    public String  sendSms(String to, String body){
+        String requestURL = buildURL(to, body);
+
         try {
-            return restTemplate.getForEntity(builder.toUriString(), String.class).getBody();
+            return restTemplate.getForEntity(requestURL, String.class).getBody();
         }
         catch (Exception e ){
             return null;
         }
+    }
+
+    private String buildURL(String to, String body) {
+        String result = this.URL + "?";
+        result += "sender=" + this.SENDER + "&";
+        result += "apiKey=" + this.API_KEY + "&";
+        result += "body=" + body + "&";
+        result += "to=" + to;
+
+        return result;
     }
 }
