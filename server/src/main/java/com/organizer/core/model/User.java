@@ -65,4 +65,8 @@ public class User extends Entity<Long> {
     @JsonManagedReference
     @OneToMany(mappedBy = "user")
     private List<Schedule>schedules;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user")
+    private List<Invitation> invitations;
 }

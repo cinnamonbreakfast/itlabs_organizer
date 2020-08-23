@@ -5,7 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Table(name="admin_validation",schema="public")
+@Table(name="invitations",schema="public")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,14 +13,24 @@ import javax.persistence.*;
 @Builder
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AdminValidation extends Entity<Long>{
 
+public class Invitation extends Entity<Long>{
     @JsonBackReference
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="company", nullable = false)
     Company company;
 
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable = false)
+    User user ;
+
+    @Basic
+    @Column(name="servicename")
+    String serviceName;
+
     @Basic
     @Column
-    Boolean validated;
+    Boolean accepted;
+
 }

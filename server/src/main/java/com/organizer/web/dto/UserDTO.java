@@ -1,8 +1,10 @@
 package com.organizer.web.dto;
 
+import com.organizer.core.model.Invitation;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +23,5 @@ public class UserDTO extends BaseDTO {
     private String authTime;
     private Boolean verifiedEmail;
     private Boolean verifiedPhone;
+    List<InvitationDTO> invitationDTOS;
 }
