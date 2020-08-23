@@ -26,5 +26,8 @@ public class SpecialistServiceService {
     public List<SpecialistService> findByCompany(int company_id){
         return specialistServiceRepository.findSpecialistServiceByCompany(company_id);
     }
+    public void save(SpecialistService specialistService){
+        specialistServiceRepository.save(specialistService);
+    }
 
 }

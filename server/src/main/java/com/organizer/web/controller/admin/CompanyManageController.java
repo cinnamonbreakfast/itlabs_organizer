@@ -26,6 +26,8 @@ public class CompanyManageController {
     @Autowired
     public CompanyManageController(AdminService adminService, UserService userService,CompanyService companyService){
         this.adminService=adminService;
+        this.userService =userService;
+        this.companyService= companyService;
     }
     @RequestMapping(value = "admin/get/companies")
     public ResponseEntity<List<Company> > listValidatingCompanies(@RequestParam int page, @RequestHeader String token){
@@ -33,7 +35,16 @@ public class CompanyManageController {
         if(id==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        User user= userService.findById(id);
+        System.out.println(id);
+        User user=null;
+        try {
+            user = userService.findById(id);
+        }
+        catch (Exception e )
+        {
+            System.out.println(e);
+            e.printStackTrace();
+        }
         if(user == null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
@@ -63,6 +74,9 @@ public class CompanyManageController {
         }
         try {
             Company company = companyService.findByUsername(username);
+            if(company==null){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("In valid company username");
+            }
             company.setValidated(true);
             companyService.save(company);
         }

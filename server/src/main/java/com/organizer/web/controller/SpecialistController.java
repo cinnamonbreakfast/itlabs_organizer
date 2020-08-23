@@ -1,18 +1,13 @@
 package com.organizer.web.controller;
 
 import com.organizer.core.model.Company;
+import com.organizer.core.model.Invitation;
 import com.organizer.core.model.Specialist;
 import com.organizer.core.model.User;
-import com.organizer.core.service.CompanyService;
-import com.organizer.core.service.SpecialistService;
-import com.organizer.core.service.SpecialistServiceService;
-import com.organizer.core.service.UserService;
+import com.organizer.core.service.*;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.auth.JWToken;
-import com.organizer.web.dto.CompanyDTO;
-import com.organizer.web.dto.ServiceDTO;
-import com.organizer.web.dto.SpecialistDTO;
-import com.organizer.web.dto.UserDTO;
+import com.organizer.web.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +21,17 @@ public class SpecialistController {
     private final AuthStore authStore;
     private final UserService userService;
     private final CompanyService companyService;
+    private final InvitationService invitationService;
+    private final SpecialistServiceService specialistServiceService;
 
     @Autowired
-    public SpecialistController(SpecialistService specialistService,AuthStore authStore,UserService userService, CompanyService companyService){
+    public SpecialistController(SpecialistService specialistService, AuthStore authStore, UserService userService, CompanyService companyService, SpecialistServiceService specialistServiceService, InvitationService invitationService){
         this.userService = userService;
         this.specialistService = specialistService;
         this.authStore= authStore;
         this.companyService= companyService;
+        this.invitationService=invitationService;
+        this.specialistServiceService=specialistServiceService;
     }
 
     @RequestMapping(value = "/specialist/search/{id}", method = RequestMethod.GET)
@@ -44,11 +43,6 @@ public class SpecialistController {
 
     @RequestMapping(value = "/s/search/by/user/{user_id}", method = RequestMethod.GET)
     public ResponseEntity<Specialist> findSpecialistByPhone(@PathVariable(required= true)Long user_id){
-
-        /*
-        if(authStore.sessionExists(token)==false)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Token invalid try log in again").body(null);
-*/
 
 
         Specialist specialists = specialistService.findById(user_id);
@@ -93,57 +87,6 @@ public class SpecialistController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
-    @RequestMapping(value = "/s/create", method = RequestMethod.POST)
-    public ResponseEntity<SpecialistDTO> createSpecialist(@RequestParam Long userId,@RequestParam Long companyId, @RequestHeader(value = "SESSION") String token ) { // this aint c++
-
-//        if(authStore.sessionExists(token)==false)
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Token invalid try log in again").body(null);
-//
-//        User user = userService.findByEmail(authStore.getUsername(token));
-//        if(user==null)
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Message","token invalid").body(null);
-//
-//        Company company = companyService.findById(companyId);
-//        if(company==null)
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Message","Not a known company").body(null);
-//
-//        if((long)company.getOwner()!=user.getId())
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Message","Not authenticated as an Admin or Company User").body(null);
-//
-//        Specialist specialist = Specialist.builder()
-//                .user(user)
-//                .company(company)
-//                .build();
-//        UserDTO userDTO = UserDTO.builder()
-//                .city(user.getCity())
-//                .country(user.getCountry())
-//                .email(user.getEmail())
-//                .imageURL(user.getImageURL())
-//                .name(user.getName())
-//                .phone(user.getPhone())
-//                .build();
-//        userDTO.setId(user.getId());
-//        CompanyDTO companyDTO = CompanyDTO.builder()
-//                .address(company.getAddress())
-//                .category(company.getAddress())
-//                .city(company.getCity())
-//                .name(company.getName())
-//                .country(company.getCountry())
-//                .build();
-//        companyDTO.setId(company.getId());
-//        SpecialistDTO specialistDTO = SpecialistDTO.builder()
-//                .user(userDTO)
-//                .company(companyDTO)
-//                .build();
-//        specialistDTO.setId(specialist.getId());
-//        specialistService.signSpecialist(specialist);
-//
-//        return ResponseEntity.ok(specialistDTO);
-//    }
-
-
-        return ResponseEntity.ok(null);
-    }
     //company  and service
     @RequestMapping(value = "/s/find", method = RequestMethod.POST)
     public ResponseEntity <List<SpecialistDTO>> findSpecialistByCompany(@RequestBody String username,@RequestBody String serviceName){
@@ -187,13 +130,100 @@ public class SpecialistController {
         }
         return ResponseEntity.ok(specialistDTOS);
     }
+    //display invitations
+    @RequestMapping(value = "s/invitations",method = RequestMethod.GET)
+    public ResponseEntity <List<InvitationDTO>> invitationsDisplay(@RequestHeader String token){
+        Long id = JWToken.checkToken(token);
+        if(id==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        User user = userService.findById(id);
+        if(user==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        List <Invitation> invitations = invitationService.findByUserAndAccepted(user);
+        List<InvitationDTO> invitationDTOS = new ArrayList<>(invitations.size());
+        invitations.forEach(e->{
+            invitationDTOS.add(
+                InvitationDTO.builder()
+                        .serviceName(e.getServiceName())
+                        .id(e.getId())
+                        .companyDTO(
+                                CompanyDTO.builder()
+                                        .username(e.getCompany().getUsername())
+                                        .city(e.getCompany().getImage_url())
+                                        .address(e.getCompany().getAddress())
+                                        .city(e.getCompany().getCity())
+                                        .category(e.getCompany().getCategory())
+                                        .image_url(e.getCompany().getImage_url())
+                                        .build()).build() );
+
+        }
+            );
 
 
-    //todo:: seach for a specialist base on user_id
-    //todo:: search for a specialist base on company id
-    //todo:: validate specialist (based on availability) - important: soon
-    //todo:: create a specialist : done
-    //todo:: add a specialist an account :
-    //todo:: add some kind of regex search in finds  :
+        return  ResponseEntity.ok(invitationDTOS);
+
+    }
+
+
+
+    @RequestMapping( value = "s/acceptInvitation", method = RequestMethod.POST)
+    public ResponseEntity<String> acceptInvitation(@RequestParam Long invitationId , @RequestHeader String token)
+    {
+        Long authId = JWToken.checkToken(token);
+        if(authId==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");
+        }
+        User user = userService.findById(authId);
+        if(user ==null)
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
+        }
+        Invitation invitation = null;
+        try {
+             invitation = invitationService.findById(invitationId);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a good invitation");
+        }
+        if(invitation==null)
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Server error");
+        }
+
+        //TODO:: ADD SCHEDULES AND THAT STUFF...
+        User invitedUser = invitation.getUser();
+        Company company = invitation.getCompany();
+        Specialist specialist = Specialist.builder()
+                .company(company)
+                .user(invitedUser)
+                .build();
+
+        invitation.setAccepted(true);
+
+
+        try {
+            specialistService.save(specialist);
+            invitationService.save(invitation);
+            specialist = specialistService.findById(invitedUser.getId());
+            com.organizer.core.model.SpecialistService specialistService1 = com.organizer.core.model.SpecialistService.builder()
+                    .serviceName(invitation.getServiceName())
+                    .specialist(specialist)
+                    .build();
+
+
+            specialistServiceService.save(specialistService1);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Accepted the invite");
+        }
+        catch (Exception e )
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Server error");
+        }
+
+
+    }
+
 
 }
