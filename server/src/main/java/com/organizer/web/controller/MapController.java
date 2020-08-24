@@ -177,7 +177,7 @@ public class MapController {
         return ResponseEntity.ok(cityListService.getCityList(page,country,city));
     }
     @RequestMapping(value ="fetch/prefixes",method = RequestMethod.GET)
-    public ResponseEntity<List<Prefix>> getPrefixes(@RequestParam int page, @RequestParam String prefix){
-        return  ResponseEntity.ok(prefixService.findByCountryOrPrefix(page,prefix));
+    public ResponseEntity<List<Prefix>> getPrefixes( ){
+        return  ResponseEntity.ok(prefixService.findByCountryOrPrefix());
     }
 }

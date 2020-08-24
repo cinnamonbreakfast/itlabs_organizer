@@ -18,9 +18,9 @@ public class PrefixService {
         this.prefixRepository =prefixRepository;
     }
 
-    public List<Prefix> findByCountryOrPrefix(int pageNr,String value ) {
-        Pageable pageable = PageRequest.of(pageNr,10);
-        return prefixRepository.findPrefixByCountryOrPrefix(pageable,value).getContent();
+    public List<Prefix> findByCountryOrPrefix() {
+
+        return prefixRepository.findPrefixByCountryOrPrefix();
     }
     public Prefix findByPrefix(String prefix){
         return prefixRepository.findPrefixByPrefix(prefix);
