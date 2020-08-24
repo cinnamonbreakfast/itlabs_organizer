@@ -74,6 +74,8 @@ public class UserController {
     }
 
     private ResponseEntity<ResponseDTO<UserDTO>> makeASession(User user) {
+        String token = JWToken.create(user.getId());
+        Date authTime = new Date(JWToken.ttlMillis+System.currentTimeMillis());
         UserDTO data = UserDTO.builder()
                 .name(user.getName())
                 .email(user.getEmail())
@@ -83,17 +85,14 @@ public class UserController {
                 .verifiedPhone(user.getVerifiedPhone())
                 .city(user.getCity())
                 .country(user.getCountry())
+                .token(token)
+                .authTime(authTime.toString())
                 .build();
         data.setId(user.getId());
 
-        String token = JWToken.create(user.getId());
-        Date authTime = new Date(JWToken.ttlMillis+System.currentTimeMillis());
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("TOKEN", token);
-        responseHeaders.set("AUTH_TIME", authTime.toString());
 
         return ResponseEntity.ok()
-                .headers(responseHeaders)
+
                 .body(
                         ResponseDTO.<UserDTO>builder()
                                 .message("User authenticated successfully!")
@@ -105,7 +104,9 @@ public class UserController {
 
     @RequestMapping(value = "u/signin", method = RequestMethod.POST)
     public ResponseEntity<ResponseDTO<UserDTO>> authenticate(@RequestParam String contact, @RequestParam String password) {
-        User authUser = userService.findByEmailOrPhone(contact, contact);
+        int m = regex.phoneMatcher("40",contact);
+        String tel = "+40"+contact.substring(m,contact.length());
+        User authUser = userService.findByEmailOrPhone(contact, tel);
         System.out.println(authUser);
         if(authUser != null) {
             String hashPass = Hash.md5(password);
@@ -129,7 +130,13 @@ public class UserController {
     public ResponseEntity<ResponseDTO<Integer>> validate(@RequestParam Integer code, @RequestParam String purpose, @RequestParam String contact) {
         ValidationCode dbCode = this.validationCodeService.find(code);
 
-        if(dbCode != null && dbCode.getPurpose().equals(purpose) && dbCode.getAccount().getPhone().equals(contact)) {
+
+        int m = regex.phoneMatcher("40",contact);
+        if(m==0){
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Bring a valid phone number.").code(400).build());
+        }
+        String tel = "+40"+contact.substring(m,contact.length());
+        if(dbCode != null && dbCode.getPurpose().equals(purpose) && dbCode.getAccount().getPhone().equals(tel)) {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(
                             ResponseDTO.<Integer>builder()
@@ -148,23 +155,22 @@ public class UserController {
     }
 
     @RequestMapping(value = "u/presignup", method = RequestMethod.POST, consumes = "multipart/form-data")
-    public ResponseEntity<ResponseDTO<Integer>> signUpCodeRequest(@RequestParam(required = true) String phone, @RequestParam(required = true) String prefix) {
+    public ResponseEntity<ResponseDTO<Integer>> signUpCodeRequest(@RequestParam(required = true) String phone) {
 
-            Prefix prefix1 = prefixService.findByPrefix(prefix);
-            if(prefix1==null){
-                return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Not a valid prefix").code(400).build());
-            }
-            int m = regex.phoneMatcher(prefix,phone);
+
+            int m = regex.phoneMatcher("40",phone);
             if(m==0){
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Bring a valid phone number.").code(400).build());
             }
-            String tel = "+"+prefix+phone.substring(m,phone.length());
+            String tel = "+40"+phone.substring(m,phone.length());
             User target = this.userService.findByPhone(tel);
 
             if(target != null && target.getVerifiedPhone() != null) {
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("This phone number is already in use.").code(400).build());
             }
-            target= User.builder().phone(tel).
+            target= User.builder()
+                    .verifiedPhone(false)
+                    .verifiedEmail(false).phone(tel).
                     build();
             target = this.userService.saveOrUpdate(target);
             ValidationCode code = this.validationCodeService.createNewCode(target, "sign_up", LocalDateTime.now().plusHours(1));
@@ -270,7 +276,17 @@ public class UserController {
 
     @RequestMapping(value = "u/signup", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<ResponseDTO<UserDTO>> signUp(@RequestBody(required = true) SignUpDTO signUpDTO) {
-        User existingUser = userService.findByPhone(signUpDTO.getPhone());
+        String contact =signUpDTO.getPhone();
+        int m = regex.phoneMatcher("40",contact);
+        if(m==0){
+            return ResponseEntity.ok()
+                    .body(
+                            ResponseDTO.<UserDTO>builder().message("Invalid phone number.").code(400).build()
+                    ); }
+        String tel = "+40"+contact.substring(m,contact.length());
+        System.out.println(tel);
+        User existingUser = userService.findByPhone(tel);
+
         System.out.println(existingUser);
         if(existingUser == null) {
             return ResponseEntity.ok()
@@ -341,17 +357,23 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something happened");
     }
 
-    /*
-    @RequestMapping(value = "u/createAdmin",method = RequestMethod.POST)
-    public  ResponseEntity<String > createAdmin(@RequestParam String password){
 
+    @RequestMapping(value = "u/changeDetails",method = RequestMethod.PUT)
+    public ResponseEntity<String> changeDetails(@RequestParam SignUpDTO details,@RequestHeader String token){
+        Long id = JWToken.checkToken(token);
+        if(id==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("invalid token");
+        }
+        User user = userService.findById(id);
+        if(user == null)
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
+        }
+        user.setName(details.getName());
+        user.setCity(details.getCity());
+        user.setCountry(details.getCountry());
 
-        User user  = User.builder()
-                .email("testest")
-                .password(Hash.md5(password))
-                .phone("07-naN")
-                .build();
-        userService.saveOrUpdate(user);
-        return ResponseEntity.ok("made an admin");
-    }*/
+        return ResponseEntity.ok("changed");
+
+    }
 }
