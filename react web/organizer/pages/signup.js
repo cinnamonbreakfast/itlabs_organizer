@@ -1,127 +1,249 @@
 import React, { useState, useEffect } from 'react'
 import styles from '../styles/pages/auth.module.scss'
 import axios from 'axios'
+import UserController from './api/userController'
+import { useDispatch, useSelector } from 'react-redux'
+import { useRouter } from 'next/router'
 
-const SignUpPage = () => {
+const SignUpValidator = (props) => {
+    const uc = props.userControl
 
-    const [errorMsg, setMessage] = useState(null);
+    const [code, setCode] = useState('')
+    const [formMessage, setformMessage] = useState(null)
+    const phone = props.phone
 
-    const [userRole, setUserRole] = useState(0);
-    const [userName, setName] = useState("")
-    const [userEmail, setEmail] = useState("")
-    const [userCity, setCity] = useState("")
-    const [userCountry, setCountry] = useState("")
-    const [userPhone, setPhone] = useState("")
-    const [userPassword, setPassword] = useState("")
+    const submitCode = (event) => {
+        event.preventDefault()
 
-    const handleInputData = (event) => {
-        let target = event.target;
-        let identifier = target.name;
-        switch(identifier) {
-            case 'name':
-                setName(target.value)
-                break;
-            case 'email':
-                setEmail(target.value)
-                break;
-            case 'city':
-                setCity(target.value)
-                break;
-            case 'country':
-                setCountry(target.value)
-                break;
-            case 'phone':
-                setPhone(target.value)
-                break;
-            case 'password':
-                setPassword(target.value)
-                break;
-            default:
-                return;
-                    
-        }
+        uc.checkCode(phone, code, "sign_up")
+        .then(resp => {
+            if(resp.data.code != 200) {
+                setformMessage({message: resp.data.message, type: "error"})
+            } else {
+                props.continue(code)
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
     }
 
-    const formSubmit = (event) => {
-        console.log("event was called");
+    const handleCode = (e) => {
+        let cd = e.target.value
+        if(cd) setCode(cd)
+        else setCode('')
+    }
+
+    return (
+        <form className={styles.form} onSubmit={event => submitCode(event)}>
+            <div className={styles.greetings}>
+                <h1>Sign Up</h1>
+                <p>Please enter the code you received to your phone.</p>
+            </div>
+
+            <div className={styles.formGroup}>
+                <input type="text" value={code} onChange={e => handleCode(e)} name="code" maxLength={6} placeholder="Code"/>
+            </div>
+
+            {formMessage && <p className={styles.message + ' ' + (formMessage.type === 'error' ? styles.error:styles.ok)}>{formMessage.message}</p>}
+
+            <div className={styles.formGroup}>
+                <input type="submit" value="Validate"/>
+            </div>
+        </form>
+    )
+}
+
+const SignUpRequest = (props) => {
+    const uc = props.userControl
+
+    const [phone, setPhone] = useState('')
+    const [prefixes, setPrefixes] = useState(null)
+    const [formMessage, setformMessage] = useState(null)
+
+    const handlePhone = (e) => {
+        let ph = e.target.value
+        if(ph) setPhone(ph)
+        else setPhone('')
+    }
+
+    const askForCode = (event) => {
         event.preventDefault();
 
-        axios.post(process.env.REQ_HOST + '/u/signup',
-        {
-            email: userEmail,
-            name: userName,
-            phone: userPhone,
-            role: userRole,
-            city: userCity,
-            country: userCountry,
-            password: userPassword,
-            id: null
-        }, {
-            'Content-Type': 'application/json',
+        setformMessage(null)
+
+        uc.sendSignUpCode("+40"+phone)
+        .then(res => {
+            if(res.data.code !== 200) {
+                setformMessage({'message':res.data.message, type: 'error'})
+            } else {
+                setformMessage({'message':res.data.message, type: 'ok'})
+                props.continue("+40"+phone)
+            }
         })
-        .then(response => {
-            console.log(response)
-            setMessage({type: "ok", message: response.data.message})
-        })
-        .catch(error => {
-            console.log(error)
-            setMessage({type:"error", message: error.response.data})
+        .catch(err => {
+            console.log(err)
         })
     }
 
     return (
-        <div className={styles.wrapper}>
+        <form className={styles.form} onSubmit={event => askForCode(event)}>
             <div className={styles.greetings}>
                 <h1>Sign Up</h1>
-                <p>Tell us who you are. Set up your account.</p>
+                <p>We need to verify your phone number before.</p>
             </div>
 
-            
-            {
-                errorMsg !== null ?
-                    (
-                    <p className={styles.message + ' ' + (errorMsg.type === 'error' ? styles.error : styles.ok)}>{errorMsg.message}</p>
-                    )
-                : (null)
+            <div className={styles.formGroup +' '+ styles.phoneBox}>
+                <label>RO +40</label>
+                <input type="text" value={phone} onChange={e => handlePhone(e)} name="phone" placeholder="Phone number"/>
+            </div>
+
+            {formMessage && <p className={styles.message + ' ' + (formMessage.type === 'error' ? styles.error:styles.ok)}>{formMessage.message}</p>}
+
+            <div className={styles.formGroup}>
+                <input type="submit" value="Send code"/>
+            </div>
+        </form>
+    )
+}
+
+const SignUpMeta = (props) => {
+    const uc = props.userControl
+    const router = useRouter()
+    const user = useSelector(state => state.user)
+
+    const [email, setEmail] = useState('')
+    const [name, setName] = useState('')
+    const [city, setCity] = useState('')
+    const [country, setCountry] = useState('')
+    const [password, setPassword] = useState('')
+    const [password2, setPassword2] = useState('')
+    const phone = props.phone;
+    const code = props.code
+
+    const handleForm = (e) => {
+        let value = e.target.value
+        if(!value) value = ''
+
+        switch(e.target.name) {
+            case 'name':
+                setName(value)
+                break
+            case 'email':
+                setEmail(value)
+                break
+            case 'city':
+                setCity(value)
+                break
+            case 'country':
+                setCountry(value)
+                break
+            case 'password':
+                setPassword(value)
+                break
+            case 'password2':
+                setPassword2(value)
+            default:
+                return
+        }
+    }
+
+    const [formMessage, setFormMessage] = useState(null)
+
+    const submitForm = (event) => {
+        event.preventDefault()
+
+        if(password !== password2) {
+            setFormMessage({message: "Password fields do not match.", type: "error"})
+            return
+        }
+
+        let data = { name, email, phone, city, country, password, code }
+
+        uc.signUpAction(data)
+        .then(resp => {
+            if(resp) {
+                if(resp.data) {
+                    if(resp.data.code === 200) {
+                        setLoginData(resp.data.data)
+                        router.push("/")
+                    } else {
+                        setFormMessage({message: resp.data.message, type: "error"})
+                    }
+                }
             }
 
-            {
-                errorMsg === null || errorMsg.type !== "ok" ? 
-                (
-                    <form onSubmit={(e) => formSubmit(e)}>
-                        <div className={styles.formGroup}>
-                            <input type="text" name="name" onChange={(e) => handleInputData(e)} placeholder="First & Last name"/>
-                        </div>
+            setFormMessage({message: "An error occured. Try again later.", type: "error"})
+        })
+        .catch(err => {
+            setFormMessage({message: "An error occured. Try again later.", type: "error"})
+        })
+    }
 
-                        <div className={styles.formGroup}>
-                            <input type="text" name="email" onChange={(e) => handleInputData(e)} placeholder="E-Mail"/>
-                        </div>
+    return (
+        <form className={styles.form} onSubmit={event => submitForm(event)}>
+            <div className={styles.greetings}>
+                <h1>Sign Up</h1>
+                <p>Get all finished. By adding your email, a validation code will be sent to it. Remember, it's only available for 15 days.</p>
+            </div>
 
-                        <div className={styles.formGroup}>
-                            <input type="text" name="city" onChange={(e) => handleInputData(e)} placeholder="City"/>
-                        </div>
+            <div className={styles.formGroup}>
+                <input onChange={e => handleForm(e)} type="text" value={name} name="name" placeholder="Full name"/>
+            </div>
 
-                        <div className={styles.formGroup}>
-                            <input type="text" name="country" onChange={(e) => handleInputData(e)} placeholder="Country"/>
-                        </div>
+            <div className={styles.formGroup}>
+                <input onChange={e => handleForm(e)} type="text" value={email} name="email" placeholder="E-mail address"/>
+            </div>
 
-                        <div className={styles.formGroup}>
-                            <input type="text" name="phone" onChange={(e) => handleInputData(e)} placeholder="Phone"/>
-                        </div>
+            <div className={styles.formGroup}>
+                <input onChange={e => handleForm(e)} type="text" value={city} name="city" placeholder="City"/>
+            </div>
 
-                        <div className={styles.formGroup}>
-                            <input type="password" name="password" onChange={(e) => handleInputData(e)} placeholder="Password"/>
-                        </div>
+            <div className={styles.formGroup}>
+                <input onChange={e => handleForm(e)} type="text" value={country} name="country" placeholder="Country"/>
+            </div>
 
-                        <div className={styles.formGroup + ' ' + styles.formButtons}>
-                            <input type="submit" name="submit" value="Sign Up"/>
-                            <input type="button" name="submit" value="Clear"/>
-                        </div>
-                    </form>
-                ) :
-                (null)
-            }
-            
+            <div className={styles.formGroup}>
+                <input onChange={e => handleForm(e)} type="password" value={password} name="password" placeholder="Password"/>
+            </div>
+
+            <div className={styles.formGroup}>
+                <input onChange={e => handleForm(e)} type="password" value={password2} name="password2" placeholder="Password again"/>
+            </div>
+
+            {formMessage && <p className={styles.message + ' ' + (formMessage.type === 'error' ? styles.error:styles.ok)}>{formMessage.message}</p>}
+
+            <div className={styles.formGroup}>
+                <input type="submit" value="Finish"/>
+            </div>
+        </form>
+    )
+}
+
+const SignUpPage = () => {
+    const dispatch = useDispatch()
+    const userController = new UserController(dispatch)
+    const [message, setMessage] = useState(null)
+
+    const [phone, setPhone] = useState('')
+    const [code, setCode] = useState('')
+    const [step, setStep] = useState(0)
+
+    const toValidate = (phone) => {
+        setPhone(phone)
+        setStep(1)
+    }
+
+    const toCompletion = (code) => {
+        setCode(code)
+        setStep(2)
+    }
+
+    return (
+        <div className={styles.wrapper}>
+            {step === 2 && <SignUpMeta phone={phone} code={code} userControl={userController}/>}
+            {step === 1 && <SignUpValidator phone={phone} userControl={userController} continue={toCompletion}/>}
+            {step === 0 && <SignUpRequest userControl={userController} continue={toValidate}/>}
         </div>
     )
 }
