@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 
 public class ServiceDTO extends  BaseDTO{
-    String companyName;
+    String companyUsername;
     String name;
     Float duration;
     Float price;

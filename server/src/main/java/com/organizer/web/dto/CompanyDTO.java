@@ -19,7 +19,7 @@ public class CompanyDTO extends BaseDTO {
         private String country;
         private String image_url;
         private String username;
-        private UserDTO userDTO;
-
+        private UserDTO owner;
+        private List<SpecialistDTO> staffMembers;
         private List<ServiceDTO> services;
 }

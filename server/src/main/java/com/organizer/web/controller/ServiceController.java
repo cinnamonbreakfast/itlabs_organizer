@@ -42,7 +42,7 @@ public class ServiceController {
     }
 
     @RequestMapping(value = "service/create", method = RequestMethod.POST)
-    public ResponseEntity<String> createService(@RequestHeader String token,  ServiceDTO serviceDTO)
+    public ResponseEntity<String> createService(@RequestHeader String token, @RequestBody ServiceDTO serviceDTO)
     {
         System.out.println(serviceDTO);
         Long id = JWToken.checkToken(token);
@@ -53,7 +53,7 @@ public class ServiceController {
         if(user == null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
         }
-        Company company = companyService.findByUsername(serviceDTO.getCompanyName());
+        Company company =  companyService.findByUsername(serviceDTO.getCompanyUsername());
         if(company == null)
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid company");
@@ -66,7 +66,7 @@ public class ServiceController {
         String serviceName =serviceDTO.getName();
 
 
-        Service service = serviceService.findByServiceAndCompany(serviceName,serviceDTO.getCompanyName());
+        Service service = serviceService.findByServiceAndCompany(serviceName,serviceDTO.getCompanyUsername());
         if(service != null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service Already Exists");
         }
@@ -85,4 +85,57 @@ public class ServiceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body("Created a service");
     }
+    @RequestMapping(value = "service/update", method = RequestMethod.PUT,consumes = {"appication/json"})
+    public ResponseEntity<String> updateService(@RequestHeader String token ,@RequestBody ServiceDTO serviceDTO){
+
+        System.out.println(serviceDTO);
+        Long id = JWToken.checkToken(token);
+        if(id==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Bad token");
+        }
+        User user = userService.findById(id);
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
+        }
+
+        System.out.println(serviceDTO);
+        Service service = serviceService.findById(serviceDTO.getId());
+
+        if(service == null)
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid service");
+        }
+
+        Company company = service.getCompany();
+        if(user.getId()!=company.getOwner().getId())
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not the owner of the company");
+        }
+        String serviceName =serviceDTO.getName();
+            //Service service = serviceService.findByServiceAndCompany(serviceName,serviceDTO.getCompanyUsername());
+        try {
+            service.setDuration(serviceDTO.getDuration());
+        }
+        catch (Exception e){
+
+        }
+        try {
+            service.setPrice(serviceDTO.getPrice());
+        }
+        catch (Exception e){
+
+        }
+        try {
+            service.setServiceName(serviceDTO.getName());
+        }
+        catch (Exception e){
+
+        }
+
+        serviceService.save(service);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Updated service");
+
+    }
+
+
 }

@@ -44,8 +44,8 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("*")
                         .allowedMethods("GET", "PUT", "POST", "DELETE")
-                        .allowedHeaders("TOKEN","AUTH_TIME")
-                        .exposedHeaders("TOKEN","AUTH_TIME");
+                        .allowedHeaders("token","TOKEN","AUTH_TIME")
+                        .exposedHeaders("token","TOKEN","AUTH_TIME");
 
             }
         };

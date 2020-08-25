@@ -30,9 +30,11 @@ public class CompanyController {
     private final CountryListService countryListService;
     private final InvitationService invitationService;
     private final ServiceService serviceService;
+    private final SpecialistService specialistService;
     private final Emailer emailer;
     @Autowired
     public CompanyController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, AnimeService animeService, CityListService cityListService, CountryListService countryListService, InvitationService invitationService, ServiceService serviceService,
+                             SpecialistService specialistService,
                              Emailer emailer) {
         this.companyService = companyService;
         this.authStore = authStore;
@@ -44,6 +46,7 @@ public class CompanyController {
         this.invitationService = invitationService;
         this.serviceService=  serviceService;
         this.emailer=emailer;
+        this.specialistService=specialistService;
     }
 
     @RequestMapping(value = "c/create",method = RequestMethod.POST,consumes = {"multipart/form-data"})
@@ -133,12 +136,12 @@ CompanyDTO newCompany,@RequestHeader String token ){
 
             CompanyDTO companyDTO =CompanyDTO.builder()
                     .country(company.getCountry())
+                    .owner(userDTO)
                     .name(company.getName())
                     .category(company.getCategory())
                     .address(company.getAddress())
                     .city(company.getCity())
                     .image_url(company.getImage_url())
-                    .userDTO(userDTO)
                     .username(company.getUsername())
                     .build();
             companyDTO.setId(company.getId());
@@ -162,12 +165,40 @@ CompanyDTO newCompany,@RequestHeader String token ){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         List<Service> specialistServices = company.getServices();
 
+        List<Specialist> specialistsStaf=null;
+
+        try {
+            specialistsStaf = specialistService.findByCompanyUsername(username);
+
+        }
+        catch (Exception e ){
+
+        }
+        List<SpecialistDTO> specialiststaffDTOS = new ArrayList<>();
+        if(specialistsStaf!=null){
+            for(Specialist sp :specialistsStaf){
+                User u = sp.getUser();
+                UserDTO userDTO = UserDTO.builder()
+                        .name(u.getName())
+                        .email(u.getEmail())
+                        .phone(u.getPhone())
+                        .city(u.getCity())
+                        .imageURL(u.getImageURL())
+                        .country(u.getCountry())
+                        .build();
+                userDTO.setId(u.getId());
+                SpecialistDTO specialistDTO = SpecialistDTO.builder()
+                        .user(userDTO)
+                        .build();
+                specialiststaffDTOS.add(specialistDTO);
+            }
+        }
+
+
+
         List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
-
         for (Service specialistService : specialistServices) {
-
-
-            List<SpecialistDTO>specialistDTOS = new ArrayList<>(specialistService.getAvailabilities().size());
+            List<SpecialistDTO>specialistDTOS = new ArrayList<>();
             for(Specialist sp : specialistService.getSpecialists()){
                 User user = sp.getUser();
                 UserDTO userDTO = UserDTO.builder()
@@ -181,6 +212,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 userDTO.setId(user.getId());
                 SpecialistDTO specialistDTO = SpecialistDTO.builder()
                         .user(userDTO)
+
                         .build();
                 specialistDTO.setId(sp.getId());
                 specialistDTOS.add(specialistDTO);
@@ -188,22 +220,33 @@ CompanyDTO newCompany,@RequestHeader String token ){
 
             ServiceDTO serviceDTO = ServiceDTO.builder()
                     .price(specialistService.getPrice())
-                    .specialistDTOList(specialistDTOS)
+                    .specialistDTOList( specialistDTOS)
                     .duration(specialistService.getDuration())
                     .name(specialistService.getServiceName()).build();
             serviceDTO.setId(specialistService.getId());
             serviceDTOS.add(serviceDTO);
         }
-
-
+        User ow = company.getOwner();
+        UserDTO owner = UserDTO.builder()
+                .imageURL(ow.getImageURL())
+                .country(ow.getCountry())
+                .city(ow.getCity())
+                .phone(ow.getPhone())
+                .email(ow.getEmail())
+                .name(ow.getName())
+                .build();
+        owner.setId(ow.getId());
         CompanyDTO companyDTO = CompanyDTO.builder()
                 .name(company.getName())
+                .owner(owner)
                 .address(company.getAddress())
                 .city(company.getCity())
                 .category(company.getCategory())
                 .country(company.getCountry())
                 .username(company.getUsername())
+                .staffMembers(specialiststaffDTOS)
                 .services(serviceDTOS).build();
+
         companyDTO.setId(company.getId());
         return ResponseEntity.ok(companyDTO);
     }

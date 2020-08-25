@@ -97,7 +97,9 @@ public class MapController {
                             .duration(specialistService.getDuration())
                             .price(specialistService.getPrice())
                             .build();
+                    serviceDTO.setId(specialistService.getId());
                     serviceDTOS.add(serviceDTO);
+
                 }
                 CompanyDTO companyDTO = CompanyDTO.builder()
                         .name(company.getName())

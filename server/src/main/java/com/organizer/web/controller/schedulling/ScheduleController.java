@@ -9,22 +9,21 @@ import com.organizer.core.service.schedulling.ScheduleService;
 import com.organizer.core.service.schedulling.TimeTableService;
 import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.BaseDTO;
+import com.organizer.web.dto.schedulling.IntervalDTO;
 import com.organizer.web.dto.schedulling.ScheduleDTO;
 import com.organizer.web.utils.DateOperations;
+import org.antlr.v4.runtime.misc.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class ScheduleController {
     AvailabilityService availabilityService;
@@ -41,8 +40,6 @@ public class ScheduleController {
             Schedule validSchedule = Schedule.builder().start(avf.getStart()).end(avf.getEnd()).build();
             av.add((validSchedule));
         }
-        System.out.println(av);
-        System.out.println(tt);
         //add to schedule
         Boolean check = false;
         while(check==false) {
@@ -62,7 +59,6 @@ public class ScheduleController {
                                 .end(av.get(i).getEnd())
                                 .build();
                         av.add(sch);
-                        System.out.println("here4");
                         av.remove(av.get(i));
                         check = false;
                     }
@@ -72,7 +68,6 @@ public class ScheduleController {
                             || tt.get(j).getEnd().isEqual(av.get(i).getEnd())
                     )) {
                         //inside
-                        System.out.println("here1");
                         av.remove(av.get(i));
                         check = false;
                     } else if (tt.get(j).getStart().isAfter(av.get(i).getStart())
@@ -85,7 +80,7 @@ public class ScheduleController {
                         av.remove(av.get(i));
                         av.add(sch);
                         check = false;
-                        System.out.println("here2");
+
                     } else if (tt.get(j).getEnd().isAfter(av.get(i).getStart())&&
                             tt.get(j).getEnd().isBefore(av.get(i).getEnd())
                     ){
@@ -95,7 +90,6 @@ public class ScheduleController {
                                 .start(tt.get(j).getEnd())
                                 .end(av.get(i).getEnd())
                                 .build();
-                        System.out.println("here3");
                         av.remove(av.get(i));
                         av.add(sch);
                         check = false;
@@ -193,6 +187,41 @@ public class ScheduleController {
                 .build();
         scheduleService.save(schedule);
         return ResponseEntity.ok("Save the schedule ");
+    }
+
+    @RequestMapping(value = "specialist/availablity",method = RequestMethod.GET)
+    public ResponseEntity<List<IntervalDTO>> getSpecialstIntervalByCompany(IntervalDTO intervalDTO , @RequestHeader String token)
+    {
+
+        Long id = JWToken.checkToken(token);
+        if(id==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        User user = userService.findById(id);
+        if(user==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        System.out.println(intervalDTO);
+        Specialist specialist =specialistService.findById(intervalDTO.getSpecialist_id());
+        if(specialist==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        Service service =specialist.getService();
+        LocalDateTime date = intervalDTO.getDate();
+        List<Availability> availabilities = availabilityService.findByDate(date);
+        List<TimeTable> timeTables = timeTableService.findByDate(date);
+        List<Schedule> schedules = validSchedules(timeTables,availabilities);
+        List<IntervalDTO> intervalDTOS = new ArrayList<>(schedules.size());
+        for(Schedule sch : schedules){
+            IntervalDTO inter = IntervalDTO.builder()
+                    .start(sch.getStart().toString())
+                    .end(sch.getEnd().toString())
+                    .build();
+            intervalDTOS.add(inter);
+        }
+
+        return ResponseEntity.ok(intervalDTOS);
     }
 }
 

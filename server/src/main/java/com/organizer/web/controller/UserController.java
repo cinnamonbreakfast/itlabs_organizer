@@ -374,6 +374,8 @@ public class UserController {
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
         }
+        System.out.println("doing a file request");
+        //System.out.println(file.toString());
         /*
         try {
             user.setName(details.getName());
@@ -399,7 +401,9 @@ public class UserController {
 
         }*/
         String username= user.getPhone();
+        System.out.println(file.getOriginalFilename());
         try {
+
             String[] list = file.getOriginalFilename().split("[.]");
             if (list.length == 1) {
                 fileService.uploadDir(file, username+ "." + list[0]);
@@ -413,6 +417,7 @@ public class UserController {
         }
         catch (Exception e )
         {
+            e.printStackTrace();
             user.setImageURL("default_company");
         }
         try {
