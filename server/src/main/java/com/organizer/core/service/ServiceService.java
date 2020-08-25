@@ -26,4 +26,7 @@ public class ServiceService {
     public Service findByServiceAndCompany(String service, String companyUsername){
         return specialistServiceRepository.findServiceByCompanyAndName(service,companyUsername);
     }
+    public void delete(Service service){
+        specialistServiceRepository.delete(service);
+    }
 }

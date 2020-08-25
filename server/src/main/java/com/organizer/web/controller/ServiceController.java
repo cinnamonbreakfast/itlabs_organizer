@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class ServiceController {
 
@@ -85,7 +86,7 @@ public class ServiceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body("Created a service");
     }
-    @RequestMapping(value = "service/update", method = RequestMethod.PUT,consumes = {"appication/json"})
+    @RequestMapping(value = "service/update", method = RequestMethod.PUT)
     public ResponseEntity<String> updateService(@RequestHeader String token ,@RequestBody ServiceDTO serviceDTO){
 
         System.out.println(serviceDTO);
@@ -133,9 +134,43 @@ public class ServiceController {
         }
 
         serviceService.save(service);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Updated service");
+        return ResponseEntity.status(HttpStatus.OK).body("Updated service");
 
     }
+
+    @RequestMapping(value = "service/delete", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteService(@RequestHeader String token ,@RequestBody ServiceDTO serviceDTO){
+
+
+        System.out.println(serviceDTO);
+        Long id = JWToken.checkToken(token);
+        if(id==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Bad token");
+        }
+        User user = userService.findById(id);
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
+        }
+
+        System.out.println(serviceDTO);
+        Service service = serviceService.findById(serviceDTO.getId());
+
+        if(service == null)
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid service");
+        }
+
+        Company company = service.getCompany();
+        if(user.getId()!=company.getOwner().getId())
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not the owner of the company");
+        }
+
+        serviceService.delete(service);
+        return ResponseEntity.status(HttpStatus.OK).body("Updated service");
+    }
+
+
 
 
 }

@@ -1,6 +1,7 @@
 package com.organizer.web.dto.schedulling;
 
 import com.organizer.web.dto.BaseDTO;
+import com.organizer.web.dto.ServiceDTO;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,7 +14,8 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 @Getter
 @Builder
-public class TimeTableDTO  {
+public class TimeTableDTO  extends BaseDTO {
+
     String companyUsername;
     String serviceName;
     @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
@@ -22,5 +24,9 @@ public class TimeTableDTO  {
     @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
     LocalDateTime end;
 
+    String s_end;
+    String s_start;
+
+    ServiceDTO serviceDTO;
 
 }

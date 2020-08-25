@@ -10,8 +10,10 @@ import com.organizer.core.service.ServiceService;
 import com.organizer.core.service.UserService;
 import com.organizer.core.service.schedulling.TimeTableService;
 import com.organizer.web.auth.JWToken;
+import com.organizer.web.dto.ServiceDTO;
 import com.organizer.web.dto.schedulling.TimeTableDTO;
 import com.organizer.web.utils.DateOperations;
+import org.apache.coyote.Response;
 import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -102,13 +105,45 @@ public class TimeTableController {
 
 
 
-    @RequestMapping(value="testTime" ,method = RequestMethod.POST)
-    public ResponseEntity<LocalDateTime> test(@RequestParam  @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) LocalDateTime local){
-        LocalDateTime l = LocalDateTime.now();
-        System.out.println(l.toString());
-        System.out.println(local.toString());
+    @RequestMapping(value="tt/findAllByCompany" ,method = RequestMethod.GET)
+    public ResponseEntity<List<TimeTableDTO>> findAllByCompany( TimeTableDTO timeTableDTO){
 
-        return ResponseEntity.ok(l);
+        Company company = companyService.findByUsername(timeTableDTO.getCompanyUsername());
+        if(company==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        LocalDateTime start,end;
+        try{
+            start = timeTableDTO.getStart();
+            end = timeTableDTO.getEnd();
+        }
+        catch (Exception e){
+            start =null; end = null;
+        }
+        List<TimeTable> tts=  timeTableService.findByCompanyAndRange(company,start,end);
+        List<TimeTableDTO> ttDTOS = new ArrayList<>(tts.size());
+        for(TimeTable tt : tts ){
+            Service service =tt.getService();
+
+            ServiceDTO serviceDTO = ServiceDTO.builder()
+                    .name(service.getServiceName())
+                    .duration(service.getDuration())
+                    .price(service.getPrice())
+                    .build();
+            serviceDTO.setId(service.getId());
+
+            TimeTableDTO ttDTO = TimeTableDTO.builder()
+                    .s_start(tt.getStart().toString())
+                    .s_end(tt.getEnd().toString())
+                    .serviceDTO(serviceDTO)
+                    .build();
+            ttDTO.setId(tt.getId());
+            ttDTOS.add(ttDTO);
+        }
+        return ResponseEntity.ok(ttDTOS);
+
     }
+
+
 
 }

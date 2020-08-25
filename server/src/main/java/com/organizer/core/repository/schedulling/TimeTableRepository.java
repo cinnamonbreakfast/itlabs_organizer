@@ -1,6 +1,7 @@
 package com.organizer.core.repository.schedulling;
 
 import com.organizer.core.model.Availability;
+import com.organizer.core.model.Company;
 import com.organizer.core.model.Service;
 import com.organizer.core.model.TimeTable;
 import com.organizer.core.repository.Repository;
@@ -21,4 +22,10 @@ public interface TimeTableRepository extends Repository<Long, TimeTable> {
 
     @Query("select tt from TimeTable  tt where date(tt.start)= date(?1)")
     List<TimeTable> findByDate(LocalDateTime date);
+
+    @Query("select tt from TimeTable  tt where tt.service.company=?1")
+    List<TimeTable> findByCompany(Company company);
+
+    @Query("select tt from TimeTable  tt where tt.service.company=?1 and tt.start>?2 and tt.end<?3 ")
+    List<TimeTable> findByCompanyRange(Company company,LocalDateTime start, LocalDateTime end);
 }
