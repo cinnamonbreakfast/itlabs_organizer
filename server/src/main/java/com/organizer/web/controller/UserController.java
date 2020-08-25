@@ -374,6 +374,6 @@ public class UserController {
         user.setCountry(details.getCountry());
 
         return ResponseEntity.ok("changed");
-
     }
+
 }
