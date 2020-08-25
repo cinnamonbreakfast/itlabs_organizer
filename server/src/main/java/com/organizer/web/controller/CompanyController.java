@@ -6,6 +6,7 @@ import com.organizer.core.service.file.FileService;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.*;
+import com.organizer.web.utils.Emailer;
 import com.organizer.web.utils.Parser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,8 +29,11 @@ public class CompanyController {
     private final CityListService cityListService;
     private final CountryListService countryListService;
     private final InvitationService invitationService;
+    private final ServiceService serviceService;
+    private final Emailer emailer;
     @Autowired
-    public CompanyController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, AnimeService animeService, CityListService cityListService, CountryListService countryListService, InvitationService invitationService) {
+    public CompanyController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, AnimeService animeService, CityListService cityListService, CountryListService countryListService, InvitationService invitationService, ServiceService serviceService,
+                             Emailer emailer) {
         this.companyService = companyService;
         this.authStore = authStore;
         this.userService = userService;
@@ -38,20 +42,22 @@ public class CompanyController {
         this.cityListService=cityListService;
         this.countryListService=countryListService;
         this.invitationService = invitationService;
+        this.serviceService=  serviceService;
+        this.emailer=emailer;
     }
 
     @RequestMapping(value = "c/create",method = RequestMethod.POST,consumes = {"multipart/form-data"})
         //public ResponseEntity<String> addNewCompany(@RequestParam("file") MultipartFile file, @RequestBody CompanyDTO newCompany, @RequestHeader(name = "token") String token){
     public ResponseEntity<String> addNewCompany(@RequestParam(name="file",required = false) MultipartFile file,
 CompanyDTO newCompany,@RequestHeader String token ){
-
+        System.out.println(newCompany);
         Long id =  JWToken.checkToken(token);
         //valid token
         if(id== null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
 
         String username = newCompany.getName()+"-"+newCompany.getCity();
-        Company company = companyService.findByUsername(username);
+        Company company = companyService.findByUsernameAll(username);
         // validate company_name
         if(company!=null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Company name already taken");
@@ -84,6 +90,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 .owner(user)
                 .name(newCompany.getName())
                 .username(username)
+                .validated(false)
                 .build();
         try {
             String[] list = file.getOriginalFilename().split("[.]");
@@ -105,6 +112,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
         return ResponseEntity.ok("Company has been created, wait for an admin validation");
     }
 
+
     @RequestMapping(value = "c/findByOwner",method = RequestMethod.GET)
     public ResponseEntity<List<CompanyDTO>> listByCompanyOwner(@RequestHeader(value = "token") String token){
        Long id  = JWToken.checkToken(token);
@@ -121,6 +129,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
                     .phone(user. getPhone())
                     .email(user.getEmail())
                     .build();
+            userDTO.setId(user.getId());
 
             CompanyDTO companyDTO =CompanyDTO.builder()
                     .country(company.getCountry())
@@ -132,6 +141,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
                     .userDTO(userDTO)
                     .username(company.getUsername())
                     .build();
+            companyDTO.setId(company.getId());
             companyDTOList.add(companyDTO);
         }
 
@@ -143,22 +153,49 @@ CompanyDTO newCompany,@RequestHeader String token ){
         Company company = companyService.findById(id);
         return ResponseEntity.ok(company);
     }
+
     @RequestMapping(value = "c/{username:.+}",method = RequestMethod.GET)
     public ResponseEntity<CompanyDTO> findUsername(@PathVariable String username ){
 
         Company company = companyService.findByUsername(username);
         if(company==null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        List<com.organizer.core.model.SpecialistService> specialistServices = Parser.getServicesFromCompany(company);
+        List<Service> specialistServices = company.getServices();
 
         List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
 
-        for (com.organizer.core.model.SpecialistService specialistService : specialistServices) {
+        for (Service specialistService : specialistServices) {
+
+
+            List<SpecialistDTO>specialistDTOS = new ArrayList<>(specialistService.getAvailabilities().size());
+            for(Specialist sp : specialistService.getSpecialists()){
+                User user = sp.getUser();
+                UserDTO userDTO = UserDTO.builder()
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .phone(user.getPhone())
+                        .city(user.getCity())
+                        .country(user.getCountry())
+                        .imageURL(user.getImageURL())
+                        .build();
+                userDTO.setId(user.getId());
+                SpecialistDTO specialistDTO = SpecialistDTO.builder()
+                        .user(userDTO)
+                        .build();
+                specialistDTO.setId(sp.getId());
+                specialistDTOS.add(specialistDTO);
+            }
+
             ServiceDTO serviceDTO = ServiceDTO.builder()
+                    .price(specialistService.getPrice())
+                    .specialistDTOList(specialistDTOS)
+                    .duration(specialistService.getDuration())
                     .name(specialistService.getServiceName()).build();
+            serviceDTO.setId(specialistService.getId());
             serviceDTOS.add(serviceDTO);
         }
-      List<SpecialistDTO> specialistDTOS = Parser.getSpecialisDTOtFromCompany(company);
+
+
         CompanyDTO companyDTO = CompanyDTO.builder()
                 .name(company.getName())
                 .address(company.getAddress())
@@ -166,7 +203,6 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 .category(company.getCategory())
                 .country(company.getCountry())
                 .username(company.getUsername())
-                .specialistDTOList(specialistDTOS)
                 .services(serviceDTOS).build();
         companyDTO.setId(company.getId());
         return ResponseEntity.ok(companyDTO);
@@ -238,8 +274,9 @@ CompanyDTO newCompany,@RequestHeader String token ){
     }
 
     @RequestMapping(value="c/invite/specialist", method = RequestMethod.POST)
-    public ResponseEntity<String > inviteSpecialist(@RequestBody Long userId,@RequestBody String companyUsername,@RequestBody String serviceName, @RequestHeader String token){
+    public ResponseEntity<String > inviteSpecialist(@RequestParam Long userId,@RequestParam String companyUsername,@RequestParam String serviceName, @RequestHeader String token){
         Long id = JWToken.checkToken(token);
+
         if(id==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Bad token");
         }
@@ -255,23 +292,41 @@ CompanyDTO newCompany,@RequestHeader String token ){
         if(userSelected==null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known selected user");
         }
-        Invitation invitation =Invitation.builder()
-                .company(company)
-                .user(userSelected)
-                .serviceName(serviceName)
-                .build();
-
-        try {
-            invitationService.save(invitation);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Server error");
+        Service service = serviceService.findByServiceAndCompany(serviceName,companyUsername);
+        if(service==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not yet created");
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Invitation has been send");
+
+        Invitation invitation = invitationService.findByUserAndService(userSelected,service);
+        if(invitation!=null){
+          //has received
+
+            return ResponseEntity.status(HttpStatus.OK).body("Invitation has already been send again");
+        }
+        {
+            invitation = Invitation.builder()
+                    .company(company)
+                    .user(userSelected)
+                    .service(service)
+                    .accepted(false)
+                    .build();
+
+            try {
+                invitationService.save(invitation);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error");
+            }
+
+            emailer.sendSimpleMessage(user.getEmail(),
+                    "Specialist invitation in "+company.getName()
+                    ,"You have received an invitation in "+company.getName()+"please enter" +
+                            "your account for more information!");
+
+            return ResponseEntity.status(HttpStatus.OK).body("Invitation has been send");
+        }
         //todo:mail and phone sending
 
     }
-    //invite specialists
-
 
 
 }

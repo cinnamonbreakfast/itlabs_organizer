@@ -25,9 +25,10 @@ public class Invitation extends Entity<Long>{
     @JoinColumn(name="user_id", nullable = false)
     User user ;
 
-    @Basic
-    @Column(name="servicename")
-    String serviceName;
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name="service", nullable = false)
+    Service service;
 
     @Basic
     @Column

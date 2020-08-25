@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Table(name="schedule",schema="public")
@@ -17,11 +18,16 @@ import java.util.Date;
 public class Schedule extends Entity<Long>{
     @Basic
     @Column(name="start_date")
-    Date startDate;
+    LocalDateTime start;
+
+    @Basic
+    @Column(name="end_date")
+    LocalDateTime end;
+
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name="specialist_id", nullable = false)
+    @JoinColumn(name="service", nullable = false)
     private Specialist specialist;
 
 

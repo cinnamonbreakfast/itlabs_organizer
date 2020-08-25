@@ -28,13 +28,13 @@ public class MapController {
 
     private final SpecialistService specialistService;
     private final CompanyService companyService;
-    private final SpecialistServiceService specialistServiceService;
+    private final ServiceService specialistServiceService;
     private final AnimeService animeService;
     private final CountryListService countryListService;
     private final CityListService cityListService;
     private final PrefixService prefixService;
     @Autowired
-    public MapController(SpecialistService specialistService, CompanyService companyService, SpecialistServiceService specialistServiceService, AnimeService animeService, CountryListService countryListService, CityListService cityListService, PrefixService prefixService) {
+    public MapController(SpecialistService specialistService, CompanyService companyService, ServiceService specialistServiceService, AnimeService animeService, CountryListService countryListService, CityListService cityListService, PrefixService prefixService) {
         this.companyService = companyService;
         this.specialistService = specialistService;
         this.specialistServiceService = specialistServiceService;
@@ -71,29 +71,32 @@ public class MapController {
             List<MapDTO> mapDTOS = new ArrayList<>(companies.size());
             for(Company company : companies) {
 
-                List<com.organizer.core.model.SpecialistService> specialistServices;
+                List<Service> specialistServices;
                 if(type==Type.COMPANY.ordinal()) {
                     try {
-                        specialistServices = Parser.getServicesFromCompany(company).subList(0, 3);
+                        specialistServices = company.getServices().subList(0, 3);
                     }
                     catch (Exception e){
-                        specialistServices = Parser.getServicesFromCompany(company);
+                        specialistServices = company.getServices();
                     }
                 }
                 else{
                     try {
-                        specialistServices = Parser.getServicesFromCompany(company).stream().filter(e -> e.getServiceName().toLowerCase().contains(search_input.toLowerCase())).collect(Collectors.toList()).subList(0, 3);
+                        specialistServices = company.getServices().stream().filter(e -> e.getServiceName().toLowerCase().contains(search_input.toLowerCase())).collect(Collectors.toList()).subList(0, 3);
                     }
                     catch (Exception e){
-                        specialistServices = Parser.getServicesFromCompany(company).stream().filter(er -> er.getServiceName().toLowerCase().contains(search_input.toLowerCase())).collect(Collectors.toList());
+                        specialistServices = company.getServices().stream().filter(er -> er.getServiceName().toLowerCase().contains(search_input.toLowerCase())).collect(Collectors.toList());
                     }
                 }
 
                 List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
 
-                for (com.organizer.core.model.SpecialistService specialistService : specialistServices) {
+                for (Service specialistService : specialistServices) {
                     ServiceDTO serviceDTO = ServiceDTO.builder()
-                            .name(specialistService.getServiceName()).build();
+                            .name(specialistService.getServiceName())
+                            .duration(specialistService.getDuration())
+                            .price(specialistService.getPrice())
+                            .build();
                     serviceDTOS.add(serviceDTO);
                 }
                 CompanyDTO companyDTO = CompanyDTO.builder()
@@ -102,7 +105,10 @@ public class MapController {
                         .city(company.getCity())
                         .category(company.getCategory())
                         .country(company.getCountry())
-                        .services(serviceDTOS).build();
+                        .services(serviceDTOS)
+                        .image_url(company.getImage_url())
+                        .username(company.getUsername())
+                        .build();
                 companyDTO.setId(company.getId());
 
                 MapDTO mapDTO = MapDTO.builder()
@@ -130,13 +136,16 @@ public class MapController {
         List<Company> companies =companyService.findByFilter(searchFilter,searchFilter.getPage(),pageSize );
         List<MapDTO> mapDTOS = new ArrayList<>(companies.size());
         for(Company company : companies) {
-            List<com.organizer.core.model.SpecialistService> specialistServices = Parser.getServicesFromCompany(company);
+            List<Service> specialistServices = company.getServices();
 
             List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
 
-            for (com.organizer.core.model.SpecialistService specialistService : specialistServices) {
+            for (Service specialistService : specialistServices) {
                 ServiceDTO serviceDTO = ServiceDTO.builder()
-                        .name(specialistService.getServiceName()).build();
+                        .name(specialistService.getServiceName())
+                        .price(specialistService.getPrice())
+                        .duration(specialistService.getDuration())
+                        .build();
                 serviceDTOS.add(serviceDTO);
             }
             CompanyDTO companyDTO = CompanyDTO.builder()
@@ -145,6 +154,8 @@ public class MapController {
                     .city(company.getCity())
                     .category(company.getCategory())
                     .country(company.getCountry())
+                    .username(company.getUsername())
+                    .image_url(company.getImage_url())
                     .services(serviceDTOS).build();
             companyDTO.setId(company.getId());
 
@@ -156,10 +167,6 @@ public class MapController {
         return  ResponseEntity.ok(mapDTOS);
     }
 
-    @RequestMapping(value="testing",method = RequestMethod.GET)
-    public ResponseEntity<List<Company>> testing(){
-        List<Company> companies = companies = companyService.findByService("maSaj","Ro","IaSi",0,4);
-        return ResponseEntity.ok(companies);    }
 
     @RequestMapping(value="fetch/animelist",method = RequestMethod.GET)
     public ResponseEntity<List<AnimeList>> getAnimeList(@RequestParam int page,@RequestParam String name){

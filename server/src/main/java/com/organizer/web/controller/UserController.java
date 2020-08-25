@@ -6,6 +6,7 @@ import com.organizer.core.model.ValidationCode;
 import com.organizer.core.service.PrefixService;
 import com.organizer.core.service.UserService;
 import com.organizer.core.service.ValidationCodeService;
+import com.organizer.core.service.file.FileService;
 import com.organizer.core.utils.Hash;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.auth.JWToken;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -36,8 +38,10 @@ public class UserController {
     private final Smser smser;
     private final Regex regex;
     private final PrefixService prefixService;
+    private final FileController fileController;
+    private final FileService fileService;
     @Autowired
-    public UserController(UserService userService, AuthStore authStore, Emailer emailer, ValidationCodeService validationCodeService, Smser smser, Regex regex, PrefixService prefixService) {
+    public UserController(UserService userService, AuthStore authStore, Emailer emailer, ValidationCodeService validationCodeService, Smser smser, Regex regex, PrefixService prefixService, FileController fileController, FileService fileService) {
         this.userService = userService;
         this.authStore = authStore;
         this.emailer = emailer;
@@ -45,6 +49,8 @@ public class UserController {
         this.smser = smser;
         this.regex=regex;
         this.prefixService = prefixService;
+        this.fileController=fileController;
+        this.fileService=fileService;
     }
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
@@ -107,7 +113,6 @@ public class UserController {
         int m = regex.phoneMatcher("40",contact);
         String tel = "+40"+contact.substring(m,contact.length());
         User authUser = userService.findByEmailOrPhone(contact, tel);
-        System.out.println(authUser);
         if(authUser != null) {
             String hashPass = Hash.md5(password);
 
@@ -358,8 +363,8 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = "u/changeDetails",method = RequestMethod.PUT)
-    public ResponseEntity<String> changeDetails(@RequestParam SignUpDTO details,@RequestHeader String token){
+    @RequestMapping(value = "u/changeDetails",method = RequestMethod.PUT ,consumes = {"multipart/form-data"})
+    public ResponseEntity<String> changeDetails(@RequestParam(name="file",required = false) MultipartFile file ,@RequestHeader String token){
         Long id = JWToken.checkToken(token);
         if(id==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("invalid token");
@@ -369,11 +374,55 @@ public class UserController {
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
         }
-        user.setName(details.getName());
-        user.setCity(details.getCity());
-        user.setCountry(details.getCountry());
+        /*
+        try {
+            user.setName(details.getName());
+        }
+        catch (Exception e ){
 
-        return ResponseEntity.ok("changed");
+        }
+        try {
+            user.setCity(details.getCity());
+        }catch (Exception e){
+
+        }
+        try {
+            user.setCountry(details.getCountry());
+        }
+        catch (Exception e){
+
+        }
+        try {
+            user.setPassword(Hash.md5(details.getPassword()));
+        }
+        catch (Exception e ){
+
+        }*/
+        String username= user.getPhone();
+        try {
+            String[] list = file.getOriginalFilename().split("[.]");
+            if (list.length == 1) {
+                fileService.uploadDir(file, username+ "." + list[0]);
+                user.setImageURL(username);
+            } else if (list.length > 1) {
+                fileService.uploadDir(file, username + "." + list[list.length - 1]);
+                user.setImageURL(username);
+            } else {
+                user.setImageURL("default_company");
+            }
+        }
+        catch (Exception e )
+        {
+            user.setImageURL("default_company");
+        }
+        try {
+            userService.saveOrUpdate(user);
+        }catch (Exception e ){
+
+        }
+
+        return ResponseEntity.ok("Changed user details");
 
     }
+
 }

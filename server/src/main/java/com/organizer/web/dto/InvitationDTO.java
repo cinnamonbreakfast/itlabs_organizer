@@ -11,7 +11,7 @@ import lombok.*;
 public class InvitationDTO {
     Long id;
     Boolean accept;
-    String serviceName;
+    ServiceDTO serviceDTO;
     CompanyDTO companyDTO;
 
 

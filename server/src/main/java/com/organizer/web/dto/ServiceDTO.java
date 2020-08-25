@@ -1,6 +1,10 @@
 package com.organizer.web.dto;
 
+import com.organizer.core.model.TimeTable;
+import com.organizer.web.dto.schedulling.TimeTableDTO;
 import lombok.*;
+
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,6 +16,11 @@ import lombok.*;
 @Setter
 
 public class ServiceDTO extends  BaseDTO{
-    CompanyDTO companyDTO;
+    String companyName;
     String name;
+    Float duration;
+    Float price;
+    TimeTableDTO timeTableDTO;
+    CompanyDTO companyDTO;
+    List<SpecialistDTO> specialistDTOList;
 }

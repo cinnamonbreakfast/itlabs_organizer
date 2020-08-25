@@ -50,9 +50,10 @@ public class Company extends Entity<Long>{
     @JoinColumn(name = "owner")
     private User owner;
 
+
     @JsonManagedReference
     @OneToMany(mappedBy = "company")
-    private List<Specialist> specialists;
+    private List<Service> services;
 
     @Basic
     @Column

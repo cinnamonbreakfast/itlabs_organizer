@@ -17,26 +17,16 @@ import java.util.List;
 @ToString(callSuper = true)
 @Builder
 
-@NamedQuery(name = "Specialist.findByCompany", query = "select s from Specialist s where s.company.id = ?1")
 @NamedQuery(name = "Specialist.findByUser", query= " select s from Specialist s where s.user.id = ?1")
 public class Specialist extends Entity<Long>{
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name="company_id")
-    private Company company;
+    @JoinColumn(name="service")
+    private Service service;
 
     @ManyToOne
     @JoinColumn(name="user_id")
     private User user;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "specialist")
-    private List<SpecialistService> specialistServices ;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "specialist")
-    private List<TimeTable> timeTables;
-
 
     @JsonManagedReference
     @OneToMany(mappedBy = "specialist")

@@ -26,6 +26,16 @@ public class InvitationService {
     }
 
     public Invitation findById(Long id ){
-        return invitationRepository.getOne(id);
+        return invitationRepository.findById(id).get();
     }
+
+    public Invitation findByUserAndServiceAndAccepted(User user , com.organizer.core.model.Service service , Boolean accepted){
+        return invitationRepository.findByUserAndServiceAndAccepted(user,service,accepted);
+    }
+
+    public Invitation findByUserAndService(User user , com.organizer.core.model.Service service){
+        return invitationRepository.findByUserAndService(user , service);
+    }
+
+
 }

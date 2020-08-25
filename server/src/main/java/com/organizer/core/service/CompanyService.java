@@ -58,16 +58,21 @@ public class CompanyService {
         return this.companyRepository.findByNameAndCityAnd(name,city);
     }
 
-    public Company findByUsername(String username){
-        return this.companyRepository.findByUsername(username);
-    }
-    public Company save(Company company){
-        return this.companyRepository.save(company);
-    }
 
     public List<Company> findByOwner(User user )
     {
         return companyRepository.findByOwner(user);
+    }
+
+    public Company findByUsername(String username){
+        return this.companyRepository.findByUsername(username);
+    }
+
+    public Company save(Company company){
+        return this.companyRepository.save(company);
+    }
+    public Company findByUsernameAll(String username){
+        return this.companyRepository.findByUsernameAll(username);
     }
 
 }

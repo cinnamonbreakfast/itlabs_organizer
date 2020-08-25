@@ -1,9 +1,6 @@
 package com.organizer.web.controller;
 
-import com.organizer.core.model.Company;
-import com.organizer.core.model.Invitation;
-import com.organizer.core.model.Specialist;
-import com.organizer.core.model.User;
+import com.organizer.core.model.*;
 import com.organizer.core.service.*;
 import com.organizer.web.auth.AuthStore;
 import com.organizer.web.auth.JWToken;
@@ -22,16 +19,16 @@ public class SpecialistController {
     private final UserService userService;
     private final CompanyService companyService;
     private final InvitationService invitationService;
-    private final SpecialistServiceService specialistServiceService;
+    private final ServiceService serviceService;
 
     @Autowired
-    public SpecialistController(SpecialistService specialistService, AuthStore authStore, UserService userService, CompanyService companyService, SpecialistServiceService specialistServiceService, InvitationService invitationService){
+    public SpecialistController(SpecialistService specialistService, AuthStore authStore, UserService userService, CompanyService companyService, ServiceService serviceService, InvitationService invitationService){
         this.userService = userService;
         this.specialistService = specialistService;
         this.authStore= authStore;
         this.companyService= companyService;
         this.invitationService=invitationService;
-        this.specialistServiceService=specialistServiceService;
+        this.serviceService =serviceService;
     }
 
     @RequestMapping(value = "/specialist/search/{id}", method = RequestMethod.GET)
@@ -56,7 +53,7 @@ public class SpecialistController {
             List<SpecialistDTO> specialistDTOS = new ArrayList<>(specialists.size());
             for (Specialist specialist : specialists) {
                 User user = specialist.getUser();
-                Company company = specialist.getCompany();
+                Company company = specialist.getService().getCompany();
                 UserDTO userDTO = UserDTO.builder()
                         .city(user.getCity())
                         .country(user.getCountry())
@@ -88,8 +85,8 @@ public class SpecialistController {
     }
 
     //company  and service
-    @RequestMapping(value = "/s/find", method = RequestMethod.POST)
-    public ResponseEntity <List<SpecialistDTO>> findSpecialistByCompany(@RequestBody String username,@RequestBody String serviceName){
+    @RequestMapping(value = "/s/find", method = RequestMethod.GET)
+    public ResponseEntity <List<SpecialistDTO>> findSpecialistByCompany(@RequestParam String username,@RequestParam String serviceName){
         Company company = companyService.findByUsername(username);
         if(company== null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -100,16 +97,14 @@ public class SpecialistController {
 
         for(Specialist specialist : specialists){
 
-            List<com.organizer.core.model.SpecialistService> specialistServices = specialist.getSpecialistServices();
-            List<ServiceDTO> serviceDTOS = new ArrayList<>(specialistServices.size());
-            for(com.organizer.core.model.SpecialistService specialistService : specialistServices){
-                ServiceDTO serviceDTO = ServiceDTO.builder()
-                        .name(specialistService.getServiceName())
-                        .build();
-                serviceDTO.setId(specialistService.getId());
-                serviceDTOS.add(serviceDTO);
-            }
+            Service specialistServices = specialist.getService();
 
+            ServiceDTO serviceDTO = ServiceDTO.builder()
+                    .duration(specialistServices.getDuration())
+                    .price(specialistServices.getPrice())
+                    .name(specialistServices.getServiceName())
+                    .build();
+            serviceDTO.setId(specialistServices.getId());
             User user = specialist.getUser();
             UserDTO userDTO = UserDTO.builder()
                     .imageURL(user.getImageURL())
@@ -122,7 +117,7 @@ public class SpecialistController {
             userDTO.setId(user.getId());
 
             SpecialistDTO specialistDTO = SpecialistDTO.builder()
-                    .servicesDTO(serviceDTOS)
+                    .servicesDTO(serviceDTO)
                     .user(userDTO)
                     .build();
             specialistDTO.setId(specialist.getId());
@@ -130,6 +125,7 @@ public class SpecialistController {
         }
         return ResponseEntity.ok(specialistDTOS);
     }
+
     //display invitations
     @RequestMapping(value = "s/invitations",method = RequestMethod.GET)
     public ResponseEntity <List<InvitationDTO>> invitationsDisplay(@RequestHeader String token){
@@ -147,7 +143,13 @@ public class SpecialistController {
         invitations.forEach(e->{
             invitationDTOS.add(
                 InvitationDTO.builder()
-                        .serviceName(e.getServiceName())
+                        .serviceDTO(
+                                ServiceDTO.builder()
+                                .name(e.getService().getServiceName())
+                                .duration(e.getService().getDuration())
+                                .price(e.getService().getPrice())
+                                .build()
+                        )
                         .id(e.getId())
                         .companyDTO(
                                 CompanyDTO.builder()
@@ -166,7 +168,6 @@ public class SpecialistController {
         return  ResponseEntity.ok(invitationDTOS);
 
     }
-
 
 
     @RequestMapping( value = "s/acceptInvitation", method = RequestMethod.POST)
@@ -193,33 +194,34 @@ public class SpecialistController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Server error");
         }
 
-        //TODO:: ADD SCHEDULES AND THAT STUFF...
+
         User invitedUser = invitation.getUser();
-        Company company = invitation.getCompany();
+        if(invitedUser.getId()!=user.getId()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a matching user");
+        }
+
+        Service service = invitation.getService();
+        Invitation test = invitationService.findByUserAndServiceAndAccepted(user,service,true);
+        if(test!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have already accepted");
+        }
         Specialist specialist = Specialist.builder()
-                .company(company)
+                .service(service)
                 .user(invitedUser)
                 .build();
 
         invitation.setAccepted(true);
 
-
         try {
             specialistService.save(specialist);
             invitationService.save(invitation);
-            specialist = specialistService.findById(invitedUser.getId());
-            com.organizer.core.model.SpecialistService specialistService1 = com.organizer.core.model.SpecialistService.builder()
-                    .serviceName(invitation.getServiceName())
-                    .specialist(specialist)
-                    .build();
-
-
-            specialistServiceService.save(specialistService1);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Accepted the invite");
         }
+
         catch (Exception e )
         {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Server error");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something happened");
         }
 
 

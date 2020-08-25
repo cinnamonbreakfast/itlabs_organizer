@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.core.io.Resource;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -24,8 +25,8 @@ public class FileController {
         this.fileService=fileService;
     }
 
-    @RequestMapping(value ="img/{image_url}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String image_url, HttpServletRequest request)
+    @RequestMapping(value ="img/{image_url}",method = RequestMethod.GET )
+    public ResponseEntity<Resource> downloadFile(@PathVariable String image_url)
     {
         Resource resource=null;
         try{
