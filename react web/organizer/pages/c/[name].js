@@ -1,12 +1,26 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import styles from '../../styles/pages/companyView.module.scss'
+import { useSelector } from 'react-redux'
 
 import CompanyController from '../api/companyController'
 import PageContent, { PagePreloader, PageNotFound } from '../../components/company/pageContent'
 
 const Cover = (props) => {
     const company = props.company
+    const user = useSelector(state => (state.user))
+    const router = useRouter()
+    const [content, setContent] = useState(props.content)
+
+    const clickManage = () => {
+        if(content === 'manage'){
+            setContent('main')
+            props.manage('main')
+        } else {
+            setContent('manage')
+            props.manage('manage')
+        }
+    }
 
     return (
         <div className={styles.cover}>
@@ -15,14 +29,16 @@ const Cover = (props) => {
                 <img src="/photo/logos/milestone.png"/>
             </div>
             
-            <div className={styles.adminControls}>
-                <button>Manage company</button>
-                <button>Schedules</button>
-            </div>
+            {
+                user.data.id === company.owner.id &&
+                <div className={styles.adminControls}>
+                    <button onClick={e => clickManage()}>{content === 'manage' ? 'Exit Manager mode' : 'Manage company'}</button>
+                    <button onClick={e => router.push('/c/@'+ company.username +'/calendar')}>Schedules</button>
+                </div>
+            }
 
             <div className={styles.controls}>
                 <button>+Appointment</button>
-                <button>Message</button>
             </div>
             
             <div className={styles.companyTitle}>
@@ -33,12 +49,22 @@ const Cover = (props) => {
     )
 }
 
+
+
 const Name = () => {
     const router = useRouter()
     const { name } = router.query
     const controller = new CompanyController(null)
     const [company, setCompany] = useState(null)
     const [status, setStatus] = useState(0)
+
+    const [content, setContent] = useState('main')
+
+    const clickManage = (target) => {
+        setContent(target)
+    }
+
+    console.log(content)
 
     useEffect(() => {
         name && 
@@ -66,8 +92,8 @@ const Name = () => {
 
     if(company) return (
         <div className={styles.pageWrapper}>
-            <Cover company={company}/>
-            <PageContent company={company}/>
+            <Cover company={company} manage={clickManage} content={content}/>
+            <PageContent company={company} content={content}/>
         </div>
     )
 

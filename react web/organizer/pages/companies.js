@@ -42,9 +42,9 @@ const Companies = () => {
                 </div>
                 
                 {
-                    Array.isArray(s_search.data)&&s_search.data.map(e=>{
+                    Array.isArray(s_search.data) && s_search.data.map(e=>{
                         return(
-                            <div className={styles.company}>
+                            <div key={e.id} className={styles.company}>
                                 <div className={styles.identity}>
                                     <div className={styles.cover}>
                                     <img src={`${process.env.STATIC_FRONT_RESOURCES}/milestone_cover.png`}/>

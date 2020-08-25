@@ -224,6 +224,8 @@ const SignUpPage = () => {
     const dispatch = useDispatch()
     const userController = new UserController(dispatch)
     const [message, setMessage] = useState(null)
+    const user = useSelector(state => (state.user))
+    const router = useRouter()
 
     const [phone, setPhone] = useState('')
     const [code, setCode] = useState('')
@@ -238,6 +240,10 @@ const SignUpPage = () => {
         setCode(code)
         setStep(2)
     }
+
+    useEffect(() => {
+        if(user.data && user.userLoggedIn) router.push("/")
+    })
 
     return (
         <div className={styles.wrapper}>

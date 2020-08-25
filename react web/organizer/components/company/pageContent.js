@@ -1,5 +1,7 @@
 import styles from '../../styles/pages/companyView.module.scss'
 import Employee from '../../components/company/employee'
+import { useSelector } from 'react-redux'
+import { useState } from 'react'
 
 export const PagePreloader = (props) => {
 
@@ -23,8 +25,28 @@ export const PageNotFound = (props) => {
     )
 }
 
+const PageEdit = (props) => {
+    const company = props.company
+
+    return (
+        <div className="col-9">
+            <div className={styles.board}>
+                <h2>Edit services</h2>                
+            </div>
+
+            <div className={styles.board}>
+                <h2>Edit services</h2>                
+            </div>
+        </div>
+    )
+}
+
 const PageContent = (props) => {
     const company = props.company
+    const user = useSelector(state => (state.user))
+    const content = props.content
+    
+    console.log(content, "<<")
 
     return (
         <div className="grid">
@@ -42,36 +64,43 @@ const PageContent = (props) => {
                         <li className={styles.closed}>Sunday</li>
                     </ul>
                 </div>
+
+                {/* {
+                    user.data.id === company.owner.id &&
+                    <div className={styles.board}>
+                        
+                    </div>
+                } */}
             </div>
 
-            <div className="col-9">
-                <div className={styles.board}>
-                    <h2>Services</h2>
+            {
+                content === 'main' &&
+                <div className="col-9">
+                    <div className={styles.board}>
+                        <h2>Services</h2>
 
-                    <ul className={styles.servicesList}>
-                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
-                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
-                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
-                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
-                        <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
-                    </ul>
-                </div>
+                        <ul className={styles.servicesList}>
+                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                        </ul>
+                    </div>
 
-                <div className={styles.board}>
-                    <h2>Staff</h2>
+                    <div className={styles.board}>
+                        <h2>Staff</h2>
 
-                    <div className={styles.employeesCarousel}>
-                        <Employee/>
-                        <Employee/>
-                        <Employee/>
-                        <Employee/>
-                        <Employee/>
-                        <Employee/>
-                        <Employee/>
-                        <Employee/>
+                        <div className={styles.employeesCarousel}>
+                            <Employee/>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+            {
+                content === 'manage' &&
+                <PageEdit company={company}/>
+            }
         </div>
     )
 }
