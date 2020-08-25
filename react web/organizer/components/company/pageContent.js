@@ -45,7 +45,7 @@ const PageContent = (props) => {
     const company = props.company
     const user = useSelector(state => (state.user))
     const content = props.content
-    
+
     console.log(content, "<<")
 
     return (
@@ -80,11 +80,11 @@ const PageContent = (props) => {
                         <h2>Services</h2>
 
                         <ul className={styles.servicesList}>
-                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
-                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
-                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
-                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
-                            <li><div className={styles.serviceName}>Tuns</div><div>30 min</div><div>10$</div></li>
+                            {
+                                Array.isArray(company.services) && company.services.map(serv => (
+                                <li key={serv.id}><div className={styles.serviceName}>{serv.name}</div><div>{serv.duration} min</div><div>{serv.price} RON</div></li>
+                                ))
+                            }
                         </ul>
                     </div>
 
