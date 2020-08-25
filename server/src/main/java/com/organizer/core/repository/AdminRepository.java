@@ -13,5 +13,4 @@ public interface AdminRepository extends  Repository<Long, Company>{
     @Query("select c from Company c where c.validated=false")
     Page<Company> findCompanies(Pageable pageable);
 
-
 }
