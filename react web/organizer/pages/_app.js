@@ -29,10 +29,6 @@ const links = [
 ]
 
 function MyApp({ Component, pageProps }) {
-  console.log(process.env.REQ_HOST)
-
-  console.log(myStore.getState())
-
   return (
     <Provider store={myStore}>
       <PersistGate loading={(<div>loading</div>)} persistor={persisted}>

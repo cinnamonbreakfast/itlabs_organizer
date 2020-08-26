@@ -68,14 +68,26 @@ const Name = () => {
         setContent(target)
     }
 
+    console.log(companyView)
+
     useEffect(() => {
+        
         if(name)
         {
+            dispatcher({type: cva.CLEAR_VIEW_COMPANY})
             dispatcher({type: cva.SET_VIEW_USERNAME, payload: name.slice(1)})
+            dispatcher({type: cva.SET_FIND_CODE, payload: 0})
         
             controller.getCompany(name.slice(1))
             .then(resp => {
-                dispatcher({type: cva.SET_VIEW_COMPANY, payload: resp})
+                if(resp.code != 404) {
+                    dispatcher({type: cva.SET_VIEW_COMPANY, payload: resp})
+                    dispatcher({type: cva.SET_FIND_CODE, payload: 0})
+                }
+                else {
+                    setStatus(404)
+                    dispatcher({type: cva.SET_FIND_CODE, payload: 404})
+                }
             })
             .catch(err => {
                 if(err.code === 404) setStatus(404)
@@ -84,6 +96,9 @@ const Name = () => {
         }
     }, [router])
 
+
+    if(status === 404 || companyView.find_code === 404) return(<PageNotFound/>)
+
     if(company) return (
         <div className={styles.pageWrapper}>
             <Cover manage={clickManage} content={content}/>
@@ -91,12 +106,7 @@ const Name = () => {
         </div>
     )
 
-    // if(company) return (<PageContent company={company}/>)
-    if(status === 404) return(<PageNotFound/>)
     return (<PagePreloader/>)
-
-    
-    
 }
 
 

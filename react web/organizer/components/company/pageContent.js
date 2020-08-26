@@ -93,10 +93,20 @@ const ServiceEdit = (props) => {
 
 const ServiceElement = (props) => {
     const service = props.service
+    const user = useSelector(state => (state.user))
     const [editor, setEditor] = useState(false)
+    const dispatch = useDispatch()
+
+    const cc = new CompanyController(dispatch)
+
+    service.companyUsername = props.company.username
 
     const cancel = () => {
         setEditor(false)
+    }
+
+    const deleteService = () => {
+        cc.deleteService(service, user.token)
     }
 
     if(editor) {
@@ -113,7 +123,7 @@ const ServiceElement = (props) => {
             <div>{service.duration} min</div>
             <div>{service.price} RON</div>
             <div>
-                <button>Delete</button>
+                <button onClick={e => deleteService()}>Delete</button>
                 <button onClick={e => setEditor(true)}>Update</button>
             </div>    
         </li>

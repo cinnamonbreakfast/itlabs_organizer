@@ -15,6 +15,7 @@ class CompanyController {
             return null;
         })
         .catch(err => {
+            console.log(err)
             if(err.response && err.response.data) return {message: err.response.data, code: 404 }
             return {message: "unknown error", code: 404 }
         })
@@ -22,17 +23,21 @@ class CompanyController {
 
     dispatchCompany(id) {
         this.getCompany(id).then(r => {
-            if(r && this.dispatcher) {
+            if(r && this.dispatcher && !r.code) {
                 this.dispatcher({type: cva.SET_VIEW_COMPANY, payload: r})
                 console.log('set up comp')
             } else {
                 console.log('erer1')
+                this.dispatcher({type: cva.CLEAR_VIEW_COMPANY})
                 this.dispatcher({type: cva.SET_FIND_CODE, payload: 404})
             }
         })
         .catch(e => {
             console.log(e)
-            if(this.dispatcher) this.dispatcher({type: cva.SET_FIND_CODE, payload: 404})
+            if(this.dispatcher) {
+                this.dispatcher({type: cva.SET_FIND_CODE, payload: 404})
+                this.dispatcher({type: cva.CLEAR_VIEW_COMPANY})
+            }
         })
     }
 
@@ -52,6 +57,28 @@ class CompanyController {
         }).catch(_err => {
             console.log(_err)
             console.log(_err.response)
+            return {status: 'bad', message: (_err.response || _err.response) || "Unknown error occured. Try again."}
+        })
+    }
+
+    async deleteService(service, token) {
+        return axios({
+            url: process.env.REQ_HOST + '/service/delete',
+            method: 'DELETE',
+            data: service,
+            headers: {
+                'TOKEN': token,
+            },
+        }).then(_resp => {
+            console.log(_resp)
+            console.log(service.companyUsername)
+            service.companyUsername && this.dispatchCompany(service.companyUsername)
+            return {status: 'ok', message: 'Service was deleted!'}
+        }).catch(_err => {
+            console.log(_err)
+            console.log(_err.response)
+            console.log(service.companyUsername)
+            console.log(service)
             return {status: 'bad', message: (_err.response || _err.response) || "Unknown error occured. Try again."}
         })
     }
