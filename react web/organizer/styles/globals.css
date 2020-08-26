@@ -21,6 +21,11 @@ a {
   box-sizing: border-box;
 }
 
+input, select {
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 15px;
+}
+
 input[type='text'],
 input[type='password'] {
   padding: 9px;

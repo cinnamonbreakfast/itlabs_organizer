@@ -42,9 +42,9 @@ const Companies = () => {
                 </div>
                 
                 {
-                    Array.isArray(s_search.data)&&s_search.data.map(e=>{
+                    Array.isArray(s_search.data) && s_search.data.map(e=>{
                         return(
-                            <div className={styles.company}>
+                            <div key={e.id} className={styles.company}>
                                 <div className={styles.identity}>
                                     <div className={styles.cover}>
                                     <img src={`${process.env.STATIC_FRONT_RESOURCES}/milestone_cover.png`}/>
@@ -57,10 +57,10 @@ const Companies = () => {
                                 <div className={styles.info}>
                                     <h2>{e.name}</h2>
                                         <p>{e.address}, {e.city}, {e.country}</p>
-                                    <p>Phone: {e.userDTO.phone}</p>
+                                    <p>Phone: {e.owner.phone}</p>
 
                                     <div className={styles.controls}>
-                                        <button>Manage</button>
+                                        <button onClick={ev => router.push('/c/@'+e.username)}>Manage</button>
                                     </div>
                                 </div>
                             </div>

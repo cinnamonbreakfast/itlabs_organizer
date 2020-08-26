@@ -1,4 +1,5 @@
 import '../styles/globals.css'
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useRouter } from 'next/router'
 import TopNavigation, { LINK_PROP } from '../components/TopNavigation'
 import { PersistGate } from 'redux-persist/integration/react'
@@ -22,14 +23,12 @@ const links = [
   },
   {
     url: '/app',
-    name: 'Download',
+    name: 'My Appointments',
     props: [LINK_PROP.DISPLAY_ALWAYS]
   },
 ]
 
 function MyApp({ Component, pageProps }) {
-  console.log(process.env.REQ_HOST)
-
   return (
     <Provider store={myStore}>
       <PersistGate loading={(<div>loading</div>)} persistor={persisted}>

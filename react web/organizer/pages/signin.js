@@ -1,57 +1,62 @@
-import React, { useState, } from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from '../styles/pages/auth.module.scss'
 import UserController from './api/userController'
-import { actions } from './api/redux/userActions'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
-import getConfig from 'next/config'
+import { useSelector } from 'react-redux'
 
 const SignInPage = () => {
-    const userController = new UserController();
     const dispatch = useDispatch()
+    const userController = new UserController(dispatch);
     const router = useRouter()
-    const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+    const user = useSelector(state => (state.user))
 
-    const [authEmail, setAuthEmail] = useState('')
+    const [authContact, setAuthContact] = useState('')
     const [authPassword, setAuthPassword] = useState('')
+
+    const [formMessage, setFormMessage] = useState('')
 
     const handleInputData = (event) => {
         let target = event.target;
         let identifier = target.name;
+        let value = target.value
+        if(!value) value = ''
 
         switch(identifier) {
-            case 'email':
-                setAuthEmail(target.value)
+            case 'contact':
+                setAuthContact(value)
                 break;
             case 'password':
-                setAuthPassword(target.value)
+                setAuthPassword(value)
                 break;
             default:
                 return
         }
     }
 
+    useEffect(() => {
+        if(user.data && user.userLoggedIn) router.push("/")
+    })
+
     const caller = (e) => {
         e.preventDefault()
 
-        userController.signInWithEmail(
-            {
-                email: authEmail,
-                password: authPassword, 
-            }
-        ).then(res => {
-            if(res) {
-                dispatch({type: actions.SET_AUTH_STATUS, payload: true})
-                dispatch({type: actions.SET_USER_DATA, payload: res.data})
-                dispatch({type: actions.SET_USER_AUTH_TOKEN, payload: res.headers['token']})
-                dispatch({type: actions.SET_USER_AUTH_TIME, payload: res.headers['auth_time']})
-
-                router.push('/')
+        userController.signInAction({contact: authContact, password: authPassword})
+        .then(resp => {
+            if(resp.data) {
+                if(resp.data.code != 200) {
+                    if(resp.data.message) setFormMessage({message: resp.data.message, type: 'error'})
+                    else setFormMessage({message: 'An unknown error occured. Try again later.', type: 'error'})
+                } else {
+                    userController.setLoginData(resp.data.data)
+                    router.push("/")
+                }
             } else {
-                console.log("False info",res)
+                setFormMessage({message: 'An unknown error occured. Try again later.', type: 'error'})
             }
-        }).catch(err => {
-            console.log(err)
+        })
+        .catch(err => {
+            setFormMessage({message: 'An unknown error occured. Try again later.', type: 'error'})
         })
     }
 
@@ -62,14 +67,16 @@ const SignInPage = () => {
                 <p>Welcome back! We're glad you returned.</p>
             </div>
 
-            <form onSubmit={(event) => {caller(event)}}>
+            <form className={styles.form} onSubmit={(event) => {caller(event)}}>
                 <div className={styles.formGroup}>
-                    <input type="text" name="email" onChange={(e) => handleInputData(e)} placeholder="E-Mail"/>
+                    <input type="text" value={authContact} name="contact" onChange={(e) => handleInputData(e)} placeholder="E-Mail or Phone"/>
                 </div>
 
                 <div className={styles.formGroup}>
-                    <input type="password" name="password" onChange={(e) => handleInputData(e)} placeholder="Password"/>
+                    <input type="password" value={authPassword} name="password" onChange={(e) => handleInputData(e)} placeholder="Password"/>
                 </div>
+
+                {formMessage && <p className={styles.message + ' ' + (formMessage.type === 'error' ? styles.error:styles.ok)}>{formMessage.message}</p>}
 
                 <div className={styles.formGroup}>
                     <input type="submit" name="submit" value="Sign In"/>
