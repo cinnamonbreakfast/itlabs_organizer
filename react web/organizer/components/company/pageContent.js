@@ -171,15 +171,6 @@ const PageEdit = (props) => {
                     <form>
                         <div className={styles.formGroup}>
                             <input type='text' name='username' autoComplete="off" placeholder="Add by username" onFocus={e => setAutoSuggest(true)} onBlur={e => setAutoSuggest(false)}/>
-
-                            {autoSuggest && <div className={styles.autoSuggest}>
-                                <ul>
-                                    <li>Derek</li>
-                                    <li>Pha</li>
-                                    <li>Phadasdas</li>
-                                    <li>Phadasea</li>
-                                </ul>
-                            </div>}
                         </div>
 
                         <div className={styles.formGroup}>
@@ -198,6 +189,7 @@ const PageEdit = (props) => {
                     </form>
 
                     <div className={styles.employeesCarousel}>
+                        <Employee specialist={company.owner}/>
                         {
                             Array.isArray(company.staffMembers) && company.staffMembers.map(spec => (
                                 <Employee key={spec.id} specialist={spec} options={employeeOptions}/>
