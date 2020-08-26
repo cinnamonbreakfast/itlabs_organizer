@@ -2,18 +2,21 @@ import styles from '../../styles/components/company/employee.module.scss'
 
 const Employee = (props) => {
     const specialist = props.specialist
+    const imgURL = ((specialist.user && specialist.user.imageURL) || specialist.imageURL);
+    const name = ((specialist.user && specialist.user.name) || specialist.name);
+    const phone = ((specialist.user && specialist.user.phone) || specialist.phone);
 
     return (
         <div className={styles.card}>
             { 1 && <div className={styles.badge}>Pending</div> }
 
             <div className={styles.photo}>
-                { specialist.user.imageURL && <img src={process.env.REQ_HOST+'/img/'+specialist.user.imageURL}/> }
-                { !specialist.user.imageURL && <h1>{specialist.user.name[0]}</h1> }
+                { imgURL && <img src={process.env.REQ_HOST+'/img/'+(imgURL)}/> }
+                { !imgURL && <h1>{name[0]}</h1> }
             </div>
 
-            <h2>{specialist.user.name}</h2>
-            <p>{specialist.user.phone}</p>
+            <h2>{name}</h2>
+            <p>{phone}</p>
 
             <div className={styles.hover}>
                 { props.options && props.options.map(option => (

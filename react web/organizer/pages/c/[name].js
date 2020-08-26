@@ -31,7 +31,7 @@ const Cover = (props) => {
             </div>
             
             {
-                user.data.id === company.owner.id &&
+                user.userLoggedIn && user.data.id === company.owner.id &&
                 <div className={styles.adminControls}>
                     <button onClick={e => clickManage()}>{content === 'manage' ? 'Exit Manager mode' : 'Manage company'}</button>
                     <button onClick={e => router.push('/c/@'+ company.username +'/calendar')}>Schedules</button>
