@@ -57,10 +57,10 @@ const Companies = () => {
                                 <div className={styles.info}>
                                     <h2>{e.name}</h2>
                                         <p>{e.address}, {e.city}, {e.country}</p>
-                                    <p>Phone: {e.userDTO.phone}</p>
+                                    <p>Phone: {e.owner.phone}</p>
 
                                     <div className={styles.controls}>
-                                        <button>Manage</button>
+                                        <button onClick={ev => router.push('/c/@'+e.username)}>Manage</button>
                                     </div>
                                 </div>
                             </div>

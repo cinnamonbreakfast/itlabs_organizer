@@ -1,7 +1,9 @@
 import styles from '../../styles/pages/companyView.module.scss'
 import Employee from '../../components/company/employee'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useState } from 'react'
+
+import CompanyController from '../../pages/api/companyController'
 
 export const PagePreloader = (props) => {
 
@@ -25,28 +27,187 @@ export const PageNotFound = (props) => {
     )
 }
 
+const ServiceEdit = (props) => {
+    const service = props.service
+    const [name, setName] = useState((service && service.name) || "")
+    const [duration, setDuration] = useState((service && service.duration) || "")
+    const [price, setPrice] = useState((service && service.price) || "")
+    const dispatch = useDispatch()
+    
+    const user = useSelector(state => (state.user))
+    const cc = new CompanyController(dispatch)
+
+    const clear = () => {
+        setName('')
+        setDuration('')
+        setPrice('')
+    }
+
+    const updateSend = (e) => {
+        e.preventDefault()
+
+        let serv = {
+            id: (service && service.id) || null,
+            name: name,
+            duration: duration,
+            price: price,
+            companyUsername: (props.company && props.company.username) || null
+        }
+
+        if(service) {
+            cc.updateService(serv, user.token)
+            .then(resp => {
+                console.log(resp)
+                if(resp.status == 'ok') {
+                    props.cancel()
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        } else {
+            cc.createService(serv, user.token)
+            .then(resp => {
+                console.log(resp)
+                if(resp.status == "ok") {
+                    clear()
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        }
+    }
+
+    return (
+        <form className={styles.addForm} onSubmit={e => updateSend(e)}>
+            <input value={name} onChange={e => setName(e.target.value)}placeholder="Service name" type="text" name="service_name" />
+            <input value={duration} onChange={e => setDuration(e.target.value)}placeholder="Duration (min)" type="text" name="service_duration" />
+            <input value={price} onChange={e => setPrice(e.target.value)}placeholder="Price (RON)" type="text" name="service_price" />
+
+            <input type="submit" value="Save" />
+            <input onClick={e => props.cancel()} type="button" value="Cancel" />
+        </form>
+    )
+}
+
+const ServiceElement = (props) => {
+    const service = props.service
+    const [editor, setEditor] = useState(false)
+
+    const cancel = () => {
+        setEditor(false)
+    }
+
+    if(editor) {
+        return (
+            <li key={service.id}>
+                <ServiceEdit service={service} cancel={cancel} company={props.company}/>
+            </li>
+        )
+    }
+
+    return (
+        <li key={service.id}>
+            <div className={styles.serviceName}>{service.name}</div>
+            <div>{service.duration} min</div>
+            <div>{service.price} RON</div>
+            <div>
+                <button>Delete</button>
+                <button onClick={e => setEditor(true)}>Update</button>
+            </div>    
+        </li>
+    )
+}
+
 const PageEdit = (props) => {
-    const company = props.company
+    const companyView = useSelector(state => (state.companyView))
+    const company = companyView.company
+
+    const [autoSuggest, setAutoSuggest] = useState(false)
+
+    console.log(props.company.services)
+
+    const employeeOptions = [
+        {
+            id: 0,
+            text: 'Remove',
+            callBack: console.log
+        },
+    ]
 
     return (
         <div className="col-9">
             <div className={styles.board}>
-                <h2>Edit services</h2>                
+                <h2>Edit services</h2>
+
+                <div className={styles.content}>
+                    <ServiceEdit company={company}/>
+                </div>
+
+                <ul className={styles.servicesList}>
+                    {
+                        Array.isArray(company.services) && company.services.map(serv => (
+                            <ServiceElement key={serv.id} service={serv} company={company}/>
+                        ))
+                    }
+                </ul>
             </div>
 
             <div className={styles.board}>
-                <h2>Edit services</h2>                
+                <h2>Edit employees</h2>
+
+                <div className={styles.employeesEdit}>
+                    <form>
+                        <div className={styles.formGroup}>
+                            <input type='text' name='username' autoComplete="off" placeholder="Add by username" onFocus={e => setAutoSuggest(true)} onBlur={e => setAutoSuggest(false)}/>
+
+                            {autoSuggest && <div className={styles.autoSuggest}>
+                                <ul>
+                                    <li>Derek</li>
+                                    <li>Pha</li>
+                                    <li>Phadasdas</li>
+                                    <li>Phadasea</li>
+                                </ul>
+                            </div>}
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <select name='service'>
+                                {
+                                    Array.isArray(company.services) && company.services.map(serv => (
+                                        <option key={serv.id} value={serv.name}>{serv.name}</option>
+                                    ))
+                                }
+                            </select>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <input type='submit' value='Add' autoComplete="on"/>
+                        </div>
+                    </form>
+
+                    <div className={styles.employeesCarousel}>
+                        {
+                            Array.isArray(company.staffMembers) && company.staffMembers.map(spec => (
+                                <Employee key={spec.id} specialist={spec} options={employeeOptions}/>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div className={styles.board}>
+                <h2>Edit company info</h2>
             </div>
         </div>
     )
 }
 
 const PageContent = (props) => {
-    const company = props.company
+    const company = useSelector(state => (state.companyView.company))
     const user = useSelector(state => (state.user))
     const content = props.content
-
-    console.log(content, "<<")
 
     return (
         <div className="grid">
@@ -92,7 +253,11 @@ const PageContent = (props) => {
                         <h2>Staff</h2>
 
                         <div className={styles.employeesCarousel}>
-                            <Employee/>
+                            {
+                                Array.isArray(company.staffMembers) && company.staffMembers.map(spec => (
+                                    <Employee key={spec.id} specialist={spec}/>
+                                ))
+                            }
                         </div>
                     </div>
                 </div>

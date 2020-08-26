@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import styles from '../../styles/pages/companyView.module.scss'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 import CompanyController from '../api/companyController'
 import PageContent, { PagePreloader, PageNotFound } from '../../components/company/pageContent'
+import { company_view_actions as cva } from '../api/redux/companyViewer'
 
 const Cover = (props) => {
-    const company = props.company
+    const company = useSelector(state => (state.companyView.company))
     const user = useSelector(state => (state.user))
     const router = useRouter()
     const [content, setContent] = useState(props.content)
@@ -53,47 +54,40 @@ const Cover = (props) => {
 
 const Name = () => {
     const router = useRouter()
+    const companyView = useSelector(state => (state.companyView))
+    const company = companyView.company
+    const dispatcher = useDispatch()
+    
     const { name } = router.query
-    const controller = new CompanyController(null)
-    const [company, setCompany] = useState(null)
-    const [status, setStatus] = useState(0)
 
+    const controller = new CompanyController(dispatcher)
+    const status = companyView.find_code
     const [content, setContent] = useState('main')
 
     const clickManage = (target) => {
         setContent(target)
     }
 
-    console.log(content)
-
     useEffect(() => {
-        name && 
-        controller.getCompany(name.slice(1))
-        .then(resp => {
-            setCompany(resp.data)
-        })
-        .catch(err => {
-            if(err.response) {
-                if(err.response.status === 404) {
-                    setStatus(404)
-                    setCompany(null)
-                } else {
-                    // anything else
-                    console.log(err)
-                }
-            } else {
-                console.log("communication err")
-            }
-            
-        })
+        if(name)
+        {
+            dispatcher({type: cva.SET_VIEW_USERNAME, payload: name.slice(1)})
+        
+            controller.getCompany(name.slice(1))
+            .then(resp => {
+                dispatcher({type: cva.SET_VIEW_COMPANY, payload: resp})
+            })
+            .catch(err => {
+                if(err.code === 404) setStatus(404)
+                console.log(err.message)
+            })
+        }
     }, [router])
-
-    console.log(company)
 
     if(company) return (
         <div className={styles.pageWrapper}>
-            <Cover company={company} manage={clickManage} content={content}/>
-            <PageContent company={company} content={content}/>
+            <Cover manage={clickManage} content={content}/>
+            <PageContent content={content}/>
         </div>
     )
 
