@@ -301,6 +301,7 @@ public class ScheduleController {
                     .address(company.getAddress())
                     .name(company.getName())
                     .cui(company.getCui())
+                    .country(company.getCountry())
                     .build();
             companyDTO.setId(company.getId());
             SpecialistDTO spDTO = SpecialistDTO.builder()
@@ -376,5 +377,38 @@ public class ScheduleController {
     }
 
 
+
+
+
+@RequestMapping(value = "schedule/delete",method = RequestMethod.DELETE)
+public ResponseEntity<String> ff(@RequestHeader String token , @RequestParam Long scheduleId){
+
+    Long id = JWToken.checkToken(token);
+    if(id==null){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");
+    }
+
+    User user = userService.findById(id);
+    if(user==null){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
+    }
+
+    Schedule schedule = scheduleService.findById(scheduleId);
+
+    if(schedule==null){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known user");
+    }
+    if(schedule.getUser().getId()!= user.getId()&&schedule.getSpecialist().getUser().getId()!=user.getId()){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("not the owner of the schedule");
+    }
+
+    try{
+        scheduleService.delete(schedule);
+    }catch (Exception e ){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("not the owner of the schedule");
+    }
+    return ResponseEntity.ok("Deleted a schedule");
+
+}
 }
 

@@ -17,8 +17,8 @@ const links = [
     props: [LINK_PROP.DISPLAY_ALWAYS]
   },
   {
-    url: '/app',
-    name: 'My Appointments',
+    url: '/appointments',
+    name: 'Appointment',
     props: [LINK_PROP.DISPLAY_ALWAYS]
   },
 ]

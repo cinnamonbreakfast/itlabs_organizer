@@ -46,7 +46,7 @@ public class TimeTableController {
     }
 
     @RequestMapping(value="tt/create",method = RequestMethod.POST)
-    public ResponseEntity<String> createTimeTable(TimeTableDTO timeTableDTO, @RequestHeader String token){
+    public ResponseEntity<String> createTimeTable(@RequestBody TimeTableDTO timeTableDTO, @RequestHeader String token){
 
         Long id = JWToken.checkToken(token);
         if(id==null){
@@ -92,10 +92,11 @@ public class TimeTableController {
         if(!(day>=0&&day<=6)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a valid day");
         }
-        TimeTable tt =  timeTableService.findCollisions(start,end,service,day);
-        if(tt!=null){
+        List<TimeTable> tts =  timeTableService.findCollisions(start,end,service,day);
+        if(tts.size()!=0){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Found collisions ");
         }
+        TimeTable tt ;
         tt = TimeTable.builder()
                 .start(start)
                 .end(end)

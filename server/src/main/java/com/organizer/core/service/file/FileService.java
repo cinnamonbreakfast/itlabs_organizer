@@ -24,8 +24,8 @@ public class FileService {
         try {
             Path copyLocation = Paths
                     .get(uploadDir + File.separator + genName);
-            Files.delete(copyLocation);
-            Files.copy(file.getInputStream(), copyLocation, StandardCopyOption.REPLACE_EXISTING);
+
+            Files.copy(file.getInputStream(),copyLocation,StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             e.printStackTrace();
         }

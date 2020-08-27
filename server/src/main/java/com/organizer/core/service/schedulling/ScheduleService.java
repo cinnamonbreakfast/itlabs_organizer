@@ -36,10 +36,16 @@ public class ScheduleService {
         return  scheduleRepository.findAllSchedulesOfUserSpecialistAndCompany(user,company);
     }
 
-
+    public Schedule findById(Long id ){
+        return scheduleRepository.findById(id).get();
+    }
 
     public void save(Schedule schedule){
         scheduleRepository.save(schedule);
+    }
+
+    public void delete ( Schedule schedule){
+        scheduleRepository.delete(schedule);
     }
 
 }

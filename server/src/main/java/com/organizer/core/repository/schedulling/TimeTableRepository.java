@@ -16,11 +16,11 @@ import java.util.List;
 
 public interface TimeTableRepository extends Repository<Long, TimeTable> {
 
-    @Query("select tt from TimeTable tt where tt.start <=?1 and tt.end>= ?2 or " +
+    @Query("select tt from TimeTable tt where (?1<=tt.start and ?2>=tt.end or tt.start <=?1 and tt.end>= ?2 or " +
             "tt.start>?1 and tt.start<?2 or "+
-            "tt.end>?1 and tt.end<  ?2 or "+
-            "?1<=tt.start and ?2>=tt.end and tt.service=?3 and tt.day=?4")
-    TimeTable findCollisions(LocalTime start, LocalTime end, Service service, int day);
+            "tt.end>?1 and tt.end<  ?2  "+
+            ") and tt.service=?3 and tt.day=?4")
+    List<TimeTable> findCollisions(LocalTime start, LocalTime end, Service service, int day);
 
     @Query("select tt from TimeTable  tt where tt.day = ?1 and tt.service=?2")
     List<TimeTable> findByDay(int day, Service service);

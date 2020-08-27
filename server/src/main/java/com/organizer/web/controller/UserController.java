@@ -353,7 +353,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "u/changeDetails",method = RequestMethod.PUT)
-    public ResponseEntity<String>changeName(SignUpDTO details,@RequestHeader String token){
+    public ResponseEntity<String>changeName(@RequestBody SignUpDTO details,@RequestHeader String token){
         Long id = JWToken.checkToken(token);
         if(id==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("invalid token");
@@ -363,8 +363,6 @@ public class UserController {
         {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
         }
-        System.out.println("doing a change details request");
-        //System.out.println(file.toString());
 
         try {
             user.setName(details.getName());
@@ -383,18 +381,11 @@ public class UserController {
         catch (Exception e){
 
         }
-        try {
-            user.setPassword(Hash.md5(details.getPassword()));
-        }
-        catch (Exception e ){
+        System.out.println(details);
 
-        }
+        User u = userService.saveOrUpdate(user);
+        System.out.println(u.getName());
 
-        try {
-            userService.saveOrUpdate(user);
-        }catch (Exception e ){
-
-        }
 
         return ResponseEntity.ok("Changed user details");
     }
@@ -412,31 +403,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
         }
         System.out.println("doing a file request");
-        //System.out.println(file.toString());
-        /*
-        try {
-            user.setName(details.getName());
-        }
-        catch (Exception e ){
 
-        }
-        try {
-            user.setCity(details.getCity());
-        }catch (Exception e){
-
-        }
-        try {
-            user.setCountry(details.getCountry());
-        }
-        catch (Exception e){
-
-        }
-        try {
-            user.setPassword(Hash.md5(details.getPassword()));
-        }
-        catch (Exception e ){
-
-        }*/
         String username= user.getPhone();
         System.out.println(file.getOriginalFilename());
         try {
@@ -467,4 +434,24 @@ public class UserController {
 
     }
 
+    @RequestMapping(value="u/display/{id}")
+    public ResponseEntity<UserDTO> getUserDetail(@PathVariable Long id  ){
+
+        User user = userService.findById(id);
+        if(user == null)
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        UserDTO userDTO = UserDTO.builder()
+
+                .name(user.getName())
+                .email(user.getEmail())
+                .imageURL(user.getImageURL())
+                .phone(user.getPhone())
+                .city(user.getCity())
+                .country(user.getCountry())
+                .build();
+        return  ResponseEntity.ok(userDTO);
+
+    }
 }

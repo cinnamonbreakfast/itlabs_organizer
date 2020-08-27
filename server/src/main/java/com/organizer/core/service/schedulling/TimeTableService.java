@@ -27,7 +27,7 @@ public class TimeTableService {
     public void save(TimeTable timeTable){
         timeTableRepository.save(timeTable);
     }
-    public TimeTable findCollisions(LocalTime start , LocalTime end, com.organizer.core.model.Service service, int day){
+    public List<TimeTable> findCollisions(LocalTime start , LocalTime end, com.organizer.core.model.Service service, int day){
         return timeTableRepository.findCollisions(start,end,service,day);
     }
 
