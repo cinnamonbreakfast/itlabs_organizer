@@ -24,6 +24,7 @@ public class FileService {
         try {
             Path copyLocation = Paths
                     .get(uploadDir + File.separator + genName);
+            Files.delete(copyLocation);
             Files.copy(file.getInputStream(), copyLocation, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             e.printStackTrace();
@@ -34,7 +35,7 @@ public class FileService {
         File f = new File(uploadDir);
         File[] matchingFiles = f.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                return name.startsWith(fileName);
+                return name.startsWith(fileName)||name.endsWith(fileName);
             }
         });
         String pathFile = matchingFiles[0].getAbsolutePath();

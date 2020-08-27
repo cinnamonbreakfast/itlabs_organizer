@@ -27,7 +27,7 @@ public class Schedule extends Entity<Long>{
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name="service", nullable = false)
+    @JoinColumn(name="specialist_id", nullable = false)
     private Specialist specialist;
 
 
@@ -35,8 +35,5 @@ public class Schedule extends Entity<Long>{
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     private User user;
-
-
-
 
 }

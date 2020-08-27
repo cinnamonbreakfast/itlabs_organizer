@@ -3,7 +3,9 @@ package com.organizer.core.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Table(name="time_table",schema="public")
@@ -18,15 +20,19 @@ public class TimeTable extends  Entity<Long>{
 
     @Basic
     @Column(name="start_time")
-    private LocalDateTime start;
+    private LocalTime start;
 
     @Basic
     @Column(name="end_time")
-    private LocalDateTime end;
+    private LocalTime end;
 
     @ManyToOne
     @JoinColumn(name="service")
     Service service;
+
+    @Basic
+    @Column(name="day_of_week")
+    Integer day;
 
 
 }

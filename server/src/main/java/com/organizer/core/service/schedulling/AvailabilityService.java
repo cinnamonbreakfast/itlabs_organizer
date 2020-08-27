@@ -23,8 +23,8 @@ public class AvailabilityService {
         return availabilityRepository.findCollisions(start,end, service,specialist);
     }
 
-    public List<Availability> findByDate(LocalDateTime date){
-        return availabilityRepository.findByDate(date);
+    public List<Availability> findByDate(LocalDateTime date, com.organizer.core.model.Service service){
+        return availabilityRepository.findByDate(date,service);
 
     }
     public void save(Availability availability){

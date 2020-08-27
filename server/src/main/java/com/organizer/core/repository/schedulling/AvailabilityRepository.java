@@ -17,6 +17,6 @@ public interface AvailabilityRepository extends Repository<Long, Availability>{
     Availability findCollisions(LocalDateTime start, LocalDateTime end, Service service, Specialist specialist);
 
 
-    @Query("select tt from Availability  tt where date(tt.start)= date(?1)")
-    List<Availability> findByDate( LocalDateTime date);
+    @Query("select tt from Availability  tt where date(tt.start)= date(?1) and tt.service=?2")
+    List<Availability> findByDate( LocalDateTime date,Service service);
 }

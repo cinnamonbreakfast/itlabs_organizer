@@ -9,8 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -25,12 +27,12 @@ public class TimeTableService {
     public void save(TimeTable timeTable){
         timeTableRepository.save(timeTable);
     }
-    public TimeTable findCollisions(LocalDateTime start , LocalDateTime end, com.organizer.core.model.Service service){
-        return timeTableRepository.findCollisions(start,end,service);
+    public TimeTable findCollisions(LocalTime start , LocalTime end, com.organizer.core.model.Service service, int day){
+        return timeTableRepository.findCollisions(start,end,service,day);
     }
 
-    public List<TimeTable> findByDate(LocalDateTime date){
-        return timeTableRepository.findByDate(date);
+    public List<TimeTable> findByDay(int day, com.organizer.core.model.Service service){
+        return timeTableRepository.findByDay(day,service);
     }
 
     public List<TimeTable> findByCompanyAndRange(Company company, LocalDateTime start,LocalDateTime end){
@@ -39,6 +41,8 @@ public class TimeTableService {
             return timeTableRepository.findByCompany(company);
         }
         return timeTableRepository.findByCompanyRange(company,start,end);
-
+    }
+    public List<TimeTable> findByService(Long serviceId){
+        return timeTableRepository.findByService(serviceId);
     }
 }

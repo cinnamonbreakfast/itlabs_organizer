@@ -6,7 +6,9 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,14 +17,15 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class TimeTableDTO  extends BaseDTO {
-
+    Long id;
     String companyUsername;
     String serviceName;
-    @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
-    LocalDateTime start;
+    Integer day;
+    @DateTimeFormat(iso=DateTimeFormat.ISO.TIME)
+    LocalTime start;
 
-    @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
-    LocalDateTime end;
+    @DateTimeFormat(iso=DateTimeFormat.ISO.TIME)
+    LocalTime end;
 
     String s_end;
     String s_start;

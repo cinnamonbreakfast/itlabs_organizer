@@ -1,5 +1,7 @@
 package com.organizer.web.dto.schedulling;
 
+import com.organizer.web.dto.ServiceDTO;
+import com.organizer.web.dto.SpecialistDTO;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -22,4 +24,9 @@ public class ScheduleDTO {
 
     @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
     LocalDateTime end;
+
+
+    String s_start;
+    String s_end;
+    SpecialistDTO specialistDTO;
 }

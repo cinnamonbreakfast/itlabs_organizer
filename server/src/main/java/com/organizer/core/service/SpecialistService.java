@@ -35,5 +35,6 @@ public class SpecialistService {
     }
     public void save (Specialist specialist ){
         specialistRepository.save(specialist);
+
     }
 }

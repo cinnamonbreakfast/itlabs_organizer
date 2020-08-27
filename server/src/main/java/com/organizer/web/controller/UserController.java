@@ -352,18 +352,55 @@ public class UserController {
                 );
     }
 
-    @RequestMapping(value = "u/changeName",method = RequestMethod.PUT)
-    public ResponseEntity<String>changeName(@RequestParam String email,@RequestParam String name){
-        User user =  userService.findByEmail(email);
-        user.setName(name);
-        if(userService.saveOrUpdate(user)!=null)
-            return ResponseEntity.ok().body("Name changed.");
-        else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something happened");
+    @RequestMapping(value = "u/changeDetails",method = RequestMethod.PUT)
+    public ResponseEntity<String>changeName(SignUpDTO details,@RequestHeader String token){
+        Long id = JWToken.checkToken(token);
+        if(id==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("invalid token");
+        }
+        User user = userService.findById(id);
+        if(user == null)
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
+        }
+        System.out.println("doing a change details request");
+        //System.out.println(file.toString());
+
+        try {
+            user.setName(details.getName());
+        }
+        catch (Exception e ){
+
+        }
+        try {
+            user.setCity(details.getCity());
+        }catch (Exception e){
+
+        }
+        try {
+            user.setCountry(details.getCountry());
+        }
+        catch (Exception e){
+
+        }
+        try {
+            user.setPassword(Hash.md5(details.getPassword()));
+        }
+        catch (Exception e ){
+
+        }
+
+        try {
+            userService.saveOrUpdate(user);
+        }catch (Exception e ){
+
+        }
+
+        return ResponseEntity.ok("Changed user details");
     }
 
 
-    @RequestMapping(value = "u/changeDetails",method = RequestMethod.PUT ,consumes = {"multipart/form-data"})
+    @RequestMapping(value = "u/changeFile",method = RequestMethod.PUT ,consumes = {"multipart/form-data"})
     public ResponseEntity<String> changeDetails(@RequestParam(name="file",required = false) MultipartFile file ,@RequestHeader String token){
         Long id = JWToken.checkToken(token);
         if(id==null){

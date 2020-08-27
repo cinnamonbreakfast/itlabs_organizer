@@ -1,5 +1,6 @@
 package com.organizer.web.controller.schedulling;
 
+import com.auth0.jwt.JWT;
 import com.organizer.core.model.*;
 import com.organizer.core.service.CompanyService;
 import com.organizer.core.service.SpecialistService;
@@ -8,7 +9,7 @@ import com.organizer.core.service.schedulling.AvailabilityService;
 import com.organizer.core.service.schedulling.ScheduleService;
 import com.organizer.core.service.schedulling.TimeTableService;
 import com.organizer.web.auth.JWToken;
-import com.organizer.web.dto.BaseDTO;
+import com.organizer.web.dto.*;
 import com.organizer.web.dto.schedulling.IntervalDTO;
 import com.organizer.web.dto.schedulling.ScheduleDTO;
 import com.organizer.web.utils.DateOperations;
@@ -18,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,10 +37,12 @@ public class ScheduleController {
     SpecialistService specialistService;
     ScheduleService scheduleService;
 
-    private List<Schedule  > validSchedules(List<TimeTable> availabilities, List<Availability> tt){
+    private List<Schedule  > validSchedules(List<Schedule> availabilities, List<Availability> tt){
         List<Schedule> av = new ArrayList<>(availabilities.size());
-        for(TimeTable avf : availabilities) {
+
+        for(Schedule avf : availabilities) {
             Schedule validSchedule = Schedule.builder().start(avf.getStart()).end(avf.getEnd()).build();
+
             av.add((validSchedule));
         }
         //add to schedule
@@ -113,7 +118,7 @@ public class ScheduleController {
     @RequestMapping(value = "schedule/create", method = RequestMethod.POST)
     public ResponseEntity<String> createSchedule(ScheduleDTO scheduleDTO, @RequestHeader String token){
 
-
+        System.out.println(scheduleDTO);
         Long id = JWToken.checkToken(token);
         if(id==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");
@@ -129,7 +134,7 @@ public class ScheduleController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known specialist");
         }
 
-        if(!((scheduleDTO.getStart() instanceof LocalDateTime) &&( scheduleDTO.getEnd() instanceof  LocalDateTime)))
+        if(!((scheduleDTO.getStart() instanceof LocalDateTime) ))
         {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Wrong request, not an instance of local date time ");
         }
@@ -153,17 +158,21 @@ public class ScheduleController {
         if(end.isAfter(end_limit)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("End time should be within a day of start time");
         }
-        //logic (no collisions)
-        Schedule schedule =scheduleService.findCollisions(start,end,user,specialist);
+        //logic collisions
+
+        Schedule schedule = scheduleService.findCollisions(start,end,user,specialist);
         if(schedule!=null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Found collisions, please select a valid interval");
         }
 
         //logic : schedule validity from timetable and availability
-
-        List<Availability> availabilities = availabilityService.findByDate(start);
-        List<TimeTable> timeTables = timeTableService.findByDate(start);
-
+        Service service =specialist.getService();
+        List<Availability> availabilities = availabilityService.findByDate(start,service);
+        int day = start.getDayOfWeek().getValue();
+        List<TimeTable> tts = timeTableService.findByDay(day,service);
+        //conver to the same day
+        LocalDate date = start.toLocalDate();
+        List<Schedule> timeTables =dateOperations.convertTtToSchedule(tts,date);
         List<Schedule> schedules = validSchedules(timeTables,availabilities);
 
         boolean valid=false;
@@ -202,18 +211,44 @@ public class ScheduleController {
         if(user==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        System.out.println(intervalDTO);
+
         Specialist specialist =specialistService.findById(intervalDTO.getSpecialist_id());
         if(specialist==null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         Service service =specialist.getService();
         LocalDateTime date = intervalDTO.getDate();
-        List<Availability> availabilities = availabilityService.findByDate(date);
-        List<TimeTable> timeTables = timeTableService.findByDate(date);
+        //service
+        List<Availability> availabilities = availabilityService.findByDate(date,service);
+        int day = date.getDayOfWeek().getValue();
+        List<TimeTable> tts = timeTableService.findByDay(day,service);
+        //conver to the same day
+        LocalDate dat = date.toLocalDate();
+        List<Schedule> timeTables =dateOperations.convertTtToSchedule(tts,dat);
+
+
+
         List<Schedule> schedules = validSchedules(timeTables,availabilities);
-        List<IntervalDTO> intervalDTOS = new ArrayList<>(schedules.size());
-        for(Schedule sch : schedules){
+
+
+        List<Schedule> specialistSchedules = scheduleService.findBySpecialistAndDate(specialist,date);
+
+
+        List<Availability> tmp = new ArrayList<>();
+        for( Schedule sh : specialistSchedules){
+            Availability availability = Availability.builder()
+                    .start(sh.getStart())
+                    .end(sh.getEnd())
+                    .build();
+            tmp.add(availability);
+        }
+
+
+        List<Schedule> schedulesOut = validSchedules(schedules,tmp);
+
+        List<IntervalDTO> intervalDTOS = new ArrayList<>(schedulesOut.size());
+
+        for(Schedule sch : schedulesOut){
             IntervalDTO inter = IntervalDTO.builder()
                     .start(sch.getStart().toString())
                     .end(sch.getEnd().toString())
@@ -223,5 +258,123 @@ public class ScheduleController {
 
         return ResponseEntity.ok(intervalDTOS);
     }
+
+    @RequestMapping(value= "schedules/user/display",method = RequestMethod.GET)
+    public ResponseEntity<List<ScheduleDTO>> getSchedulesForUser(@RequestHeader String token)
+    {
+        Long id = JWToken.checkToken(token);
+        if(id == null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        User user = userService.findById(id);
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        List <Schedule > schedules =  scheduleService.findByUser(user);
+        List<ScheduleDTO> scheduleDTOS = new ArrayList<>(schedules.size());
+        for(Schedule sch : schedules){
+
+            Specialist sp = sch.getSpecialist();
+            Service ser = sp.getService();
+            User u = sp.getUser();
+            UserDTO userDTO = UserDTO.builder()
+                    .imageURL(u.getImageURL())
+                    .country(u.getCountry())
+                    .city(u.getCity())
+                    .phone(u.getPhone())
+                    .email(u.getEmail())
+                    .name(u.getName())
+                    .build();
+            userDTO.setId(u.getId());
+
+            ServiceDTO serDTo = ServiceDTO.builder()
+                    .price(ser.getPrice())
+                    .price(ser.getPrice())
+                    .name(ser.getServiceName()).build();
+            serDTo.setId(ser.getId());
+            Company company = ser.getCompany();
+            CompanyDTO companyDTO = CompanyDTO.builder()
+                    .image_url(company.getImage_url())
+                    .username(company.getUsername())
+                    .category(company.getCategory())
+                    .city(company.getCity())
+                    .address(company.getAddress())
+                    .name(company.getName())
+                    .cui(company.getCui())
+                    .build();
+            companyDTO.setId(company.getId());
+            SpecialistDTO spDTO = SpecialistDTO.builder()
+                    .servicesDTO(serDTo)
+                    .user(userDTO)
+                    .company(companyDTO)
+                    .build();
+            spDTO.setId(sp.getId());
+            ScheduleDTO scheduleDTO = ScheduleDTO.builder()
+                    .s_start(sch.getStart().toString())
+                    .s_end(sch.getEnd().toString())
+                    .specialistDTO(spDTO)
+                    .id(sch.getId())
+                    .build();
+            scheduleDTOS.add(scheduleDTO);
+        }
+        return ResponseEntity.ok(scheduleDTOS);
+    }
+
+    @RequestMapping(value= "schedules/user_specialist/display",method = RequestMethod.GET)
+    public ResponseEntity<List<ScheduleDTO>> getSpecialistSchedules(@RequestHeader String token, @RequestParam String companyUsername) {
+        Long id = JWToken.checkToken(token);
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        User user = userService.findById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        Company company = companyService.findByUsername(companyUsername);
+        System.out.println(user.getId());
+        if (company == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        System.out.println(user.getName());
+        System.out.println(company.getName());
+        List<Schedule> schedules = scheduleService.findAllSchedulesOfUserSpecialistAndCompany(user, company);
+        List<ScheduleDTO> scheduleDTOS = new ArrayList<>(schedules.size());
+        for (Schedule sch : schedules) {
+            Specialist sp = sch.getSpecialist();
+            Service ser = sp.getService();
+            User u = sp.getUser();
+            UserDTO userDTO = UserDTO.builder()
+                    .imageURL(u.getImageURL())
+                    .country(u.getCountry())
+                    .city(u.getCity())
+                    .phone(u.getPhone())
+                    .email(u.getEmail())
+                    .name(u.getName())
+                    .build();
+            userDTO.setId(u.getId());
+
+            ServiceDTO serDTo = ServiceDTO.builder()
+                    .price(ser.getPrice())
+                    .price(ser.getPrice())
+                    .name(ser.getServiceName()).build();
+            serDTo.setId(ser.getId());
+            SpecialistDTO spDTO = SpecialistDTO.builder()
+                    .servicesDTO(serDTo)
+                    .user(userDTO)
+                    .build();
+            spDTO.setId(sp.getId());
+            ScheduleDTO scheduleDTO = ScheduleDTO.builder()
+                    .s_start(sch.getStart().toString())
+                    .s_end(sch.getEnd().toString())
+                    .specialistDTO(spDTO)
+                    .build();
+            scheduleDTOS.add(scheduleDTO);
+
+
+        }
+        return ResponseEntity.ok(scheduleDTOS);
+    }
+
+
 }
 

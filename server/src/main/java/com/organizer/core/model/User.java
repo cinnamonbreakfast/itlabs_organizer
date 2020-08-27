@@ -1,6 +1,7 @@
 package com.organizer.core.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import org.hibernate.annotations.NamedQuery;
 import org.springframework.stereotype.Component;
@@ -69,4 +70,9 @@ public class User extends Entity<Long> {
     @JsonManagedReference
     @OneToMany(mappedBy = "user")
     private List<Invitation> invitations;
+
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user")
+    private List<Specialist> specialists;
 }

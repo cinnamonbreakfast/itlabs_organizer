@@ -57,9 +57,17 @@ const Search = () => {
           .catch(err=>false);
     }
     
+    const actionButton=(e)=>{
+        e.preventDefault()
+        console.log(e.target.id);
+        let path = e.target.id;
+        router.push('/c/@'+path)
+    }
     return (
+        
+
         <div className={styles.pageWrapper}>
-            <div className="row">
+            <div className="grid">
                 <div className={"col-3" + ' ' + styles.floaterSide}>
                     <div className={styles.filterBox}>
                         <h2>Search filters</h2>
@@ -87,12 +95,10 @@ const Search = () => {
                     </div>
                 </div>
 
-                <div className={"col-9 " + styles.results}>
+                <div className={"col-9"+' ' + styles.results}>
                     <div>
                         <p>Search results for <strong> {s_service}</strong>{s_location}</p>
                     </div>
-
-                    
                     <ul>
                         
                         { Array.isArray(searchResult) && searchResult.map(e=>{ 
@@ -107,7 +113,7 @@ const Search = () => {
                                     <p>Services: {e.company.services.map(el=>{return el.name+' '})}</p> 
                                     <p>Category: {e.company.category}</p> 
                                     </div>
-                                    <button>Schedule</button>
+                                    <button id={e.company.username}  onClick={actionButton}  >Schedule</button>
                                     </li>
                                 )
                             })

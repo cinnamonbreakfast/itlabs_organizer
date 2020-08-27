@@ -21,8 +21,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -63,87 +65,69 @@ public class TimeTableController {
         if(user.getId()!=company.getOwner().getId()){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the owner of the company");
         }
-
-        if(!((timeTableDTO.getStart() instanceof LocalDateTime) &&( timeTableDTO.getEnd() instanceof  LocalDateTime)))
-        {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Wrong request, not an instance of local date time ");
-        }
-
-        LocalDateTime start = timeTableDTO.getStart();
-        LocalDateTime end = timeTableDTO.getEnd();
-        if(start.isAfter(end)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start time should be before end time");
-        }
-
-        LocalDateTime end_limit = LocalDateTime.of(
-                start.getYear(),
-                start.getMonth(),
-                start.getDayOfMonth(),23,59,59,99999
-        );
-        if(end.isAfter(end_limit)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("End time should be within a day of start time");
-        }
-        //logic part
         Service service = serviceService.findByServiceAndCompany(timeTableDTO.getServiceName(),timeTableDTO.getCompanyUsername());
-        if(service==null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known service name from the company");
+        if(service == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a valid service ");
         }
 
-        TimeTable timeTable  = timeTableService.findCollisions(start,end,service);
-        //TimeTable timeTable=null;
-        if(timeTable!=null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Found collisions on table");
-        }
-        timeTable = TimeTable.builder()
-                .start(start)
-                .end(end)
-                .service(null)
-                .build();
-        timeTableService.save(timeTable);
-        return ResponseEntity.status(HttpStatus.OK).body("Succes creating time table");
-    }
 
-
-
-    @RequestMapping(value="tt/findAllByCompany" ,method = RequestMethod.GET)
-    public ResponseEntity<List<TimeTableDTO>> findAllByCompany( TimeTableDTO timeTableDTO){
-
-        Company company = companyService.findByUsername(timeTableDTO.getCompanyUsername());
-        if(company==null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-        LocalDateTime start,end;
+       LocalTime start ,end;
         try{
             start = timeTableDTO.getStart();
             end = timeTableDTO.getEnd();
+        }catch (Exception e ){
+            start =null;
+            end = null;
         }
-        catch (Exception e){
-            start =null; end = null;
-        }
-        List<TimeTable> tts=  timeTableService.findByCompanyAndRange(company,start,end);
-        List<TimeTableDTO> ttDTOS = new ArrayList<>(tts.size());
-        for(TimeTable tt : tts ){
-            Service service =tt.getService();
 
-            ServiceDTO serviceDTO = ServiceDTO.builder()
-                    .name(service.getServiceName())
-                    .duration(service.getDuration())
-                    .price(service.getPrice())
-                    .build();
-            serviceDTO.setId(service.getId());
 
-            TimeTableDTO ttDTO = TimeTableDTO.builder()
-                    .s_start(tt.getStart().toString())
-                    .s_end(tt.getEnd().toString())
-                    .serviceDTO(serviceDTO)
-                    .build();
-            ttDTO.setId(tt.getId());
-            ttDTOS.add(ttDTO);
+        if(!((start instanceof LocalTime) &&(end instanceof  LocalTime)))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a time data type");
+
+        if(start.isAfter(end) || start.equals(end)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start time should be before end time");
         }
-        return ResponseEntity.ok(ttDTOS);
+
+        int day = timeTableDTO.getDay();
+        if(!(day>=0&&day<=6)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a valid day");
+        }
+        TimeTable tt =  timeTableService.findCollisions(start,end,service,day);
+        if(tt!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Found collisions ");
+        }
+        tt = TimeTable.builder()
+                .start(start)
+                .end(end)
+                .service(service)
+                .day(day)
+                .build();
+        try{
+        timeTableService.save(tt);}
+        catch (Exception e ){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error ");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("Createad timetable");
+
 
     }
-
-
+    @RequestMapping(value = "tt/service/display/{serviceId}",method = RequestMethod.GET)
+    public ResponseEntity<List<TimeTableDTO>> getTTbyService(@PathVariable Long serviceId){
+        if(serviceId==null||!(serviceId instanceof Long)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        List<TimeTable > tts = timeTableService.findByService(serviceId);
+        List<TimeTableDTO> ttsDTO = new ArrayList<>(tts.size());
+        for(TimeTable tt : tts) {
+            TimeTableDTO timeTableDTO = TimeTableDTO.builder()
+                    .s_end(tt.getEnd().toString())
+                    .day(tt.getDay())
+                    .s_start(tt.getStart().toString()).build();
+            timeTableDTO.setId(tt.getId());
+            ttsDTO.add(timeTableDTO);
+        }
+        return  ResponseEntity.ok(ttsDTO);
+    }
 
 }

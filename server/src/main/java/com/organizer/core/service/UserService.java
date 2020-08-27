@@ -1,10 +1,13 @@
 package com.organizer.core.service;
 
+import com.organizer.core.model.Specialist;
 import com.organizer.core.model.User;
 import com.organizer.core.repository.UserRepository;
 import com.organizer.core.utils.Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -48,4 +51,5 @@ public class UserService {
     public User findByEmailOrPhone(String email, String phone){
         return userRepository.findByEmailOrPhone(email, phone);
     }
+
 }

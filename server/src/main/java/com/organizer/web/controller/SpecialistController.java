@@ -88,6 +88,7 @@ public class SpecialistController {
     @RequestMapping(value = "/s/find", method = RequestMethod.GET)
     public ResponseEntity <List<SpecialistDTO>> findSpecialistByCompany(@RequestParam String username,@RequestParam String serviceName){
         Company company = companyService.findByUsername(username);
+
         if(company== null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -159,6 +160,7 @@ public class SpecialistController {
                                         .city(e.getCompany().getCity())
                                         .category(e.getCompany().getCategory())
                                         .image_url(e.getCompany().getImage_url())
+                                        .name(e.getCompany().getName())
                                         .build()).build() );
 
         }
@@ -215,13 +217,13 @@ public class SpecialistController {
         try {
             specialistService.save(specialist);
             invitationService.save(invitation);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Accepted the invite");
+            return ResponseEntity.status(HttpStatus.OK).body("Accepted the invite");
         }
 
         catch (Exception e )
         {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something happened");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something happened");
         }
 
 

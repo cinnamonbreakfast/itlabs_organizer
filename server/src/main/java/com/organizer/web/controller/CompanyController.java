@@ -84,6 +84,14 @@ CompanyDTO newCompany,@RequestHeader String token ){
         category = animeService.findByList(category).getList();
         country= countryListService.findByCountry(country).getAbbreviation();
         city = cityListService.findByCity(city).getCity();
+        String cui;
+        try {
+            cui = newCompany.getCui();
+        }
+        catch (Exception e ){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please send the cui");
+
+        }
 
         User user = userService.findById(id);
         company = Company.builder().address(newCompany.getAddress())
@@ -94,6 +102,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 .name(newCompany.getName())
                 .username(username)
                 .validated(false)
+                .cui(cui)
                 .build();
         try {
             String[] list = file.getOriginalFilename().split("[.]");
@@ -245,12 +254,13 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 .country(company.getCountry())
                 .username(company.getUsername())
                 .staffMembers(specialiststaffDTOS)
+                .image_url(company.getImage_url())
                 .services(serviceDTOS).build();
 
         companyDTO.setId(company.getId());
         return ResponseEntity.ok(companyDTO);
     }
-    @RequestMapping(value = "c/changeDetails", method=RequestMethod.PUT)
+    @RequestMapping(value = "c/changeDetails", method=RequestMethod.PUT,consumes ={"multipart/form-data"})
     public ResponseEntity<String> updateDetails(@RequestParam(name="file",required = false) MultipartFile file,
                                                     CompanyDTO updateCompany,@RequestHeader String token )
     {
@@ -317,9 +327,11 @@ CompanyDTO newCompany,@RequestHeader String token ){
     }
 
     @RequestMapping(value="c/invite/specialist", method = RequestMethod.POST)
-    public ResponseEntity<String > inviteSpecialist(@RequestParam Long userId,@RequestParam String companyUsername,@RequestParam String serviceName, @RequestHeader String token){
+    public ResponseEntity<String > inviteSpecialist(@RequestParam String  userPhone,@RequestParam String companyUsername,@RequestParam String serviceName, @RequestHeader String token){
         Long id = JWToken.checkToken(token);
-
+        System.out.println(userPhone);
+        System.out.println(companyUsername);
+        System.out.println(serviceName);
         if(id==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Bad token");
         }
@@ -331,7 +343,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
         if(company.getOwner().getId()!=user.getId()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You are not the owner of this company");
         }
-        User userSelected = userService.findById(userId);
+        User userSelected = userService.findByPhone(userPhone);
         if(userSelected==null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known selected user");
         }
@@ -360,7 +372,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error");
             }
 
-            emailer.sendSimpleMessage(user.getEmail(),
+            emailer.sendSimpleMessage(userSelected.getEmail(),
                     "Specialist invitation in "+company.getName()
                     ,"You have received an invitation in "+company.getName()+"please enter" +
                             "your account for more information!");

@@ -68,14 +68,6 @@ public class AvailabilityController {
         }
         //logic
 
-        LocalDateTime end_limit = LocalDateTime.of(
-                start.getYear(),
-                start.getMonth(),
-                start.getDayOfMonth(),23,59,59,99999
-        );
-        if(end.isAfter(end_limit)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("End time should be within a day of start time");
-        }
         Availability availability = availabilityService.findCollisions(start,end,service,specialist);
 
         if(availability!=null){
