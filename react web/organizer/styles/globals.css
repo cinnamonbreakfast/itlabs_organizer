@@ -133,3 +133,19 @@ input[type='password']:focus {
     grid-column: 1 !important;
   }
 }
+
+.appCalendar {
+  
+}
+
+.appCalendar button {
+  border-radius: 0px;
+}
+
+.appCalendar button.react-calendar__month-view__days__day--neighboringMonth {
+  background-color: #222;
+}
+
+.appCalendar button.react-calendar__tile--now {
+  background-color: #ed7d26;
+}

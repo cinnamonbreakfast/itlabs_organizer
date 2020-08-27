@@ -4,7 +4,7 @@ import { useSelector, useStore } from 'react-redux'
 import axios from 'axios'
 
 const FileUpload = (props) => {
-    const [photo, setPhoto] = useState(null)
+    const [photo, setPhoto] = useState(props.photo || null)
     const [fileInput, setFileinput] = useState(null)
     const [fileName, setFileName] = useState(null)
 
@@ -319,3 +319,4 @@ const CreateCompany = (props) => {
 }
 
 export default CreateCompany
+export { FileUpload }

@@ -1,3 +1,9 @@
+@keyframes crown {
+    0% { transform: rotateZ(25deg) translateX(+1px) translateY(-5px); }
+    50% { transform: rotateZ(25deg) translateX(0px) translateY(0px); }
+    100% { transform: rotateZ(25deg) translateX(+1px) translateY(-5px); }
+}
+
 .card {
     width: 140px;
     height: 200px;
@@ -27,6 +33,15 @@
             opacity: 0.2;
             cursor: pointer;
         }
+    }
+
+    .owner {
+        position: absolute;
+        transform: rotateZ(25deg);
+        right: 42px;
+        top: 5px;
+
+        animation: crown 3s infinite;
     }
 
     .hover {
