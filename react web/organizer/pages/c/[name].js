@@ -12,6 +12,7 @@ const Cover = (props) => {
     const user = useSelector(state => (state.user))
     const router = useRouter()
     const [content, setContent] = useState(props.content)
+    const companyIMG_URL = process.env.REQ_HOST + '/img/' + company.image_url
 
     const clickManage = () => {
         if(content === 'manage'){
@@ -27,7 +28,8 @@ const Cover = (props) => {
         <div className={styles.cover}>
             <img src="/photo/logos/milestone_cover.png"/>
             <div className={styles.companyLogo}>
-                <img src="/photo/logos/milestone.png"/>
+                { company.image_url && <img src={companyIMG_URL}/> }
+                { !company.image_url && <h1>{company.name[0]}</h1> }
             </div>
             
             {
@@ -39,7 +41,7 @@ const Cover = (props) => {
             }
 
             <div className={styles.controls}>
-                <button>+Appointment</button>
+                <button onClick={e => props.togglePop()}>+Appointment</button>
             </div>
             
             <div className={styles.companyTitle}>
@@ -59,6 +61,11 @@ const Name = () => {
     const dispatcher = useDispatch()
     
     const { name } = router.query
+
+    const [appPop, setAppop] = useState(false)
+    const toggleAppop = () => {
+        setAppop(!appPop)
+    }
 
     const controller = new CompanyController(dispatcher)
     const status = companyView.find_code
@@ -101,8 +108,8 @@ const Name = () => {
 
     if(company) return (
         <div className={styles.pageWrapper}>
-            <Cover manage={clickManage} content={content}/>
-            <PageContent content={content}/>
+            <Cover manage={clickManage} content={content} togglePop={toggleAppop}/>
+            <PageContent content={content} appPop={appPop} togglePop={toggleAppop}/>
         </div>
     )
 

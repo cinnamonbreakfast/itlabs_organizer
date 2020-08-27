@@ -4,6 +4,21 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useState } from 'react'
 
 import CompanyController from '../../pages/api/companyController'
+import CompanyEdit from '../../components/company/companyEdit'
+import AppointPop from './appointment'
+
+const translateDay = (day) => {
+    switch(day) {
+        case 0: return 'Monday'; break;
+        case 1: return 'Tuesday'; break;
+        case 2: return 'Wednesday'; break;
+        case 3: return 'Thursday'; break;
+        case 4: return 'Friday'; break;
+        case 5: return 'Saturday'; break;
+        case 6: return 'Sunday'; break;
+        default: return 'Time error?'; break
+    }
+}
 
 export const PagePreloader = (props) => {
 
@@ -132,11 +147,15 @@ const ServiceElement = (props) => {
 
 const PageEdit = (props) => {
     const companyView = useSelector(state => (state.companyView))
+    const user = useSelector(state => (state.user))
     const company = companyView.company
+    const cc = new CompanyController(null)
 
-    const [autoSuggest, setAutoSuggest] = useState(false)
+    const [invitePhone, setInvitePhone] = useState('')
+    const [inviteService, setInviteService] = useState((Array.isArray(company.services) && company.services.length > 0 && company.services[0].name) || '')
+    const [serviceError, setServiceError] = useState(false)
 
-    console.log(props.company.services)
+    // console.log(props.company.services)
 
     const employeeOptions = [
         {
@@ -145,6 +164,34 @@ const PageEdit = (props) => {
             callBack: console.log
         },
     ]
+
+    const submitInvite = (e) => {
+        e.preventDefault()
+
+        if(inviteService === '') {
+            setServiceError(true)
+            return
+        }
+
+        let invite = {
+            phone: invitePhone,
+            service: inviteService,
+            username: company.username,
+            token: user.token
+        }
+
+        cc.sendInvite(invite)
+        .then(r => {
+            console.log(r)
+
+            if(r.type == 'ok') {
+                setInvitePhone('')
+            }
+        })
+        .catch(e => {
+            console.log(e, "err")
+        })
+    }
 
     return (
         <div className="col-9">
@@ -168,13 +215,13 @@ const PageEdit = (props) => {
                 <h2>Edit employees</h2>
 
                 <div className={styles.employeesEdit}>
-                    <form>
+                    <form onSubmit={e => submitInvite(e)}>
                         <div className={styles.formGroup}>
-                            <input type='text' name='username' autoComplete="off" placeholder="Add by username" onFocus={e => setAutoSuggest(true)} onBlur={e => setAutoSuggest(false)}/>
+                            <input type='text' name='phone' value={invitePhone} onChange={e => setInvitePhone(e.target.value || '')} autoComplete="off" placeholder="Add by phone"/>
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <select name='service'>
+                        <div className={styles.formGroup + ' ' + (serviceError && styles.error)}>
+                            <select name='service' value={inviteService} onChange={e => {setInviteService(e.target.value);}} placeholder="Service">
                                 {
                                     Array.isArray(company.services) && company.services.map(serv => (
                                         <option key={serv.id} value={serv.name}>{serv.name}</option>
@@ -189,7 +236,7 @@ const PageEdit = (props) => {
                     </form>
 
                     <div className={styles.employeesCarousel}>
-                        <Employee specialist={company.owner}/>
+                        <Employee key={0} specialist={company.owner}/>
                         {
                             Array.isArray(company.staffMembers) && company.staffMembers.map(spec => (
                                 <Employee key={spec.id} specialist={spec} options={employeeOptions}/>
@@ -201,7 +248,170 @@ const PageEdit = (props) => {
 
             <div className={styles.board}>
                 <h2>Edit company info</h2>
+
+                <div className={styles.content}>
+                    <CompanyEdit company={company}/>
+                </div>
             </div>
+
+            <div className={styles.board}>
+                <h2>Edit services timetable</h2>
+
+                <div className={styles.content}>
+                    <Timetable company={company} manager={true}/>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const TimeRow = (data) => {
+    const day = data.day
+    const [editor, setEditor] = useState(false)
+    const [start, setStart] = useState(day.s_start || '00:00:00')
+    const [end, setEnd] = useState(day.s_end || '00:00:00')
+    const cc = data.cc
+    const user = useSelector(state => state.user)
+
+    const save = (e) => {
+        e.preventDefault()
+
+        let fdata = {
+            companyUsername: data.company.username,
+            serviceName: data.service,
+            day: day.day,
+            start: start,
+            end: end
+        }
+
+        cc.createTable(fdata, user.token)
+        .then(r => {
+            console.log(r)
+        })
+        .catch(e => {
+            console.log(e)
+        })
+    }
+
+    if(editor) {
+        return (
+            <tr className={styles.editor}>
+                <td colSpan="4">
+                    <form onSubmit={e => save(e)}>
+                        <label>{translateDay(day.day)}</label>
+                        <input type="time" value={start} onChange={e => setStart(e.target.value)} name="start" placeholder="Start hour"/>
+                        <input type="time" value={end} onChange={e => setEnd(e.target.value)} name="end" placeholder="End hour"/>
+
+                        <div>
+                            <input type='submit' value='Save'/>
+                            <input type='submit' value='Delete'/>
+                            <input onClick={e => setEditor(false)} type='button' value='X'/>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        )
+    }
+    if(day.s_start) return (
+        <tr>
+            <td>{translateDay(day.day)}</td>
+            <td>{day.s_start}</td>
+            <td>{day.s_end}</td>
+            {data.manager && <td><button onClick={e => setEditor(true)}>Edit</button></td>}
+        </tr>
+    )
+    return (
+        <tr>
+            <td>{translateDay(day.day)}</td>
+            {!data.manager && <td colSpan="2">not available</td>}
+            {data.manager && <td>not set</td>}
+            {data.manager && <td>not set</td>}
+            {data.manager && <td><button onClick={e => setEditor(true)}>Add</button></td>}
+        </tr>
+    )
+}
+
+const Timetable = (props) => {
+    const company = props.company;
+    const [active, setActive] = useState(0)
+    const [service, setService] = useState(null)
+    const dispatch = useDispatch()
+    const cc = new CompanyController(dispatch)
+
+
+    const [viewTable, setViewTable] = useState(null)
+
+
+    const placeholder = (data) => {
+        let free = [0, 1, 2, 3, 4, 5, 6]
+        if(data.length === 0) {
+            free = free.map(e => ({day: e, data: null}))
+        } else {
+            let i = 0;
+            for(i = 0; i < data.length; i++) {
+                if(data[i].day === free[data[i].day]) {
+                    free[data[i].day] = data[i]
+                }
+            }
+            free = free.map(e => {if(e.day >= 0) return e; else return {day: e, data: null}})
+        }
+        setViewTable(free)
+    }
+
+    const loadTab = (id, name) => {
+        setActive(id)
+        setService(name)
+        console.log(id)
+
+        setViewTable('loading')
+
+        cc.retrieveTable(id)
+        .then(resp => {
+            // setViewTable(resp)
+            placeholder(resp)
+        })
+        .catch(err => {
+            setViewTable([])
+        })
+    }
+
+    return (
+        <div className={styles.servicesTabs}>
+            <ul>
+                {
+                    
+                    Array.isArray(company.services) && company.services.map(serv => (
+                        <li key={serv.id} className={(active === serv.id && styles.active || null)} onClick={e => loadTab(serv.id, serv.name)}>{serv.name}</li>
+                    ))
+                }
+            </ul>
+
+            <div className={styles.content}>
+                {!viewTable && <p>Select a service to edit its time table.</p>}
+                {viewTable === 'loading' && <img src='/create/load.gif'/>}
+                {Array.isArray(viewTable) && 
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Start hour</th>
+                                <th>End hour</th>
+                                {props.manager && <th>Control</th>}
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        {
+                            viewTable.map(day => (
+                            <TimeRow key={day.day} manager={props.manager} day={day} cc={cc} service={service} company={company}>{day.day}</TimeRow>
+                            ))
+                        }
+                        </tbody>
+                    </table>
+                }
+                {Array.isArray(viewTable) && viewTable.length === 0 && <p>No data for this service</p>}
+            </div>
+
         </div>
     )
 }
@@ -210,6 +420,8 @@ const PageContent = (props) => {
     const company = useSelector(state => (state.companyView.company))
     const user = useSelector(state => (state.user))
     const content = props.content
+
+    const appPop = props.appPop
 
     return (
         <div className="grid">
@@ -255,6 +467,7 @@ const PageContent = (props) => {
                         <h2>Staff</h2>
 
                         <div className={styles.employeesCarousel}>
+                            <Employee key={0} specialist={company.owner}/>
                             {
                                 Array.isArray(company.staffMembers) && company.staffMembers.map(spec => (
                                     <Employee key={spec.id} specialist={spec}/>
@@ -262,12 +475,20 @@ const PageContent = (props) => {
                             }
                         </div>
                     </div>
+
+                    <div className={styles.board}>
+                        <h2>Staff</h2>
+
+                        <Timetable company={company} manager={false}/>
+                    </div>
                 </div>
             }
             {
                 content === 'manage' &&
                 <PageEdit company={company}/>
             }
+
+            {appPop && <AppointPop close={props.togglePop} company={company}/>}
         </div>
     )
 }

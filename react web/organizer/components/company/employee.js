@@ -8,7 +8,8 @@ const Employee = (props) => {
 
     return (
         <div className={styles.card}>
-            { 1 && <div className={styles.badge}>Pending</div> }
+            { props.pending && <div className={styles.badge}>Pending</div> }
+            { 1 && <div className={styles.owner}>👑</div> }
 
             <div className={styles.photo}>
                 { imgURL && <img src={process.env.REQ_HOST+'/img/'+(imgURL)}/> }

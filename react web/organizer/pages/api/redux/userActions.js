@@ -4,6 +4,7 @@ export const actions = {
     SET_USER_AUTH_TOKEN: 'SET_USER_AUTH_TOKEN',
     SET_USER_AUTH_TIME: 'SET_USER_AUTH_TIME',
     LOGOUT: 'LOGOUT',
+    SET_USER_INVITATIONS: 'SET_USER_INVITATIONS',
 }
 
 const USER_DEFAULT_STATE = {
@@ -11,6 +12,7 @@ const USER_DEFAULT_STATE = {
     data: null,
     token: null,
     auth_time: null,
+    invitations: null,
 }
 
 const userActionReducer = (state = USER_DEFAULT_STATE, action) => {
@@ -33,6 +35,10 @@ const userActionReducer = (state = USER_DEFAULT_STATE, action) => {
             })
         case actions.LOGOUT:
             return USER_DEFAULT_STATE
+        case actions.SET_USER_INVITATIONS:
+            return Object.assign({}, state, {
+                invitations: action.payload
+            })
         default:
             return state
     } 

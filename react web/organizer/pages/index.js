@@ -82,19 +82,20 @@ export default function Home() {
     router.push
   }
   const setTextHandler = (event)=>{
-    let child = event.target;
-    let parent =child;
-    while(parent.tagName.toString()!='LI')
-    {
-        parent = child.parentElement
-        child=parent;
-        console.log(parent)
-    }
+    router.push('/c/@'+event)
+    // let child = event.target;
+    // let parent =child;
+    // while(parent.tagName.toString()!='LI')
+    // {
+    //     parent = child.parentElement
+    //     child=parent;
+    //     console.log(parent)
+    // }
   
-    let d = document.getElementById(parent.id)
-    let firstChild = d.firstElementChild
-    setSearchString(firstChild.textContent)
-    console.log(parent.childNodes)
+    // let d = document.getElementById(parent.id)
+    // let firstChild = d.firstElementChild
+    // setSearchString(firstChild.textContent)
+    // console.log(parent.childNodes)
   }
 
   return (
@@ -120,7 +121,7 @@ export default function Home() {
                   {
                   Array.isArray(searchResult) && searchResult.map((each) => { 
                     
-                    return (<li id = {each.company.id} onClick={setTextHandler}>
+                    return (<li id = {each.company.id} onClick={e => setTextHandler(each.company.username)}>
                     <h2 >{each.company.name}</h2>
                     <p>{`${each.company.city}, ${each.company.country}`} &bull;
                     {

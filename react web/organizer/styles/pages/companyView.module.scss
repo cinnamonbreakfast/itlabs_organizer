@@ -94,6 +94,14 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0px 5px 10px rgba(100,0,0, 0.1);
+            background-color: #f0f0f0;
+
+            h1 {
+                font-size: 120px;
+                text-align: center;
+                color: #818181;
+                margin: 7px 0px;
+            }
         }
 
         .companyTitle {
@@ -201,31 +209,9 @@
                         margin-right: 0px;
                     }
 
-                    .autoSuggest {
-                        position: absolute;
-                        top: 34px;
-                        background-color: #FFF;
-                        z-index: 90;
-                        border-radius: 0px 0px 5px 5px;
-                        border: 1px solid #7500D1;
-                        border-top: 0 none;
-                        width: 100%;
-                        overflow: hidden;
-                        border-top: 1px solid #f0f0f0;
-                
-                        ul {
-                            list-style-type: none;
-                            padding: 0px 0px;
-                            margin: 0px;
-                
-                            li {
-                                padding: 5px;
-                                cursor: pointer;
-                
-                                &:hover {
-                                    background-color: #f0f0f0;
-                                }
-                            }
+                    &.error {
+                        select {
+                            border-color: red;
                         }
                     }
                 }
@@ -266,7 +252,48 @@
     }
 }
 
+.inlineForm {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width: 100%;
 
+    .formGroup {
+        margin-bottom: 20px;
+        position: relative;
+        margin-right: 15px;
+        margin-left: 15px;
+
+        .autoSuggest {
+            position: absolute;
+            top: 34px;
+            background-color: #FFF;
+            z-index: 90;
+            border-radius: 0px 0px 5px 5px;
+            border: 1px solid #cbcbcb;
+            border-top: 0 none;
+            width: 100%;
+            overflow: hidden;
+            border-top: 1px solid #f0f0f0;
+    
+            ul {
+                list-style-type: none;
+                padding: 0px 0px;
+                margin: 0px;
+    
+                li {
+                    padding: 5px;
+                    cursor: pointer;
+    
+                    &:hover {
+                        background-color: #f0f0f0;
+                    }
+                }
+            }
+        }
+    }
+}
 
 .slider {
   width: 300px;
@@ -332,4 +359,148 @@
     left: 0;
     width: 100%;
     margin: 0;
-  }
+}
+
+.servicesTabs {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+    .content {
+        background-color: #cbcbcb;
+        border-radius: 0px 5px 5px 5px;
+        width: 100%;
+        min-height: 105%;
+
+        table {
+            width: 100%;
+            border-spacing: 0px;
+
+            thead {
+                background-color: #ed7d26;
+            }
+
+            th {
+                padding: 5px;
+                text-align: left;
+
+                &:last-child {
+                    text-align: right;
+                }
+            }
+
+            td {
+                padding: 5px;
+                
+                &:last-child {
+                    text-align: right;
+                }
+            }
+
+            tr {
+                &.editor {
+                    form {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-between;
+                        align-items: center;
+                        
+                        div {
+                            input {
+                                margin-right: 5px;
+                                &:last-child {
+                                    margin-right: 0px;
+                                }
+
+                                &[type='button'] {
+                                    background-color: #818181;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0px;
+        margin: 0px;
+        border-radius: 5px 0px 0px 5px;
+        overflow: hidden;
+        width: 100px;
+
+        li {
+            padding: 8px 10px;
+            background-color: #cbcbcb;
+
+            &:hover {
+                background-color: #818181;
+                cursor: pointer;
+            }
+
+            &.active {
+                background-color: #ed7d26;
+            }
+        }
+    }
+}
+
+.popup {
+    position: fixed;
+    width: 450px;
+    background-color: #fff;
+    top: calc(50vh - 225px);
+    left: calc(50vw - 150px);
+    box-shadow: 0px 0px 20px rgba($color: #cbcbcb, $alpha: 0.70);
+    padding: 20px 25px;
+    border-radius: 10px;
+
+    h2 {
+        margin: 0px;
+    }
+
+    p {
+        margin: 0px;
+    }
+
+    .calendar {
+        margin-top: 25px;
+    }
+
+    .controlls {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .hourPick {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        align-items: center;
+        
+        p {
+            margin: 10px 0px;
+        }
+    }
+
+    .servicePick {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+
+        p {
+            margin: 10px;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 5px;
+        }
+    }
+}
