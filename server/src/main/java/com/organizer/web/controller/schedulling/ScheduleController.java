@@ -174,11 +174,15 @@ public class ScheduleController {
         LocalDate date = start.toLocalDate();
         List<Schedule> timeTables =dateOperations.convertTtToSchedule(tts,date);
         List<Schedule> schedules = validSchedules(timeTables,availabilities);
+        System.out.println(start);
+        System.out.println(end);
 
         boolean valid=false;
         for(Schedule schedul: schedules){
+            System.out.println(schedul.getStart());
+            System.out.println(schedul.getEnd());
             if((start.isAfter(schedul.getStart())|| start.isEqual(schedul.getStart()))&&
-            end.isBefore(schedul.getEnd())|| end.isEqual(schedul.getEnd()))
+                    (end.isBefore(schedul.getEnd())|| end.isEqual(schedul.getEnd())))
             {
                 valid=true;
                 break;
@@ -333,14 +337,16 @@ public class ScheduleController {
         }
         Company company = companyService.findByUsername(companyUsername);
         System.out.println(user.getId());
+        System.out.println(company.getId());
         if (company == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        System.out.println(user.getName());
-        System.out.println(company.getName());
+
         List<Schedule> schedules = scheduleService.findAllSchedulesOfUserSpecialistAndCompany(user, company);
         List<ScheduleDTO> scheduleDTOS = new ArrayList<>(schedules.size());
         for (Schedule sch : schedules) {
+            System.out.println(sch.getEnd());
+            System.out.println(sch.getStart());
             Specialist sp = sch.getSpecialist();
             Service ser = sp.getService();
             User u = sp.getUser();
@@ -410,5 +416,8 @@ public ResponseEntity<String> ff(@RequestHeader String token , @RequestParam Lon
     return ResponseEntity.ok("Deleted a schedule");
 
 }
+
+
+
 }
 

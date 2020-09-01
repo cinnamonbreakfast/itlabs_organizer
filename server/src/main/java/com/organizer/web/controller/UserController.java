@@ -410,10 +410,10 @@ public class UserController {
 
             String[] list = file.getOriginalFilename().split("[.]");
             if (list.length == 1) {
-                fileService.uploadDir(file, username+ "." + list[0]);
+                fileService.uploadDir(file, username+ "." + list[0],username);
                 user.setImageURL(username);
             } else if (list.length > 1) {
-                fileService.uploadDir(file, username + "." + list[list.length - 1]);
+                fileService.uploadDir(file, username + "." + list[list.length - 1],username);
                 user.setImageURL(username);
             } else {
                 user.setImageURL("default_company");

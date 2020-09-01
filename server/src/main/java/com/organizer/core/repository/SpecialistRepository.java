@@ -15,11 +15,14 @@ public interface SpecialistRepository extends Repository<Long, Specialist>{
     List<Specialist> findByCompany(Company company);
     Specialist findByUser(Long user);
 
-    @Query("select s from Specialist  s where  s.service.company.username=?1 and s.service.company.validated=true")
+    @Query("select s from Specialist  s where  s.service.company.username=?1 and s.service.company.validated=true ")
     List<Specialist> findByUsername(String company_username);
 
 
-    @Query("select s from Specialist  s  where s.service.serviceName=?1 and s.service.company.username=?2 and s.service.company.validated=true")
+    @Query("select s from Specialist  s  where  s.service.company.username=?1 and s.service.company.validated=true  ")
+    List<Specialist> findStaffInCompany(String company_username);
+
+    @Query("select s from Specialist   s  where s.service.serviceName=?1 and s.service.company.username=?2 and s.service.company.validated=true ")
     List<Specialist> findByCompanyAndServiceName(String service, String username);
 
 

@@ -37,4 +37,8 @@ public class SpecialistService {
         specialistRepository.save(specialist);
 
     }
+    public List<Specialist> findStaffInCompany(String username) {
+        return specialistRepository.findStaffInCompany( username);
+    }
+
 }

@@ -25,4 +25,5 @@ public interface ScheduleRepository extends Repository<Long, Schedule> {
 
     @Query("select tt from Schedule  tt where tt.specialist.user=?1 and tt.specialist.service.company=?2")
     List<Schedule> findAllSchedulesOfUserSpecialistAndCompany(User user,Company company);
+
 }

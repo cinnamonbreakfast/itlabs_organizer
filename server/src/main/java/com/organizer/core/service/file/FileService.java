@@ -1,5 +1,6 @@
 package com.organizer.core.service.file;
 
+import org.hibernate.dialect.identity.SybaseAnywhereIdentityColumnSupport;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -20,12 +21,22 @@ import java.nio.file.StandardCopyOption;
 public class FileService {
     public String uploadDir=Paths.get("").toAbsolutePath().toString()+"\\src\\main\\resources\\images";
 
-    public void uploadDir(MultipartFile file,String genName){
+    public void uploadDir(MultipartFile file,String genName,String username){
         try {
             Path copyLocation = Paths
                     .get(uploadDir + File.separator + genName);
 
-            Files.copy(file.getInputStream(),copyLocation,StandardCopyOption.REPLACE_EXISTING);
+            File[] listOfFiles = new File(uploadDir).listFiles();
+
+            for(File f :listOfFiles)
+            {
+                if(f.getName().split("[.]")[0].equals(username)){
+                    System.out.println("JAVA IS SO DRUNK");
+
+                    Files.delete(f.toPath());
+                }
+            }
+            Files.copy(file.getInputStream(),copyLocation);
         } catch (Exception e) {
             e.printStackTrace();
         }

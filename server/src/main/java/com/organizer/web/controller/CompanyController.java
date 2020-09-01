@@ -107,10 +107,10 @@ CompanyDTO newCompany,@RequestHeader String token ){
         try {
             String[] list = file.getOriginalFilename().split("[.]");
             if (list.length == 1) {
-                fileService.uploadDir(file, username+ "." + list[0]);
+                fileService.uploadDir(file, username+ "." + list[0],username);
                 company.setImage_url(username);
             } else if (list.length > 1) {
-                fileService.uploadDir(file, username + "." + list[list.length - 1]);
+                fileService.uploadDir(file, username + "." + list[list.length - 1],username);
                 company.setImage_url(username);
             } else {
                 company.setImage_url("default_company");
@@ -177,7 +177,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
         List<Specialist> specialistsStaf=null;
 
         try {
-            specialistsStaf = specialistService.findByCompanyUsername(username);
+            specialistsStaf = specialistService.findStaffInCompany(username);
 
         }
         catch (Exception e ){
@@ -186,20 +186,39 @@ CompanyDTO newCompany,@RequestHeader String token ){
         List<SpecialistDTO> specialiststaffDTOS = new ArrayList<>();
         if(specialistsStaf!=null){
             for(Specialist sp :specialistsStaf){
-                User u = sp.getUser();
-                UserDTO userDTO = UserDTO.builder()
-                        .name(u.getName())
-                        .email(u.getEmail())
-                        .phone(u.getPhone())
-                        .city(u.getCity())
-                        .imageURL(u.getImageURL())
-                        .country(u.getCountry())
-                        .build();
-                userDTO.setId(u.getId());
-                SpecialistDTO specialistDTO = SpecialistDTO.builder()
-                        .user(userDTO)
-                        .build();
-                specialiststaffDTOS.add(specialistDTO);
+                boolean check = true;
+                for(SpecialistDTO spd : specialiststaffDTOS){
+                    if(spd.getUser().getId()==sp.getUser().getId()){
+                        check = false;
+                    }
+                }
+                if(check==true) {
+                    System.out.println(sp.getUser().getId());
+                    User u = sp.getUser();
+                    UserDTO userDTO = UserDTO.builder()
+                            .name(u.getName())
+                            .email(u.getEmail())
+                            .phone(u.getPhone())
+                            .city(u.getCity())
+                            .imageURL(u.getImageURL())
+                            .country(u.getCountry())
+                            .build();
+                    userDTO.setId(u.getId());
+                    Service service= sp.getService();
+                    ServiceDTO serviceDTO = ServiceDTO.builder()
+                            .price(service.getPrice())
+                            .duration(service.getDuration())
+                            .name(service.getServiceName()).build();
+                    serviceDTO.setId(service.getId());
+
+                    SpecialistDTO specialistDTO = SpecialistDTO.builder()
+                            .user(userDTO)
+                            .servicesDTO(serviceDTO)
+                            .build();
+                    specialistDTO.setId(sp.getId());
+
+                    specialiststaffDTOS.add(specialistDTO);
+                }
             }
         }
 
@@ -309,10 +328,10 @@ CompanyDTO newCompany,@RequestHeader String token ){
         try {
                 String[] list = file.getOriginalFilename().split("[.]");
                 if (list.length == 1) {
-                    fileService.uploadDir(file, username+ "." + list[0]);
+                    fileService.uploadDir(file, username+ "." + list[0],username);
                     company.setImage_url(username);
                 } else if (list.length > 1) {
-                    fileService.uploadDir(file, username + "." + list[list.length - 1]);
+                    fileService.uploadDir(file, username + "." + list[list.length - 1],username);
                     company.setImage_url(username);
                 } else {
                     company.setImage_url("default_company");

@@ -36,6 +36,7 @@ public class ScheduleService {
         return  scheduleRepository.findAllSchedulesOfUserSpecialistAndCompany(user,company);
     }
 
+
     public Schedule findById(Long id ){
         return scheduleRepository.findById(id).get();
     }

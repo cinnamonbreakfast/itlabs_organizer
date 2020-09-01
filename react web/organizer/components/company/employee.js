@@ -5,7 +5,7 @@ const Employee = (props) => {
     const imgURL = ((specialist.user && specialist.user.imageURL) || specialist.imageURL);
     const name = ((specialist.user && specialist.user.name) || specialist.name);
     const phone = ((specialist.user && specialist.user.phone) || specialist.phone);
-
+    
     return (
         <div className={styles.card}>
             { props.pending && <div className={styles.badge}>Pending</div> }

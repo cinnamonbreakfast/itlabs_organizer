@@ -477,7 +477,7 @@ const PageContent = (props) => {
                     </div>
 
                     <div className={styles.board}>
-                        <h2>Staff</h2>
+                        <h2>Time Table</h2>
 
                         <Timetable company={company} manager={false}/>
                     </div>
