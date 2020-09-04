@@ -3,9 +3,12 @@ package com.organizer.core.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
-@Table(name="timetable",schema="public")
+@Table(name="time_table",schema="public")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,20 +17,22 @@ import java.util.Date;
 @ToString(callSuper = true)
 @Builder
 public class TimeTable extends  Entity<Long>{
-    @Basic
-    @Column
-    private Date day;
 
     @Basic
     @Column(name="start_time")
-    private Date startTime;
+    private LocalTime start;
 
     @Basic
     @Column(name="end_time")
-    private Date endTime;
+    private LocalTime end;
 
     @ManyToOne
-    @JoinColumn(name="specialist_id")
-    Specialist specialist;
+    @JoinColumn(name="service")
+    Service service;
+
+    @Basic
+    @Column(name="day_of_week")
+    Integer day;
+
 
 }

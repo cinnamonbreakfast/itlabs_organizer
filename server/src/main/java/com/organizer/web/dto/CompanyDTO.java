@@ -17,5 +17,10 @@ public class CompanyDTO extends BaseDTO {
         private String address;
         private String category;
         private String country;
-        private List<SpecialistDTO > specialistDTOList;
+        private String image_url;
+        private String username;
+        private String cui;
+        private UserDTO owner;
+        private List<SpecialistDTO> staffMembers;
+        private List<ServiceDTO> services;
 }

@@ -1,45 +1,205 @@
+@keyframes jumpy {
+    0% { transform: translateY(0px); }
+    5% { transform: translateY(-5px); }
+    10% { transform: translateY(0px); }
+}
+
 .top_nav {
     background-color: #FFFFFF;
     width: 100%;
     height: 55px;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    // justify-content: space-between;
     padding: 10px 20px;
+    position: fixed;
+    z-index: 999;
 
     .element {
 
     }
-    
-    .right {
-        .links {
-            padding: 7px 0px;
 
-            ul {
-                display: flex;
-                flex-direction: row;
-                list-style-type: none;
-                padding: 0px;
-                margin: 0px;
+    .links {
+        padding: 7px 0px;
 
-                li {
-                    margin-right: 15px;
+        ul {
+            display: flex;
+            flex-direction: row;
+            list-style-type: none;
+            padding: 0px;
+            margin: 0px;
 
-                    &:last-child {
-                        margin-right: 0px;
-                    }
+            li {
+                margin-right: 15px;
 
-                    a {
-                        &.active {
-                            color: #7500D1;
-                        }
+                &:last-child {
+                    margin-right: 0px;
+                }
+
+                a {
+                    &.active {
+                        color: #7500D1;
                     }
                 }
             }
         }
     }
 
-    .logo {
+    .center {
+        align-self: center;
+        justify-self: center;
+        margin: auto;
+    }
+    
+    .right {
+        align-self: flex-end;
+        display: flex;
+        flex-direction: row;
 
+        .userTab {
+            display: flex;
+            flex-direction: row;
+
+            .envelope {
+                margin-top: 10px;
+                margin-right: 20px;
+                position: relative;
+                z-index: 99;
+                
+                &:hover {
+                    cursor: pointer;
+                }
+
+                &.jumpy {
+                    animation: jumpy 5s infinite ease-in-out;
+                }
+
+                path {
+                    fill: #333;
+                }
+
+                div {
+                    position: absolute;
+                    width: 4px; height: 4px;
+                    border-radius: 2px;
+                    background-color: rgb(252, 88, 88);
+                    top: 0px; left: 0px;
+                    box-shadow: 0px 0px 0px 3px white;
+                }
+            }
+
+            .userImg {
+                width: 35px;
+                height: 35px;
+                position: relative;
+                border-radius: 20px;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                    height: 100%;;
+                }
+
+                .noAvatar {
+                    width: 100%;
+                    height: 100%;
+                    background-color: #F8F8F8;
+                    color: #818181;
+                    font-size: 20px;
+                    text-align: center;
+                    font-weight: 500;
+                    padding-top: 5px;
+                    position: relative;
+                    z-index: 99;
+                }
+            }
+
+            .userControl {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                cursor: pointer;
+                z-index: 999;
+                position: relative;
+
+                h2 {
+                    font-size: 15px;
+                    font-weight: 300;
+                    margin: 8px;
+                }
+
+                svg {
+                    transition: transform, 0.3s ease;
+
+                    &.active {
+                        transform: rotateZ(180deg);
+                    }
+                }
+            }
+
+            .userDropMenu {
+                display: none;
+                position: absolute;
+                z-index: 10;
+                top: 0px;
+                right: 10px;
+                width: 160px;
+                padding: 55px 0px 0px;
+                border-radius: 5px;
+                box-shadow: 0px 8px 10px rgba(0,0,0,0.05);
+                background-color: #fff;
+
+                &.active {
+                    display: block;
+                }
+
+                ul {
+                    list-style-type: none;
+                    padding: 0px;
+                    margin: 0px;
+                    padding-bottom: 10px;
+
+                    li {
+                        
+                        a {
+                            padding: 5px 15px;
+                            display: block;
+                            width: 100%;
+                        }
+
+                        &:hover {
+                            background-color: #F8F8F8;
+                        }
+                    }
+                }
+            }
+        }
+
+        .authTab {
+            display: flex;
+            flex-direction: row;
+
+            a {
+                &:first-child {
+                    padding: 9px;
+                    margin-right: 15px;
+                }
+            }
+        }
+    }
+
+    .logo {
+        display: flex;
+        flex-direction: row;
+
+        h2 {
+            font-size: 15px;
+            color: rgb(237, 125, 38);
+        }
+        
+        img {
+            height: 100%;
+            margin-right: 10px;
+        }
     }
 }

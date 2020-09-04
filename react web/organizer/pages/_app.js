@@ -1,54 +1,38 @@
 import '../styles/globals.css'
+// import 'react-calendar/dist/Calendar.css';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useRouter } from 'next/router'
-import TopNavigation from '../components/TopNavigation'
+import TopNavigation, { LINK_PROP } from '../components/TopNavigation'
 import { PersistGate } from 'redux-persist/integration/react'
-import { Provider, useSelector } from 'react-redux'
-import { createStore } from 'redux'
-
-import { useEffect } from 'react'
-// import store from './api/appStoreRedux'
-
+import { Provider } from 'react-redux'
 import myStore, { persisted } from './api/redux/store'
-// import reducer from './api/redux/reducers'
-
-
-
 const links = [
   {
     url: '/',
     name: 'Home',
-    home: true,
+    props: [LINK_PROP.IS_HOME, LINK_PROP.DISPLAY_ALWAYS]
   },
   {
     url: '/about',
-    name: 'About'
+    name: 'About',
+    props: [LINK_PROP.DISPLAY_ALWAYS]
   },
   {
-    url: '/signin',
-    name: 'Sign In',
-  },
-  {
-    url: '/signup',
-    name: 'Sign Up',
-    type: 'button',
-  },
-  {
-    url: '/logout',
-    name: 'Logout',
-    displayWhileLogged: true,
+    url: '/appointments',
+    name: 'Appointment',
+    props: [LINK_PROP.DISPLAY_ALWAYS]
   },
 ]
 
 function MyApp({ Component, pageProps }) {
-  console.log(useRouter().route)
-
-  
-
   return (
-    <Provider store={myStore} style={{height: '100vh'}}>
+    <Provider store={myStore}>
       <PersistGate loading={(<div>loading</div>)} persistor={persisted}>
         <TopNavigation links={links}/>
-        <Component {...pageProps} />
+        
+        <div style={{height: '100vh', paddingTop: '55px'}}>
+          <Component {...pageProps} />
+        </div>
       </PersistGate>
     </Provider>
   )

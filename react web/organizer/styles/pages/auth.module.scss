@@ -20,103 +20,124 @@
             margin: 0px;
         }
     }
+}
 
-    form {
-        width: 250px;
-        display: flex;
-        flex-direction: column;
+.form {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
 
-        .message {
-            padding: 9px;
-            border-radius: 5px;
+    .message {
+        padding: 9px;
+        border-radius: 5px;
+        margin-top: 0px;
 
-            &.error {
-                background-color: #FFA4A4;
-                color: #980000;
+        &.error {
+            background-color: #FFA4A4;
+            color: #980000;
+        }
+
+        &.ok {
+            background-color: #B1FFA8;
+            color: #0E8A00;
+        }
+    }
+
+    .formGroup {
+        width: 100%;
+        margin-bottom: 20px;
+
+        &.phoneBox {
+            position: relative;
+
+            input[name='phone'] {
+                padding-left: 63px;
             }
 
-            &.ok {
-                background-color: #B1FFA8;
-                color: #0E8A00;
+            label {
+                position: absolute;
+                top: 10px;
+                left: 9px;
+                color: #818181;
             }
         }
     
-        .formGroup {
+        input {
             width: 100%;
-            margin-bottom: 20px;
-        
-            input {
-                width: 100%;
-            }
-
-            .roleSplit {
-                margin-top: 15px;
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                
-                .option {
-                    border-radius: 5px;
-                    border: 1px solid #cbcbcb;
-                    width: 100px;
-                    height: 100px;
-                    padding: 17px 10px 0px;
-                    text-align: center;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-
-                    &.active {
-                        background-color: #7500D1;
-                        border-color: transparent;
-                        color: #fff;
-
-                        svg {
-                            fill: #FFF;
-                        }
-                    }
-
-                    svg {
-                        display: block;
-                        fill: #cbcbcb;
-                    }
-
-                    .control {
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
-                        justify-content: space-evenly;
-
-                        input {
-                            margin: 0px;
-                        }
-                    }
-
-                    &:hover {
-                        cursor: pointer;
-                        border: 1px solid #818181;
-                    }
-                }
-            }
         }
-        
-        .formButtons {
+
+        .roleSplit {
+            margin-top: 15px;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
-            align-items: center;
             
-            input {
-                width: 90%;
-                margin-right: 20px;
+            .option {
+                border-radius: 5px;
+                border: 1px solid #cbcbcb;
+                width: 100px;
+                height: 100px;
+                padding: 17px 10px 0px;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
 
-                &:last-child {
-                    width: auto;
-                    margin: 0px;
-                    background-color: transparent;
-                    color: #818181;
+                &.active {
+                    background-color: #7500D1;
+                    border-color: transparent;
+                    color: #fff;
+
+                    svg {
+                        fill: #FFF;
+                    }
+                }
+
+                svg {
+                    display: block;
+                    fill: #cbcbcb;
+                }
+
+                .control {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-evenly;
+
+                    input {
+                        margin: 0px;
+                    }
+                }
+
+                &:hover {
+                    cursor: pointer;
+                    border: 1px solid #818181;
                 }
             }
         }
     }
+    
+    .formButtons {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        
+        input {
+            width: 90%;
+            margin-right: 20px;
+
+            &:last-child {
+                width: auto;
+                margin: 0px;
+                background-color: transparent;
+                color: #818181;
+            }
+        }
+    }
+}
+
+.test {
+    height: 50px;
+    overflow-y: auto;
 }
