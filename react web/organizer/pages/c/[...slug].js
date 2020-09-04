@@ -6,6 +6,19 @@ import moment from 'moment'
 import styles from '../../styles/pages/calendar.module.scss'
 import axios from 'axios'
 
+function Event({ event }) {
+    
+
+    console.log(event)
+
+    return (
+        <div className={styles.event}>
+            <div className={styles.title}>{event.title}</div>
+            <div className={styles.extra}>{event.desc}</div>
+        </div>
+    );
+  }
+
 const Schedule = (req, res) => {
     const user = useSelector(state => (state.user))
     const company = useSelector(state => (state.companyView.company))
@@ -40,7 +53,8 @@ const Schedule = (req, res) => {
                        title:data[i].specialistDTO.servicesDTO.name,
                        allDay:false,
                        start: new Date(data[i].s_start),
-                       end: new Date(data[i].s_end)
+                       end: new Date(data[i].s_end),
+                       desc: 'desc'
                    })
                }
             
@@ -67,6 +81,9 @@ const Schedule = (req, res) => {
                 events={programari}
                 startAccessor="start"
                 endAccessor="end"
+                components={{
+                    event: Event
+                  }}
             />
         </div>
     )

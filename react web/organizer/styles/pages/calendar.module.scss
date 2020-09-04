@@ -3,3 +3,15 @@
 .calendarWrapper {
     height: 100%;
 }
+
+.event {
+    .extra {
+        display: none;
+    }
+
+    &:hover {
+        .extra {
+            display: block;
+        }
+    }
+}
