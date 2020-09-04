@@ -45,6 +45,7 @@ const CreateCompany = (props) => {
     const [searchCountryResult, setCountrySearchResult] = useState('');
     const [searchCityResult, setCityResult]= useState('')
     const [photo, setParentPhoto] = useState(new Blob())
+    const [CUI,setCUI]=useState(null)
 
     const [_cityAutoSuggest, _setCityAutoSuggest] = useState(false)
     const [_countryAutoSuggest, _setCountryAutoSuggest] = useState(false)
@@ -67,6 +68,7 @@ const CreateCompany = (props) => {
             case 'company_country': setCountry(value); searchCountryListRequest(country, city, 'country'); _setCountryAutoSuggest(true); break
             case 'company_category': setCategory(value); searchAnimeRequest(value); _setCategoryAutoSuggest(true); break
             case 'company_code': setCompanyCode(value); break
+            case 'company_cui':setCUI(value); break
             default: return
         }
     }
@@ -81,12 +83,14 @@ const CreateCompany = (props) => {
 
         axios.get(url, {params: { 'page': 0, 'name': name } })
         .then(_resp => {
+            console.log(_resp)
             setSearchResult(_resp.data)
         })
         .catch(_err => {
-            console.log(err)
+            console.log(_err)
             return false
         })
+        
     }
 
     const searchCountryListRequest = (country, city, resource) => {
@@ -106,7 +110,7 @@ const CreateCompany = (props) => {
 
     const setTextHandler = (identifier, value) =>{
         console.log(identifier, value)
-
+        
         switch(identifier) {
             case 'city':
                 setCity(value)
@@ -160,7 +164,8 @@ const CreateCompany = (props) => {
         formData.append('address',address);
         formData.append('category',category);
         formData.append('country',country);
-
+        formData.append('cui',CUI);
+            console.log(formData)
         const url = process.env.REQ_HOST + '/c/create'
 
         axios.post(url,formData,{headers:{
@@ -184,7 +189,6 @@ const CreateCompany = (props) => {
         _setCategoryAutoSuggest(false)
     }
 
-    console.log(formMessage)
 
     return (
         <div className={styles.pageWrapper} onClick={(e) => bgClick(e)}>
@@ -283,7 +287,7 @@ const CreateCompany = (props) => {
                                     
                                         {Array.isArray(searchResult) && searchResult.map(c => {
                                             return(
-                                                <li key={c.id} onClick={e => setTextHandler('category', c.country)}>{c.country}</li>
+                                                <li key={c.id} onClick={e => setTextHandler('category', c.list)}>{c.list}</li>
                                             )
                                     
                                         })
@@ -292,6 +296,13 @@ const CreateCompany = (props) => {
                             </div>
                         }
                     </div>
+
+                    <div className={styles.formGroup}>
+                        <label>CUI</label>
+                        <input type="text" value={CUI} name="company_cui" autoComplete="off" placeholder="CUI" onClick={e => _setCategoryAutoSuggest(true)} onChange={e => handleInput(e)}/>
+
+                    </div>
+
 
                     <div className={styles.formGroup + ' ' + styles.inLine}>
                         <input type='submit' value='Create'/>

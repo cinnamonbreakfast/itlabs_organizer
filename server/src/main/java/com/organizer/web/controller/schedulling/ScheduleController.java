@@ -167,10 +167,17 @@ public class ScheduleController {
 
         //logic : schedule validity from timetable and availability
         Service service =specialist.getService();
+        System.out.println(service.getServiceName());
+        System.out.println(scheduleDTO);
         List<Availability> availabilities = availabilityService.findByDate(start,service);
-        int day = start.getDayOfWeek().getValue();
+        int day = start.getDayOfWeek().getValue() -1 ;
+        System.out.println("the day is "+day);
         List<TimeTable> tts = timeTableService.findByDay(day,service);
         //conver to the same day
+        for( TimeTable tt: tts){
+            System.out.println(tt.getStart());
+            System.out.println(tt.getEnd());
+        }
         LocalDate date = start.toLocalDate();
         List<Schedule> timeTables =dateOperations.convertTtToSchedule(tts,date);
         List<Schedule> schedules = validSchedules(timeTables,availabilities);

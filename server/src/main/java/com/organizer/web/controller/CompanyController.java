@@ -8,6 +8,7 @@ import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.*;
 import com.organizer.web.utils.Emailer;
 import com.organizer.web.utils.Parser;
+import com.organizer.web.utils.Regex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,14 +33,17 @@ public class CompanyController {
     private final ServiceService serviceService;
     private final SpecialistService specialistService;
     private final Emailer emailer;
+    private final Regex regex;
     @Autowired
     public CompanyController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, AnimeService animeService, CityListService cityListService, CountryListService countryListService, InvitationService invitationService, ServiceService serviceService,
+                             Regex regex,
                              SpecialistService specialistService,
                              Emailer emailer) {
         this.companyService = companyService;
         this.authStore = authStore;
         this.userService = userService;
         this.fileService=fileService;
+        this.regex=  regex;
         this.animeService=animeService;
         this.cityListService=cityListService;
         this.countryListService=countryListService;
@@ -351,6 +355,11 @@ CompanyDTO newCompany,@RequestHeader String token ){
         System.out.println(userPhone);
         System.out.println(companyUsername);
         System.out.println(serviceName);
+        int m = regex.phoneMatcher("40",userPhone);
+        if(m==0){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a valid phonen number");
+        }
+        String tel = "+40"+userPhone.substring(m,userPhone.length());
         if(id==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Bad token");
         }
@@ -362,7 +371,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
         if(company.getOwner().getId()!=user.getId()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You are not the owner of this company");
         }
-        User userSelected = userService.findByPhone(userPhone);
+        User userSelected = userService.findByPhone(tel);
         if(userSelected==null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not a known selected user");
         }
@@ -370,7 +379,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
         if(service==null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Service not yet created");
         }
-
+        System.out.println(service.getServiceName());
         Invitation invitation = invitationService.findByUserAndService(userSelected,service);
         if(invitation!=null){
           //has received
@@ -398,7 +407,6 @@ CompanyDTO newCompany,@RequestHeader String token ){
 
             return ResponseEntity.status(HttpStatus.OK).body("Invitation has been send");
         }
-        //todo:mail and phone sending
 
     }
 

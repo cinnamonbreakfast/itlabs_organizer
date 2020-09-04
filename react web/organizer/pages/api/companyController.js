@@ -147,11 +147,17 @@ class CompanyController {
         return axios({
             url: process.env.REQ_HOST + '/tt/create',
             method: 'POST',
-            data: entry,
+            data: null,
             headers: {
-                'TOKEN': token,
-                'Content-type':'application/json'
-            }
+                'TOKEN': token
+            },
+            params:{
+                'companyUsername':entry.companyUsername,
+                'day':entry.day,
+                'start':entry.start ,
+                'end':entry.end,
+                'serviceName':entry.serviceName
+                       }
         })
         .then(resp => {
             console.log(resp)

@@ -46,8 +46,8 @@ public class TimeTableController {
     }
 
     @RequestMapping(value="tt/create",method = RequestMethod.POST)
-    public ResponseEntity<String> createTimeTable(@RequestBody TimeTableDTO timeTableDTO, @RequestHeader String token){
-
+    public ResponseEntity<String> createTimeTable( TimeTableDTO timeTableDTO, @RequestHeader String token){
+        System.out.println(timeTableDTO);
         Long id = JWToken.checkToken(token);
         if(id==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");

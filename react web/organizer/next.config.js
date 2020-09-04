@@ -18,7 +18,7 @@ module.exports = {
     },
 
     env: {
-        REQ_HOST: 'http://192.168.0.25:8080',
+        REQ_HOST: 'http://192.168.0.2:8080',
         STATIC_FRONT_RESOURCES: '/photo/logos'
     },
 }
