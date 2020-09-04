@@ -1,6 +1,7 @@
 package com.organizer.web.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -9,8 +10,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.FilterRegistration;
+
 @Configuration
-@PropertySource("classpath:app.properties")
+@PropertySource("classpath:api.properties")
 @EnableWebMvc
 public class WebConfig {
 
@@ -30,18 +33,22 @@ public class WebConfig {
 
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-
+                /*
                 if (!corsEnabled) {
                     registry.addMapping("/**").allowedOrigins("*");
                     return;
-                }
+                }*/
 
                 //.allowedOrigins("http://localhost:4200", "http://localhost:8080")
 
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200", "http://localhost:8080")
-                        .allowedMethods("GET", "PUT", "POST", "DELETE");
+                        .allowedOrigins("*")
+                        .allowedMethods("GET", "PUT", "POST", "DELETE")
+                        .allowedHeaders("token","TOKEN","AUTH_TIME")
+                        .exposedHeaders("token","TOKEN","AUTH_TIME");
+
             }
         };
     }
+
 }

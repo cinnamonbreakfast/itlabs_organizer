@@ -9,6 +9,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.NamedQuery;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,13 +26,23 @@ import java.util.Date;
 public class Availability extends Entity<Long>{
     @ManyToOne
     @JsonManagedReference
-    @JoinColumn(name="specialist_id", nullable = false)
-    private Specialist specialist;
+    @JoinColumn(name="service", nullable = false)
+    private Service service;
+
+    @ManyToOne
+    @JsonManagedReference
+    @JoinColumn(name="specialist", nullable = false)
+    Specialist specialist;
+
     @Basic
     @Column(name="start_time")
-    private Date startTime;
+    private LocalDateTime start;
 
     @Basic
     @Column(name="end_time")
-    private Date endTime;
+    private LocalDateTime end;
+
+    @Basic
+    @Column
+    private String reason;
 }

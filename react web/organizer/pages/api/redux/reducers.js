@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
 import userActionReducer from './userActions'
-import counter from './action'
+import companyView from './companyViewer'
 
 export default combineReducers({
-    counter,
+    companyView,
     user: userActionReducer,
 })

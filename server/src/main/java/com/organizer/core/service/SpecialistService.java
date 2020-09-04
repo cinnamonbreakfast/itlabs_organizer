@@ -1,7 +1,9 @@
 package com.organizer.core.service;
 
 
+import com.organizer.core.model.Company;
 import com.organizer.core.model.Specialist;
+import com.organizer.core.model.User;
 import com.organizer.core.repository.SpecialistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,12 +18,27 @@ public class SpecialistService {
     public SpecialistService(SpecialistRepository specialistRepository){
         this.specialistRepository=specialistRepository;
     }
-    public Specialist findById(Long user_id){ return specialistRepository.findByUser(user_id);}
-    public List<Specialist> findByCompany(Long company_id){
-        return specialistRepository.findByCompany(company_id);
+    public List<Specialist> findByCompanyUsername(String username) {
+        return specialistRepository.findByUsername( username);
     }
-    public Specialist signSpecialist(Specialist specialist)
+
+    public List<Specialist> findByCompanyAndServiceName(String service,String username){
+        return specialistRepository.findByCompanyAndServiceName(service,username);
+    }
+
+    public Specialist findByUser(User user)
     {
-        return specialistRepository.save(specialist);
+        return specialistRepository.findByUser(user);
     }
+    public Specialist findById(Long id){
+        return  specialistRepository.findById(id).get();
+    }
+    public void save (Specialist specialist ){
+        specialistRepository.save(specialist);
+
+    }
+    public List<Specialist> findStaffInCompany(String username) {
+        return specialistRepository.findStaffInCompany( username);
+    }
+
 }

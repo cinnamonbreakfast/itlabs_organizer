@@ -3,16 +3,10 @@ package com.organizer.core.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-
-import javax.persistence.*;
-
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.NamedQuery;
 
-import java.util.HashSet;
+import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Table(name="Company",schema="public")
 @javax.persistence.Entity
@@ -26,6 +20,7 @@ import java.util.Set;
 @NamedQuery(name="Company.findByCity", query = "select c from Company c where c.city = ?1")
 @NamedQuery(name="Company.findByCityAndCategory",query = "select c from Company c where c.city = ?1 and c.category = ?2")
 public class Company extends Entity<Long>{
+
 
     @Basic(optional = false)
     @Column(nullable = false)
@@ -47,11 +42,30 @@ public class Company extends Entity<Long>{
     @Basic(optional = false)
     private String country;
 
+    @Basic
+    @Column(name="username")
+    private String username;
+
     @OneToOne
     @JoinColumn(name = "owner")
     private User owner;
 
+
     @JsonManagedReference
     @OneToMany(mappedBy = "company")
-    private List<Specialist> specialists;
+    private List<Service> services;
+
+    @Basic
+    @Column
+    String image_url;
+    
+    @Basic
+    @Column
+    String cui;
+
+
+    @Basic
+    @Column
+    Boolean validated;
+
 }
