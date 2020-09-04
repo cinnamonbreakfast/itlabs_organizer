@@ -5,23 +5,47 @@ import { useSelector } from 'react-redux'
 import moment from 'moment'
 import styles from '../styles/pages/calendar.module.scss'
 import axios from 'axios'
+import { Button, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 
-function Event({ event }) {
-    
-    return (
+class Event extends React.Component {
+    constructor(props) {
+      super(props);
+      this.toggle = this.toggle.bind(this);
+      this.state = {
+        popoverOpen: false
+      };
+    }
+  
+    toggle() {
+      this.setState({
+        popoverOpen: !this.state.popoverOpen
+      });
+      console.log(this.state)
+    }
+  
+    render() {
+      return (
+        
         <div className={styles.event} >
-            <div className={styles.title}>{event.title}</div>
-            <div className={styles.extra}>
-                <p>Specialist {event.name}</p>
-                <p>Phone {event.phone}</p>
-                <p>Company {event.company}</p>
-                
+            <div className={styles.title}>{this.props.event.title}</div>
+            <div>
+                <Button id="Popover1" type="button">
+                    Details
+                </Button>
+                <Popover placement="bottom" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
+                    <PopoverBody>
+                <div >
+                <p> Company : {this.props.event.company}</p>
+                <p> Specialist : {this.props.event.name}</p>
+                <p> Phone : {this.props.event.phone}</p>
+                </div>
+                    </PopoverBody>
+                </Popover>
             </div>
-            
         </div>
-    );
+      );
+    }
   }
-
 const Appointements = (req, res) => {
     const user = useSelector(state => (state.user))
 

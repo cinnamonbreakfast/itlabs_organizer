@@ -5,32 +5,48 @@ import { useSelector } from 'react-redux'
 import moment from 'moment'
 import styles from '../../styles/pages/calendar.module.scss'
 import axios from 'axios'
-import ReactHover ,{Trigger,Hover }from 'react-hover'
+import { Button, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 
-function Event({ event }) {
-    
-    return (
-        <div className={styles.event}>
-            <div className={styles.title}>{event.title}</div>
-            <div className={styles.extra}>
-                <p>Customer {event.name}</p>
-                <p>Phone {event.phone}</p>
-            
-                
+
+class Event extends React.Component {
+    constructor(props) {
+      super(props);
+
+      this.toggle = this.toggle.bind(this);
+      this.state = {
+        popoverOpen: false
+      };
+    }
+  
+    toggle() {
+      this.setState({
+        popoverOpen: !this.state.popoverOpen
+      });
+      
+    }
+  
+    render() {
+      return (
+        
+        <div className={styles.event} >
+            <div className={styles.title}>{this.props.event.title}</div>
+            <div>
+                <Button id="Popover1" type="button">
+                    Details
+                </Button>
+                <Popover placement="bottom" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
+                    <PopoverBody>
+                <div >
+                <p> Customer : {this.props.event.name}</p>
+                <p> Phone : {this.props.event.phone}</p>
+                </div>
+                    </PopoverBody>
+                </Popover>
             </div>
-            <ReactHover options={optionsCursorTrueWithMargin}>
-                <Trigger type="trigger">
-                    <h1 style={{ background: '#abbcf1', width: '200px' }}> Hover on me </h1>
-                </Trigger>
-                <Hover type="hover">
-                    <h1> I am hover HTML </h1>
-                </Hover>
-            </ReactHover>
-            
         </div>
-    );
+      );
+    }
   }
-
 const Schedule = (req, res) => {
     const user = useSelector(state => (state.user))
     const company = useSelector(state => (state.companyView.company))

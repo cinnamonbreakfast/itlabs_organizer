@@ -1,6 +1,7 @@
 import '../styles/globals.css'
 // import 'react-calendar/dist/Calendar.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { useRouter } from 'next/router'
 import TopNavigation, { LINK_PROP } from '../components/TopNavigation'
 import { PersistGate } from 'redux-persist/integration/react'
