@@ -1,6 +1,5 @@
 package com.organizer.core.repository;
 
-import com.organizer.core.model.AnimeList;
 import com.organizer.core.model.CountryList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

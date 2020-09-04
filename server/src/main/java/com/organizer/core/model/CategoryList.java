@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 
 
-@Table(name="animelist",schema="public")
+@Table(name="categorylist",schema="public")
 @javax.persistence.Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Builder
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AnimeList extends Entity<Long> {
+public class CategoryList extends Entity<Long> {
     @Basic
     @Column(name="list")
     String list;

@@ -7,7 +7,6 @@ import com.organizer.web.dto.SearchFilter;
 import com.organizer.web.dto.CompanyDTO;
 import com.organizer.web.dto.ServiceDTO;
 import com.organizer.web.dto.map.MapDTO;
-import com.organizer.web.utils.Parser;
 import com.organizer.web.utils.StringConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,12 +28,12 @@ public class MapController {
     private final SpecialistService specialistService;
     private final CompanyService companyService;
     private final ServiceService specialistServiceService;
-    private final AnimeService animeService;
+    private final CategoryService animeService;
     private final CountryListService countryListService;
     private final CityListService cityListService;
     private final PrefixService prefixService;
     @Autowired
-    public MapController(SpecialistService specialistService, CompanyService companyService, ServiceService specialistServiceService, AnimeService animeService, CountryListService countryListService, CityListService cityListService, PrefixService prefixService) {
+    public MapController(SpecialistService specialistService, CompanyService companyService, ServiceService specialistServiceService, CategoryService animeService, CountryListService countryListService, CityListService cityListService, PrefixService prefixService) {
         this.companyService = companyService;
         this.specialistService = specialistService;
         this.specialistServiceService = specialistServiceService;
@@ -171,7 +170,7 @@ public class MapController {
 
 
     @RequestMapping(value="fetch/animelist",method = RequestMethod.GET)
-    public ResponseEntity<List<AnimeList>> getAnimeList(@RequestParam int page,@RequestParam String name){
+    public ResponseEntity<List<CategoryList>> getAnimeList(@RequestParam int page, @RequestParam String name){
         return ResponseEntity.ok(animeService.getAnimeList(page,name));
     }
 

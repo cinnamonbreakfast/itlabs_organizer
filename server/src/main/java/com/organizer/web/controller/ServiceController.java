@@ -23,14 +23,14 @@ public class ServiceController {
     private final AuthStore authStore;
     private final UserService userService;
     private final FileService fileService;
-    private final AnimeService animeService;
+    private final CategoryService animeService;
     private final CityListService cityListService;
     private final CountryListService countryListService;
     private final InvitationService invitationService;
     private final ServiceService serviceService;
     @Autowired
-    public ServiceController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, AnimeService animeService, CityListService cityListService, CountryListService countryListService, InvitationService invitationService
-    ,ServiceService serviceService) {
+    public ServiceController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, CategoryService animeService, CityListService cityListService, CountryListService countryListService, InvitationService invitationService
+    , ServiceService serviceService) {
         this.companyService = companyService;
         this.authStore = authStore;
         this.userService = userService;

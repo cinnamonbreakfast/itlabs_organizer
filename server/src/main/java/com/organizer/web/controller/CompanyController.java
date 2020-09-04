@@ -7,7 +7,6 @@ import com.organizer.web.auth.AuthStore;
 import com.organizer.web.auth.JWToken;
 import com.organizer.web.dto.*;
 import com.organizer.web.utils.Emailer;
-import com.organizer.web.utils.Parser;
 import com.organizer.web.utils.Regex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ public class CompanyController {
     private final AuthStore authStore;
     private final UserService userService;
     private final FileService fileService;
-    private final AnimeService animeService;
+    private final CategoryService animeService;
     private final CityListService cityListService;
     private final CountryListService countryListService;
     private final InvitationService invitationService;
@@ -35,7 +34,7 @@ public class CompanyController {
     private final Emailer emailer;
     private final Regex regex;
     @Autowired
-    public CompanyController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, AnimeService animeService, CityListService cityListService, CountryListService countryListService, InvitationService invitationService, ServiceService serviceService,
+    public CompanyController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, CategoryService animeService, CityListService cityListService, CountryListService countryListService, InvitationService invitationService, ServiceService serviceService,
                              Regex regex,
                              SpecialistService specialistService,
                              Emailer emailer) {

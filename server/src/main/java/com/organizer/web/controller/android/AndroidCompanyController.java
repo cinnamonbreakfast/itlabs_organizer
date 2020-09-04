@@ -14,8 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class AndroidCompanyController {
@@ -23,11 +21,11 @@ public class AndroidCompanyController {
     private final AuthStore authStore;
     private final   UserService userService;
     private final FileService fileService;
-    private final AnimeService animeService;
+    private final CategoryService animeService;
     private final CityListService cityListService;
     private final CountryListService countryListService;
     @Autowired
-    public AndroidCompanyController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, AnimeService animeService, CityListService cityListService, CountryListService countryListService) {
+    public AndroidCompanyController(CompanyService companyService, AuthStore authStore, UserService userService, FileService fileService, CategoryService animeService, CityListService cityListService, CountryListService countryListService) {
         this.companyService = companyService;
         this.authStore = authStore;
         this.userService = userService;

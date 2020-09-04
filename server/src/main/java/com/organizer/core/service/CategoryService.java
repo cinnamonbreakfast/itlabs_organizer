@@ -1,7 +1,7 @@
 package com.organizer.core.service;
 
-import com.organizer.core.model.AnimeList;
-import com.organizer.core.repository.AnimeRepository;
+import com.organizer.core.model.CategoryList;
+import com.organizer.core.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AnimeService {
+public class CategoryService {
     @Autowired
-    AnimeRepository animeRepository;
-    public AnimeService(AnimeRepository animeRepository){
+    CategoryRepository animeRepository;
+    public CategoryService(CategoryRepository animeRepository){
         this.animeRepository= animeRepository;
     }
-    public List<AnimeList> getAnimeList(int pageNumber ,String value){
+    public List<CategoryList> getAnimeList(int pageNumber , String value){
         Pageable pageable = PageRequest.of(pageNumber,5);
         return this.animeRepository.getAnimeList(pageable,value).getContent();
     }
@@ -24,7 +24,7 @@ public class AnimeService {
         return animeRepository.countByList(list);
     }
 
-    public AnimeList findByList(String list){
+    public CategoryList findByList(String list){
         return animeRepository.findByList(list);
     }
 }
