@@ -6,12 +6,25 @@ class UserController {
         this.dispatcher = dispatcher
     }
 
-    signInAction(credentials) {
+    async signInAction(credentials) {
         let data = new FormData();
         data.set('contact', credentials.contact)
         data.set('password', credentials.password)
 
         return axios.post(process.env.REQ_HOST + '/u/signin', data)
+    }
+
+    async forgotPassAction(credetials){
+        let data = new FormData();
+        data.set('contact',credetials.contact);
+        return axios.post(process.env.REQ_HOST+'/u/recoverask',data)
+    }
+    async forgotPassRecoverAction( credentials){
+
+        let data = new FormData();
+        data.set('code',credentials.code);
+        data.set('password',credentials.password);
+        return axios.post(process.env.REQ_HOST+'/u/recoveraction',data);
     }
 
     setLoginData(data) {

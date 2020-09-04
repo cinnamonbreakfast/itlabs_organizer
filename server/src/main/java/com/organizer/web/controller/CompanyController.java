@@ -107,20 +107,23 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 .validated(false)
                 .cui(cui)
                 .build();
-        try {
-            String[] list = file.getOriginalFilename().split("[.]");
-            if (list.length == 1) {
-                fileService.uploadDir(file, username+ "." + list[0],username);
-                company.setImage_url(username);
-            } else if (list.length > 1) {
-                fileService.uploadDir(file, username + "." + list[list.length - 1],username);
-                company.setImage_url(username);
-            } else {
+        if(!file.isEmpty()) {
+            try {
+                String[] list = file.getOriginalFilename().split("[.]");
+                if (list.length == 1) {
+                    fileService.uploadDir(file, username + "." + list[0], username);
+                    company.setImage_url(username);
+                } else if (list.length > 1) {
+                    fileService.uploadDir(file, username + "." + list[list.length - 1], username);
+                    company.setImage_url(username);
+                } else {
+                    company.setImage_url("default_company");
+                }
+            } catch (Exception e) {
                 company.setImage_url("default_company");
             }
         }
-        catch (Exception e )
-        {
+        else{
             company.setImage_url("default_company");
         }
         companyService.save(company);

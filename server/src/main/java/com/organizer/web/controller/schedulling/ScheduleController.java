@@ -343,17 +343,20 @@ public class ScheduleController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         Company company = companyService.findByUsername(companyUsername);
-        System.out.println(user.getId());
-        System.out.println(company.getId());
+
         if (company == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
+        System.out.println(user.getName());
         List<Schedule> schedules = scheduleService.findAllSchedulesOfUserSpecialistAndCompany(user, company);
         List<ScheduleDTO> scheduleDTOS = new ArrayList<>(schedules.size());
         for (Schedule sch : schedules) {
             System.out.println(sch.getEnd());
             System.out.println(sch.getStart());
+            User scheduler = sch.getUser();
+            UserDTO schUserDTO= UserDTO.builder().phone(scheduler.getPhone())
+                    .name(scheduler.getName())
+                    .build();
             Specialist sp = sch.getSpecialist();
             Service ser = sp.getService();
             User u = sp.getUser();
@@ -379,6 +382,7 @@ public class ScheduleController {
             spDTO.setId(sp.getId());
             ScheduleDTO scheduleDTO = ScheduleDTO.builder()
                     .s_start(sch.getStart().toString())
+                    .userDTO(schUserDTO)
                     .s_end(sch.getEnd().toString())
                     .specialistDTO(spDTO)
                     .build();

@@ -4,6 +4,7 @@ import UserController from './api/userController'
 import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
+import ReactHover ,{Trigger,Hover }from 'react-hover'
 
 const SignInPage = () => {
     const dispatch = useDispatch()
@@ -80,10 +81,19 @@ const SignInPage = () => {
 
                 <div className={styles.formGroup}>
                     <input type="submit" name="submit" value="Sign In"/>
-                    <a href="#">Reset password</a>
+                    <a href="forgotpassword">Reset password</a>
                 </div>
             </form>
+            <ReactHover options={optionsCursorTrueWithMargin}>
+            <Trigger type="trigger">
+                <h1 style={{ background: '#abbcf1', width: '200px' }}> Hover on me </h1>
+            </Trigger>
+            <Hover type="hover">
+                <h1> I am hover HTML </h1>
+            </Hover>
+            </ReactHover>
         </div>
+        
     )
 }
 

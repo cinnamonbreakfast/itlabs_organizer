@@ -5,6 +5,31 @@ import { useSelector } from 'react-redux'
 import moment from 'moment'
 import styles from '../../styles/pages/calendar.module.scss'
 import axios from 'axios'
+import ReactHover ,{Trigger,Hover }from 'react-hover'
+
+function Event({ event }) {
+    
+    return (
+        <div className={styles.event}>
+            <div className={styles.title}>{event.title}</div>
+            <div className={styles.extra}>
+                <p>Customer {event.name}</p>
+                <p>Phone {event.phone}</p>
+            
+                
+            </div>
+            <ReactHover options={optionsCursorTrueWithMargin}>
+                <Trigger type="trigger">
+                    <h1 style={{ background: '#abbcf1', width: '200px' }}> Hover on me </h1>
+                </Trigger>
+                <Hover type="hover">
+                    <h1> I am hover HTML </h1>
+                </Hover>
+            </ReactHover>
+            
+        </div>
+    );
+  }
 
 const Schedule = (req, res) => {
     const user = useSelector(state => (state.user))
@@ -40,7 +65,9 @@ const Schedule = (req, res) => {
                        title:data[i].specialistDTO.servicesDTO.name,
                        allDay:false,
                        start: new Date(data[i].s_start),
-                       end: new Date(data[i].s_end)
+                       end: new Date(data[i].s_end),
+                       phone:data[i].userDTO.phone,
+                       name:data[i].userDTO.name
                    })
                }
             
@@ -67,6 +94,9 @@ const Schedule = (req, res) => {
                 events={programari}
                 startAccessor="start"
                 endAccessor="end"
+                components={{
+                    event: Event
+                  }}
             />
         </div>
     )
