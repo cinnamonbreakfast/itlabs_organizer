@@ -33,7 +33,7 @@ class UserController {
         this.dispatcher({type: actions.SET_USER_AUTH_TOKEN, payload: data.token})
         this.dispatcher({type: actions.SET_USER_AUTH_TIME, payload: data.authTime})
 
-        getSpecialistData(data.token)
+        this.getSpecialistData(data.token)
     }
 
     sendSignUpCode(phone) {

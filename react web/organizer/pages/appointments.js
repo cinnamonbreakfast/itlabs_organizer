@@ -7,6 +7,11 @@ import styles from '../styles/pages/calendar.module.scss'
 import axios from 'axios'
 import { Button, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 
+const deleteRequest = async ()=>{
+
+
+
+}
 class Event extends React.Component {
     constructor(props) {
       super(props);
@@ -20,24 +25,30 @@ class Event extends React.Component {
       this.setState({
         popoverOpen: !this.state.popoverOpen
       });
-      console.log(this.state)
+      
     }
-  
+    handleDelete(){
+        
+    }
+    
     render() {
       return (
         
         <div className={styles.event} >
             <div className={styles.title}>{this.props.event.title}</div>
             <div>
-                <Button id="Popover1" type="button">
-                    Details
+                <Button id={'tooltip'+this.props.event.back_id} type="button">
+                    Details 
                 </Button>
-                <Popover placement="bottom" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
+                <Popover placement="bottom" isOpen={this.state.popoverOpen} target={'tooltip'+this.props.event.back_id} toggle={this.toggle}>
                     <PopoverBody>
                 <div >
                 <p> Company : {this.props.event.company}</p>
                 <p> Specialist : {this.props.event.name}</p>
                 <p> Phone : {this.props.event.phone}</p>
+                <Button id = {'tool'+this.props.event.back_id}>
+                        Delete
+                </Button>
                 </div>
                     </PopoverBody>
                 </Popover>
@@ -74,14 +85,15 @@ const Appointements = (req, res) => {
                 let schedules = []
                for( let i in data){
                    schedules.push({
+                       
                        title:data[i].specialistDTO.servicesDTO.name,
                        allDay:false,
                        start: new Date(data[i].s_start),
                        end: new Date(data[i].s_end),
                        company:data[i].specialistDTO.company.name,
                        name:data[i].specialistDTO.user.name,
-                       phone:data[i].specialistDTO.user.phone 
-
+                       phone:data[i].specialistDTO.user.phone ,
+                       back_id:data[i].id
                    })
                }
             

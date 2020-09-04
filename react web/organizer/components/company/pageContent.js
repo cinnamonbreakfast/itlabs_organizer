@@ -194,7 +194,7 @@ const PageEdit = (props) => {
     }
 
     return (
-        <div className="col-9">
+        <div className="col-12">
             <div className={styles.board}>
                 <h2>Edit services</h2>
 
@@ -425,32 +425,10 @@ const PageContent = (props) => {
 
     return (
         <div className="grid">
-            <div className="col-3">
-                <div className={styles.board}>
-                    <h2>Time table</h2>
-
-                    <ul className={styles.timeTable}>
-                        <li>Monday</li>
-                        <li>Tuesday</li>
-                        <li>Wednesday</li>
-                        <li>Thursday</li>
-                        <li>Friday</li>
-                        <li className={styles.closed}>Saturday</li>
-                        <li className={styles.closed}>Sunday</li>
-                    </ul>
-                </div>
-
-                {/* {
-                    user.data.id === company.owner.id &&
-                    <div className={styles.board}>
-                        
-                    </div>
-                } */}
-            </div>
-
+        
             {
                 content === 'main' &&
-                <div className="col-9">
+                <div className="col-12">
                     <div className={styles.board}>
                         <h2>Services</h2>
 

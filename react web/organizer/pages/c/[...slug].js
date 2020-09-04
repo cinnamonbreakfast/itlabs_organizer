@@ -21,8 +21,10 @@ class Event extends React.Component {
     toggle() {
       this.setState({
         popoverOpen: !this.state.popoverOpen
+        
       });
       
+      console.log(this.props)
     }
   
     render() {
@@ -31,10 +33,10 @@ class Event extends React.Component {
         <div className={styles.event} >
             <div className={styles.title}>{this.props.event.title}</div>
             <div>
-                <Button id="Popover1" type="button">
+                <Button id={'tooltip'+this.props.event.back_id} type="button">
                     Details
                 </Button>
-                <Popover placement="bottom" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
+                <Popover placement="bottom" isOpen={this.state.popoverOpen} target={'tooltip'+this.props.event.back_id} toggle={this.toggle}>
                     <PopoverBody>
                 <div >
                 <p> Customer : {this.props.event.name}</p>
@@ -78,6 +80,7 @@ const Schedule = (req, res) => {
                 let schedules = []
                for( let i in data){
                    schedules.push({
+                       id:data[i].id,
                        title:data[i].specialistDTO.servicesDTO.name,
                        allDay:false,
                        start: new Date(data[i].s_start),
