@@ -43,7 +43,6 @@ const UserNav = () => {
             </div>
 
             <div className={styles.userImg}>
-                {/* <img src=""/> */}
 
                 <div className={styles.noAvatar}>
                     {user.data.name[0]}

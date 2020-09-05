@@ -23,7 +23,6 @@ const Invitation = (props) => {
 
             <div className={styles.control}>
                 <button onClick={e => props.accept(invitation.id)}>Accept</button>
-                <button>Reject</button>
             </div>
         </li>
     )

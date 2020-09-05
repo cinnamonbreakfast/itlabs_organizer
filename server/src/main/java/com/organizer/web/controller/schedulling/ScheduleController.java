@@ -13,6 +13,7 @@ import com.organizer.web.dto.*;
 import com.organizer.web.dto.schedulling.IntervalDTO;
 import com.organizer.web.dto.schedulling.ScheduleDTO;
 import com.organizer.web.utils.DateOperations;
+import com.organizer.web.utils.Smser;
 import org.antlr.v4.runtime.misc.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import java.util.Set;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class ScheduleController {
+    Smser smser;
     AvailabilityService availabilityService;
     TimeTableService timeTableService;
     UserService userService;
@@ -106,7 +108,7 @@ public class ScheduleController {
         return av;
     }
     @Autowired
-    public ScheduleController (TimeTableService timeTableService, UserService userService, CompanyService companyService, DateOperations dateOperations, AvailabilityService availabilityService, SpecialistService specialistService, ScheduleService scheduleService){
+    public ScheduleController (TimeTableService timeTableService, UserService userService, CompanyService companyService, DateOperations dateOperations, AvailabilityService availabilityService, SpecialistService specialistService, ScheduleService scheduleService, Smser smser){
         this.timeTableService =timeTableService;
         this.userService=userService;
         this.companyService=companyService;
@@ -114,6 +116,7 @@ public class ScheduleController {
         this.availabilityService=availabilityService;
         this.specialistService=specialistService;
         this.scheduleService =scheduleService;
+        this.smser =smser;
     }
     @RequestMapping(value = "schedule/create", method = RequestMethod.POST)
     public ResponseEntity<String> createSchedule(ScheduleDTO scheduleDTO, @RequestHeader String token){
@@ -183,6 +186,7 @@ public class ScheduleController {
         List<Schedule> schedules = validSchedules(timeTables,availabilities);
         System.out.println(start);
         System.out.println(end);
+        //send sms to user and specialist
 
         boolean valid=false;
         for(Schedule schedul: schedules){
@@ -197,6 +201,22 @@ public class ScheduleController {
         }
         if(valid==false){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid schedule for the service");
+        }
+        String bodyUser = "A new schedule has been made from at the " +start.toLocalDate() +
+                "from "+start.toLocalTime() +" to "+ end.toLocalTime() +
+                " for the service "+service.getServiceName()+ " at company "+service.getCompany().getName()
+                +"\n Specialst contact :"+specialist.getUser().getPhone() +" \n" +
+                " User contact :" + user.getPhone() +" .\n "+
+                "For more details check the scheduling app";
+        try {
+            smser.sendSms(user.getPhone(),bodyUser);
+        }catch (Exception e ){
+
+        }
+        try {
+            smser.sendSms(specialist.getUser().getPhone(),bodyUser);
+        }catch (Exception e ){
+
         }
 
         schedule = Schedule.builder()
@@ -386,6 +406,7 @@ public class ScheduleController {
                     .s_end(sch.getEnd().toString())
                     .specialistDTO(spDTO)
                     .build();
+            scheduleDTO.setId(sch.getId());
             scheduleDTOS.add(scheduleDTO);
 
 
@@ -397,9 +418,9 @@ public class ScheduleController {
 
 
 
-@RequestMapping(value = "schedule/delete",method = RequestMethod.DELETE)
+@RequestMapping(value = "schedule/delete",method = RequestMethod.DELETE,consumes = "multipart/form-data")
 public ResponseEntity<String> ff(@RequestHeader String token , @RequestParam Long scheduleId){
-
+    System.out.println("kill me");
     Long id = JWToken.checkToken(token);
     if(id==null){
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");

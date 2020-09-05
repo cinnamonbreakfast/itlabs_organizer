@@ -7,46 +7,52 @@ import styles from '../styles/pages/calendar.module.scss'
 import axios from 'axios'
 import { Button, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 
-const deleteRequest = async ()=>{
 
 
+const Event =(props)=>{
+    const user = useSelector(state => (state.user))
+    const token = user.token;
+    const [popOverOpen,setPopOverOpen]= useState(false)
+    const request = props.request
+    const toggle = ()=> {
+      setPopOverOpen(!popOverOpen)
+    }
+    const handleDelete= ()=>{
+        //axios.post()
+        console.log('kill me')
+        const url = process.env.REQ_HOST +'/schedule/delete'
+        let scheduleId= props.event.back_id
+        let data = new FormData()
+        data.set('scheduleId',scheduleId);
+        axios.delete(url,
+        {
+            data:data,
+            headers:{
+                token :token,
+                'Content-Type':'multipart/form-data'
+            }
+        }).then(res=>{
+            console.log(res)
+            props.event.request()
 
-}
-class Event extends React.Component {
-    constructor(props) {
-      super(props);
-      this.toggle = this.toggle.bind(this);
-      this.state = {
-        popoverOpen: false
-      };
+        }).catch(err=>{
+            console.log(err)
+        })
     }
-  
-    toggle() {
-      this.setState({
-        popoverOpen: !this.state.popoverOpen
-      });
-      
-    }
-    handleDelete(){
-        
-    }
-    
-    render() {
       return (
-        
         <div className={styles.event} >
-            <div className={styles.title}>{this.props.event.title}</div>
+            <div className={styles.title}>{props.title}</div>
             <div>
-                <Button id={'tooltip'+this.props.event.back_id} type="button">
+                <Button id={'tooltip'+props.event.back_id} type="button">
                     Details 
                 </Button>
-                <Popover placement="bottom" isOpen={this.state.popoverOpen} target={'tooltip'+this.props.event.back_id} toggle={this.toggle}>
+                <Popover placement="bottom" isOpen={popOverOpen} target={'tooltip'+props.event.back_id} toggle={toggle}>
                     <PopoverBody>
                 <div >
-                <p> Company : {this.props.event.company}</p>
-                <p> Specialist : {this.props.event.name}</p>
-                <p> Phone : {this.props.event.phone}</p>
-                <Button id = {'tool'+this.props.event.back_id}>
+                    <p> Company : {props.event.company}</p>
+                    <p> Specialist : {props.event.name}</p>
+                    <p> Phone : {props.event.phone}</p>
+                <Button id = {'tool'+props.event.back_id} onClick={handleDelete}>
                         Delete
                 </Button>
                 </div>
@@ -56,10 +62,8 @@ class Event extends React.Component {
         </div>
       );
     }
-  }
 const Appointements = (req, res) => {
     const user = useSelector(state => (state.user))
-
     const router = useRouter()
     const localizer = momentLocalizer(moment)
     const [programari,setProgramari]=useState([])
@@ -93,7 +97,8 @@ const Appointements = (req, res) => {
                        company:data[i].specialistDTO.company.name,
                        name:data[i].specialistDTO.user.name,
                        phone:data[i].specialistDTO.user.phone ,
-                       back_id:data[i].id
+                       back_id:data[i].id,
+                       request:handleResponse
                    })
                }
             
