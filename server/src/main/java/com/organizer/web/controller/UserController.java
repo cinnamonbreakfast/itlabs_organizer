@@ -162,12 +162,13 @@ public class UserController {
     @RequestMapping(value = "u/presignup", method = RequestMethod.POST, consumes = "multipart/form-data")
     public ResponseEntity<ResponseDTO<Integer>> signUpCodeRequest(@RequestParam(required = true) String phone) {
 
-
             int m = regex.phoneMatcher("40",phone);
+            System.out.println(phone);
             if(m==0){
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Bring a valid phone number.").code(400).build());
             }
             String tel = "+40"+phone.substring(m,phone.length());
+            System.out.println(tel);
             User target = this.userService.findByPhone(tel);
 
             if(target != null && target.getVerifiedPhone() != null) {

@@ -86,7 +86,6 @@ const Schedule = (req, res) => {
         return new Promise(resolve=>{
             const username = company.username;
             const token = user.token
-            const schedules = [];
             scheduleRequest(token,username).then(data=>{
                 console.log(data)
                 let schedules = []

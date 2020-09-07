@@ -130,5 +130,28 @@ public class TimeTableController {
         }
         return  ResponseEntity.ok(ttsDTO);
     }
+    @RequestMapping(value = "tt/delete",method = RequestMethod.DELETE)
+    public ResponseEntity<String > deleteTt(    @RequestHeader String token ,Long tt){
+        Long id = JWToken.checkToken(token);
+        if(id==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");
+        }
+
+        User user = userService.findById(id);
+        if(user==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
+        }
+        TimeTable tit = timeTableService.findById(tt);
+        if(tit==null){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known company");
+        }
+        if(tit.getService().getCompany().getOwner().getId()!= user.getId()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not the owner of the timetable");
+        }
+        timeTableService.delete(tit);
+        return ResponseEntity.status(HttpStatus.OK).body("Not the owner of the timetable");
+
+    }
+
 
 }

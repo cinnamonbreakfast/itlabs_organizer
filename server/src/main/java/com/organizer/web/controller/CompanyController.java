@@ -287,13 +287,17 @@ CompanyDTO newCompany,@RequestHeader String token ){
     }
     @RequestMapping(value = "c/changeDetails", method=RequestMethod.PUT,consumes ={"multipart/form-data"})
     public ResponseEntity<String> updateDetails(@RequestParam(name="file",required = false) MultipartFile file,
-                                                    CompanyDTO updateCompany,@RequestHeader String token )
+                                          CompanyDTO updateCompany,@RequestHeader String token )
     {
+        System.out.println(updateCompany);
             Long id = JWToken.checkToken(token);
             if(id==null){
                 ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a valid token");
             }
             User user = userService.findById(id);
+            if(user == null){
+                ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not a known user");
+            }
             String username = updateCompany.getUsername();
             Company company = companyService.findByUsername(username);
             if(company==null){
@@ -302,11 +306,6 @@ CompanyDTO newCompany,@RequestHeader String token ){
             if(company.getOwner().getEmail().equals(user.getEmail())==false){
                 ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not the owner of the company");
             }
-        // validate company_name
-        if(company!=null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Company name already taken");
-
-        //todo:validate image
 
         //validate category
         String category = updateCompany.getCategory();
@@ -348,7 +347,7 @@ CompanyDTO newCompany,@RequestHeader String token ){
                 company.setImage_url("default_company");
             }
         companyService.save(company);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Updated company");
+        return ResponseEntity.status(HttpStatus.OK).body("Updated company");
     }
 
     @RequestMapping(value="c/invite/specialist", method = RequestMethod.POST)

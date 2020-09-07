@@ -159,7 +159,7 @@ const CompanyEdit = (props) => {
         })
         .catch(e => {
             console.log(e)
-            if(r.type === 'error') {
+            if(e.type === 'error') {
                 console.log(e.message)
             }
         })

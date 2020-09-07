@@ -48,7 +48,8 @@ class CompanyController {
             method: 'PUT',
             data: service,
             headers: {
-                'TOKEN': token,
+                'token': token,
+                'Content-Type':'multipart/form-data'
             },
         }).then(_resp => {
             console.log(_resp)
@@ -141,7 +142,23 @@ class CompanyController {
             return []
         })
     }
-
+    async deleteTable( id,token){
+        const url = process.env.REQ_HOST + '/tt/delete';
+        return axios.delete(url,{
+            params:{
+                tt:id
+            },
+            headers:{
+                token:token
+            }
+        }).then(e=>{
+            return e.data
+        })
+        .catch(e =>
+            {
+                return false
+            })
+    }
     async createTable(entry, token) {
         console.log(entry)
         return axios({
@@ -169,20 +186,21 @@ class CompanyController {
             return {message: 'Unknown error', type: 'error'}
         })
     }
-
     async updateDetails(details, token) {
-        let data = new FormData()
-        data.set('file', data.file)
-        data.set('updateCompany', data.company)
-
-        return axios({
-            url: process.env.REQ_HOST + '/c/changeDetails',
-            method: 'PUT',
-            data: data,
-            headers: {
-                'token': token,
-            }
-        })
+        let formData = new Data()
+        let c = details.company;
+        formData.append('file',details.file);
+        formData.append('name',c.name);
+        formData.append('city',c.city);
+        formData.append('address',c.address);
+        formData.append('category',c.category);
+        formData.append('country',c.country);
+        formData.append('username',c.username);
+        const url = process.env.REQ_HOST + '/c/changeDetails'
+        axios.put(url,formData,{headers:{
+            'Content-Type':'multipart/form-data',
+            'token':token
+        }})
         .then(resp => {
             if(resp.data) {
                 return {message: resp.data, type: 'ok'}
