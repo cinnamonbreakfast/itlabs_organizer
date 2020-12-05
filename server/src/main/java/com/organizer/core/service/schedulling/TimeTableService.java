@@ -45,4 +45,10 @@ public class TimeTableService {
     public List<TimeTable> findByService(Long serviceId){
         return timeTableRepository.findByService(serviceId);
     }
+    public TimeTable findById( Long id ){
+        return timeTableRepository.findById(id).get();
+    }
+    public void delete(TimeTable timeTable){
+        timeTableRepository.delete(timeTable);
+    }
 }

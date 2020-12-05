@@ -36,16 +36,13 @@ const UserNav = () => {
 
             <div className={styles.userDropMenu + ' ' + (userMenu ? styles.active : null)}>
                 <ul>
-                    <li><a href='/u'>Profile</a></li>
                     <li><a href='/companies'>My Companies</a></li>
                     <li><a href='/appointments'>My Appointments</a></li>
-                    <li><a href='/settings'>Settings</a></li>
                     <li><a href='/logout' onClick={(e) => navbarLogout(e)}>Sign Out</a></li>
                 </ul>
             </div>
 
             <div className={styles.userImg}>
-                {/* <img src=""/> */}
 
                 <div className={styles.noAvatar}>
                     {user.data.name[0]}

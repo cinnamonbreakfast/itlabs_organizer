@@ -72,13 +72,13 @@ const SignUpRequest = (props) => {
 
         setformMessage(null)
 
-        uc.sendSignUpCode("+40"+phone)
+        uc.sendSignUpCode(phone)
         .then(res => {
             if(res.data.code !== 200) {
                 setformMessage({'message':res.data.message, type: 'error'})
             } else {
                 setformMessage({'message':res.data.message, type: 'ok'})
-                props.continue("+40"+phone)
+                props.continue(phone)
             }
         })
         .catch(err => {

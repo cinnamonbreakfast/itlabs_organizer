@@ -172,8 +172,8 @@ const CreateCompany = (props) => {
             'Content-Type':'multipart/form-data',
             'token':user.token
         }}).then(_resp => {
-            console.log(_resp)
 
+            console.log(_resp)
             displayMessage({message: _resp.data, type: 'ok'})
         }).catch(_err => {
             console.log(_err)

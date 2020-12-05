@@ -162,12 +162,13 @@ public class UserController {
     @RequestMapping(value = "u/presignup", method = RequestMethod.POST, consumes = "multipart/form-data")
     public ResponseEntity<ResponseDTO<Integer>> signUpCodeRequest(@RequestParam(required = true) String phone) {
 
-
             int m = regex.phoneMatcher("40",phone);
+            System.out.println(phone);
             if(m==0){
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.<Integer>builder().message("Bring a valid phone number.").code(400).build());
             }
             String tel = "+40"+phone.substring(m,phone.length());
+            System.out.println(tel);
             User target = this.userService.findByPhone(tel);
 
             if(target != null && target.getVerifiedPhone() != null) {
@@ -208,7 +209,7 @@ public class UserController {
 
     }
 
-    @RequestMapping(value = "u/recoveraction", method = RequestMethod.POST, consumes = "multipart/form-data")
+        @RequestMapping(value = "u/recoveraction", method = RequestMethod.POST, consumes = "multipart/form-data")
     public ResponseEntity<ResponseDTO<Integer>> recoverAction(@RequestParam String code, @RequestParam String password) {
         ValidationCode existingCode = this.validationCodeService.find(Integer.parseInt(code));
 
@@ -234,10 +235,13 @@ public class UserController {
     }
 
     @RequestMapping(value = "u/recoverask", method = RequestMethod.POST, consumes = "multipart/form-data")
-    public ResponseEntity<ResponseDTO<Integer>> recoverAsk(@RequestParam String method, @RequestParam String contact, @RequestParam String prefix) {
-        if(method.equals("phone")) {
-            // todo: validare
-            User target = this.userService.findByPhone(prefix+contact);
+    public ResponseEntity<ResponseDTO<Integer>> recoverAsk(@RequestParam String contact) {
+
+            int m = regex.phoneMatcher("40",contact);
+            String tel = "+40"+contact.substring(m,contact.length());
+            System.out.println(tel+ " "+ contact);
+
+            User target = this.userService.findByPhone(tel);
 
             if(target == null) {
                 return ResponseEntity.ok()
@@ -248,7 +252,7 @@ public class UserController {
 
             ValidationCode phoneCode = this.validationCodeService.createNewCode(target, "pass_recover", LocalDateTime.now().plusHours(1));
 
-            if(this.smser.sendSms(prefix+contact, phoneCode.getCode() + " is the validation code for password recovery process on AppointmentApp.") != null) {
+            if(this.smser.sendSms(tel, phoneCode.getCode() + " is the validation code for password recovery process on AppointmentApp.") != null) {
                 return ResponseEntity.ok()
                         .body(
                                 ResponseDTO.<Integer>builder().message("A validation code has been sent to your phone number.").code(200).build()
@@ -259,24 +263,7 @@ public class UserController {
                     .body(
                             ResponseDTO.<Integer>builder().message("An unknown error has occured. Try again later.").build()
                     );
-        } else if (method.equals("email")) {
-            // todo: validare
-            User target = this.userService.findByEmail(contact);
 
-            if(target == null) {
-                return ResponseEntity.ok().body(
-                        ResponseDTO.<Integer>builder().message("No user found by this email.").code(400).build()
-                );
-            }
-
-            ValidationCode emailCode = this.validationCodeService.createNewCode(target, "pass_recover", LocalDateTime.now().plusHours(2));
-
-            this.emailer.sendSimpleMessage(contact, "Password recovery", emailCode.getCode() + " is the validation code for password recovery process on AppointmentApp.");
-
-            return ResponseEntity.ok(ResponseDTO.<Integer>builder().message("An email containing recover methods has been sent to your email.").code(200).build());
-        }
-
-        return null;
     }
 
     @RequestMapping(value = "u/signup", method = RequestMethod.POST, consumes = "application/json")

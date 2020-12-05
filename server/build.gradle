@@ -57,7 +57,7 @@ dependencies {
 //    implementation 'org.springframework.boot', name: 'spring-boot-starter-mail', '2.2.5.RELEASE'
 
     implementation 'org.springframework:spring-context-support'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'framework.boot:spring-boot-starter-morg.springail'
 
 
 

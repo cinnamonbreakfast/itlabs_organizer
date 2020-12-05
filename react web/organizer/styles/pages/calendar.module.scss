@@ -3,3 +3,17 @@
 .calendarWrapper {
     height: 100%;
 }
+
+.event {
+    .extra {
+        display: none;
+        z-index: 1;
+    }
+    
+
+    &:hover {
+        .extra {
+            display: block;
+        }
+    }
+}

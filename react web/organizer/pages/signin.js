@@ -36,26 +36,34 @@ const SignInPage = () => {
 
     useEffect(() => {
         if(user.data && user.userLoggedIn) router.push("/")
-    })
+
+    },[])
 
     const caller = (e) => {
         e.preventDefault()
 
         userController.signInAction({contact: authContact, password: authPassword})
         .then(resp => {
+                console.log(resp.data)
             if(resp.data) {
                 if(resp.data.code != 200) {
                     if(resp.data.message) setFormMessage({message: resp.data.message, type: 'error'})
-                    else setFormMessage({message: 'An unknown error occured. Try again later.', type: 'error'})
+                    else {setFormMessage({message: 'An unknown error occured. Try again later.', type: 'error'})
+                }
                 } else {
+                    setFormMessage({message: resp.data.message, type: 'ok'})
                     userController.setLoginData(resp.data.data)
-                    router.push("/")
+                    setTimeout( ()=>{
+                        router.push("/")
+                    },1000)
                 }
             } else {
-                setFormMessage({message: 'An unknown error occured. Try again later.', type: 'error'})
+                setFormMessage({message: 'An unknown error occured. Try again later.(123)', type: 'error'})
             }
         })
         .catch(err => {
+            console.log('fasdfasd')
+            console.log(err)
             setFormMessage({message: 'An unknown error occured. Try again later.', type: 'error'})
         })
     }
@@ -80,10 +88,12 @@ const SignInPage = () => {
 
                 <div className={styles.formGroup}>
                     <input type="submit" name="submit" value="Sign In"/>
-                    <a href="#">Reset password</a>
+                    <a href="forgotpassword">Reset password</a>
                 </div>
             </form>
+            
         </div>
+        
     )
 }
 

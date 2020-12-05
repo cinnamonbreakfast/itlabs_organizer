@@ -1,7 +1,8 @@
-import '../styles/globals.css'
+
 // import 'react-calendar/dist/Calendar.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { useRouter } from 'next/router'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/globals.css'
 import TopNavigation, { LINK_PROP } from '../components/TopNavigation'
 import { PersistGate } from 'redux-persist/integration/react'
 import { Provider } from 'react-redux'
@@ -11,11 +12,6 @@ const links = [
     url: '/',
     name: 'Home',
     props: [LINK_PROP.IS_HOME, LINK_PROP.DISPLAY_ALWAYS]
-  },
-  {
-    url: '/about',
-    name: 'About',
-    props: [LINK_PROP.DISPLAY_ALWAYS]
   },
   {
     url: '/appointments',

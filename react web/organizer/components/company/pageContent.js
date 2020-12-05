@@ -1,6 +1,6 @@
 import styles from '../../styles/pages/companyView.module.scss'
 import Employee from '../../components/company/employee'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch, connectAdvanced } from 'react-redux'
 import { useState } from 'react'
 
 import CompanyController from '../../pages/api/companyController'
@@ -194,7 +194,7 @@ const PageEdit = (props) => {
     }
 
     return (
-        <div className="col-9">
+        <div className="col-12">
             <div className={styles.board}>
                 <h2>Edit services</h2>
 
@@ -292,7 +292,15 @@ const TimeRow = (data) => {
             console.log(e)
         })
     }
+const deleteHandle =(event)=>{
+    //cc.deleteTable()
+    console.log(event.target.id)
+    let id = event.target.id 
+    let token = user.token
 
+    cc.deleteTable(id,token)
+    
+}
     if(editor) {
         return (
             <tr className={styles.editor}>
@@ -304,7 +312,7 @@ const TimeRow = (data) => {
 
                         <div>
                             <input type='submit' value='Save'/>
-                            <input type='submit' value='Delete'/>
+                            <button id = {day.id} type ='button' onClick={deleteHandle}> Delete </button>
                             <input onClick={e => setEditor(false)} type='button' value='X'/>
                         </div>
                     </form>
@@ -425,32 +433,10 @@ const PageContent = (props) => {
 
     return (
         <div className="grid">
-            <div className="col-3">
-                <div className={styles.board}>
-                    <h2>Time table</h2>
-
-                    <ul className={styles.timeTable}>
-                        <li>Monday</li>
-                        <li>Tuesday</li>
-                        <li>Wednesday</li>
-                        <li>Thursday</li>
-                        <li>Friday</li>
-                        <li className={styles.closed}>Saturday</li>
-                        <li className={styles.closed}>Sunday</li>
-                    </ul>
-                </div>
-
-                {/* {
-                    user.data.id === company.owner.id &&
-                    <div className={styles.board}>
-                        
-                    </div>
-                } */}
-            </div>
-
+        
             {
                 content === 'main' &&
-                <div className="col-9">
+                <div className="col-12">
                     <div className={styles.board}>
                         <h2>Services</h2>
 
